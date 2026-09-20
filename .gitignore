@@ -2,3 +2,5 @@ tools/*.zip
 tools/Godot_v4*
 node_modules/
 *.pyc
+game/.godot/
+scripts/shot_*.png
