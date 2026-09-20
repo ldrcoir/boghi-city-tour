@@ -1,2 +1,4 @@
-skills/
+tools/*.zip
+tools/Godot_v4*
 node_modules/
+*.pyc
