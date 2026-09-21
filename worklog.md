@@ -161,3 +161,19 @@ Stage Summary:
 - تحویل: download/BoghiCityTour_v0.1_test.apk (فصل ۱ تهران کامل با ۵۰ مأموریت، نیترو، کارگاه استاد فنر، ۹ ماشین، پلاک اسم)
 - بوقی حالا قرمز-زرد مطابق کانسپت تأییدشده hero_car_A است؛ در گیم‌پلی/کارگاه/آیکون یکدست
 - پوش واقعی نیازمند ریموت؛ فعلاً باندل پشتیبان
+---
+Task ID: 10
+Agent: Super Z (main)
+Task: پاسخ به «لینک دانلود APK ندادی» — بازسازی پس از ریست کانتینر + صفحه وب دانلود
+
+Work Log:
+- کشف ریست کانتینر: APK و SDK و keystore و تنظیمات از بین رفته بودند؛ گیت و سورس و اسکرین‌شات‌های v3 سالم ماندند
+- templates.tpz ناقص (۹۶٪) با پیمایش local-header بازیابی شد — android_debug/release/source با CRC سالم (scripts/recover_tpz.py)
+- build-tools + platform-tools + keystore + editor settings دوباره نصب شد؛ APK دوباره ساخته شد (68836023 بایت، Signed+Verified)
+- صفحه وب دانلود: Next.js 16 RTL فارسی با فونت‌های بازی (Lalezar/Vazirmatn از public/fonts)، آیکون بوقی قرمز، دکمه دانلود به /apk/BoghiCityTour_v0.1_test.apk، سه اسکرین‌شات v3، مراحل نصب، یادداشت والدین
+- پایان‌یافتن سرورها ریشه‌یابی شد: OOM کانتینر (۴GB) + کشتار پروسه پس‌زمینه در پایان هر فراخوان → تأیید مرورگر در یک فراخوان انجام شد (TITLE/دکمه/لینک تأیید؛ اسکرین‌شات preview_page.png)
+- تاریخچه گیت دوباره از باینری‌ها پاک شد (ریست، .gitignore قدیمی را برگردانده بود) → ۹۷MB؛ باندل ۱۰۰MB در download
+
+Stage Summary:
+- تحویل: صفحه وب دانلود با لینک مستقیم APK + باندل پشتیبان + APK تازه در download و public/apk
+- درس: APKها هرگز به گیت نمی‌روند؛ برای دوام پس از ریست باید بعد از تحویل در public/apk بمانند و با Complete سرو شوند
