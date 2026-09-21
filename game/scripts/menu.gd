@@ -1,12 +1,11 @@
 extends Control
-## Main menu: home (plate name), missions list (50), garage (cars + upgrades)
+## Main menu: home (kid name plate + missions) — garage is now its own scene
 
 var font: FontFile
 var font_bold: FontFile
 var font_display: FontFile # فونت فانتزی قصه‌ای برای تیترها و دکمه‌ها
 var panel_home: PanelContainer
 var panel_levels: PanelContainer
-var panel_garage: PanelContainer
 var coin_label: Label
 var plate_edit: LineEdit
 
@@ -17,7 +16,7 @@ func _ready() -> void:
         _build_ui()
         _refresh()
         if OS.get_cmdline_user_args().has("--garage"):
-                _show(panel_garage)
+                get_tree().change_scene_to_file("res://scenes/garage.tscn")
         if OS.get_cmdline_user_args().has("--levels"):
                 _show(panel_levels)
         if OS.get_cmdline_user_args().has("--autotest"):
@@ -67,7 +66,7 @@ func _mk_button(txt: String, size := 26, primary := true) -> Button:
         b.text = txt
         b.add_theme_font_override("font", font_display)
         b.add_theme_font_size_override("font_size", size)
-        b.custom_minimum_size = Vector2(200, 64)
+        b.custom_minimum_size = Vector2(340, 74)
         _style_btn(b, primary)
         return b
 
@@ -125,11 +124,13 @@ func _build_ui() -> void:
         plate_box.add_child(plate_edit)
         hb.add_child(plate_box)
 
-        var b_play := _mk_button(Globals.L("play"), 30)
+        var b_play := _mk_button(Globals.L("levels"), 30)
         b_play.pressed.connect(func(): _show(panel_levels))
         hb.add_child(b_play)
-        var b_garage := _mk_button(Globals.L("garage"), 30)
-        b_garage.pressed.connect(func(): _show(panel_garage))
+
+        var b_garage := _mk_button(Globals.L("workshop"), 28)
+        b_garage.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/garage.tscn"))
+        _style_btn(b_garage, false)
         hb.add_child(b_garage)
 
         coin_label = _mk_label("🪙 " + str(Globals.coins), 28, true)
@@ -168,68 +169,7 @@ func _build_ui() -> void:
         lv.add_child(b_back1)
         center.add_child(panel_levels)
 
-        # ---------- GARAGE ----------
-        panel_garage = PanelContainer.new()
-        var gv := VBoxContainer.new()
-        gv.add_theme_constant_override("separation", 8)
-        panel_garage.add_child(gv)
-        gv.add_child(_mk_label(Globals.L("garage") + " — استاد فنر", 36, false, true))
-        var gscroll := ScrollContainer.new()
-        gscroll.custom_minimum_size = Vector2(1000, 470)
-        var gcol := VBoxContainer.new()
-        gcol.add_theme_constant_override("separation", 6)
-        gscroll.add_child(gcol)
-
-        for i in Globals.CARS.size():
-                var c = Globals.CARS[i]
-                var row := HBoxContainer.new()
-                row.add_theme_constant_override("separation", 16)
-                var pic := TextureRect.new()
-                pic.texture = load(c["tex"])
-                pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-                pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-                pic.custom_minimum_size = Vector2(180, 90)
-                row.add_child(pic)
-                var info := VBoxContainer.new()
-                info.custom_minimum_size = Vector2(320, 0)
-                info.add_child(_mk_label(str(c["name"]), 26, true))
-                info.add_child(_mk_label(str(c["desc"]), 20))
-                row.add_child(info)
-                var cb := Button.new()
-                cb.custom_minimum_size = Vector2(170, 56)
-                cb.add_theme_font_override("font", font_display)
-                cb.add_theme_font_size_override("font_size", 24)
-                cb.set_meta("car_index", i)
-                _style_btn(cb, true)
-                cb.pressed.connect(_on_car_button.bind(i))
-                row.add_child(cb)
-                gcol.add_child(row)
-
-        gcol.add_child(HSeparator.new())
-        for u in Globals.UPGRADES:
-                var urow := HBoxContainer.new()
-                urow.add_theme_constant_override("separation", 16)
-                urow.add_child(_mk_label(str(u["name"]) + " — " + str(u["desc"]), 22))
-                var lvl_label := Label.new()
-                lvl_label.name = "ul_" + str(u["id"])
-                urow.add_child(lvl_label)
-                var ub := Button.new()
-                ub.set_meta("up_id", str(u["id"]))
-                ub.custom_minimum_size = Vector2(220, 52)
-                ub.add_theme_font_override("font", font_bold)
-                ub.pressed.connect(_on_upgrade.bind(str(u["id"])))
-                ub.name = "ub_" + str(u["id"])
-                _style_btn(ub, false)
-                urow.add_child(ub)
-                gcol.add_child(urow)
-
-        gv.add_child(gscroll)
-        var b_back2 := _mk_button(Globals.L("back"), 24)
-        b_back2.pressed.connect(func(): _show(panel_home))
-        gv.add_child(b_back2)
-        center.add_child(panel_garage)
-
-        for p in [panel_home, panel_levels, panel_garage]:
+        for p in [panel_home, panel_levels]:
                 p.add_theme_stylebox_override("panel", _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 26, 5))
 
         _show(panel_home)
@@ -237,9 +177,6 @@ func _build_ui() -> void:
 func _show(p: PanelContainer) -> void:
         panel_home.visible = p == panel_home
         panel_levels.visible = p == panel_levels
-        panel_garage.visible = p == panel_garage
-        if p == panel_garage:
-                _refresh_garage()
         _refresh()
 
 func _on_plate_changed() -> void:
@@ -247,46 +184,6 @@ func _on_plate_changed() -> void:
         if Globals.plate_name.is_empty():
                 Globals.plate_name = "بوقی"
         Globals.save_game()
-
-func _on_car_button(i: int) -> void:
-        if Globals.unlocked_car[i]:
-                Globals.selected_car = i
-                Globals.save_game()
-        elif not Globals.buy_car(i):
-                pass
-        _refresh_garage()
-        _refresh()
-
-func _on_upgrade(uid: String) -> void:
-        Globals.do_upgrade(uid)
-        _refresh_garage()
-        _refresh()
-
-func _refresh_garage() -> void:
-        _scan_and_refresh(panel_garage)
-
-func _scan_and_refresh(root: Node) -> void:
-        for ch in root.get_children():
-                if ch is Button and ch.has_meta("car_index"):
-                        var i: int = ch.get_meta("car_index")
-                        if Globals.selected_car == i:
-                                ch.text = Globals.L("selected")
-                        elif Globals.unlocked_car[i]:
-                                ch.text = Globals.L("select")
-                        else:
-                                ch.text = Globals.L("buy") + " " + str(Globals.CARS[i]["price"])
-                elif ch is Button and ch.has_meta("up_id"):
-                        var uid: String = ch.get_meta("up_id")
-                        var lvl: int = Globals.upgrades[uid]
-                        var cost := Globals.upgrade_cost(uid)
-                        var dots := ""
-                        for k in 3:
-                                dots += "●" if k < lvl else "○"
-                        var ll: Label = panel_garage.find_child("ul_" + uid, true, false)
-                        if ll:
-                                ll.text = dots
-                        ch.text = Globals.L("max") if cost < 0 else str(cost) + " 🪙"
-                _scan_and_refresh(ch)
 
 func _refresh() -> void:
         if coin_label:

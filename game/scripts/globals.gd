@@ -6,7 +6,7 @@ const SAVE_PATH := "user://boghi_save.json"
 var coins: int = 0
 var plate_name: String = "بوقی"
 var selected_car: int = 0
-var upgrades := {"engine": 0, "tire": 0, "turbo": 0}
+var upgrades := {"engine": 0, "tire": 0, "nitro": 0}
 var unlocked_car: Array = []
 var level_stars := {}  # id -> stars
 var season = null      # parsed season json
@@ -14,66 +14,66 @@ var season = null      # parsed season json
 # رشته ماشین‌ها: نام‌های واقعی و آشنای خیابان‌های ایران (درخواست کاربر)
 # ترتیب = نردبان قیمت؛ پراید/تیبا/پژو/سمند/دنا/نیسان/شاهین/کوییک
 const CARS := [
-	{
-		"id": "boghi", "name": "بوقی", "en": "Boghi",
-		"desc": "پراید فیروزه‌ای معروف محله — ستاره روی جلوپنجره!",
-		"tex": "res://assets/sprites/boghi_side.png",
-		"jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
-	},
-	{
-		"id": "tiba", "name": "تیبا", "en": "Tiba",
-		"desc": "آبی و چابک — سبک برای پرش‌های دقیق",
-		"tex": "res://assets/sprites/tiba_side.png",
-		"jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
-	},
-	{
-		"id": "pride", "name": "پراید قرمز", "en": "Pride RS",
-		"desc": "هاچ‌بک مسابقه‌ای با استریک و اسپویلر — شتاب بالا!",
-		"tex": "res://assets/sprites/pride_side.png",
-		"jump": 0.9, "accel": 1.18, "tough": 0.9, "price": 900
-	},
-	{
-		"id": "pejo", "name": "پژو ۲۰۶", "en": "Peugeot 206",
-		"desc": "نقره‌ای فرمان‌رو — تعادل عالی سرعت و کنترل",
-		"tex": "res://assets/sprites/pejo_side.png",
-		"jump": 1.0, "accel": 1.1, "tough": 0.95, "price": 1200
-	},
-	{
-		"id": "samand", "name": "سمند کلاسیک", "en": "Samand Classic",
-		"desc": "سالخورده‌ی مطمئن محله — مثل دیوار محکم",
-		"tex": "res://assets/sprites/samand_side.png",
-		"jump": 0.95, "accel": 0.9, "tough": 1.35, "price": 1500
-	},
-	{
-		"id": "dena", "name": "دنا پلاس", "en": "Dena Plus",
-		"desc": "سدان سفید ملی — شکوه و آرامش جاده",
-		"tex": "res://assets/sprites/dena_side.png",
-		"jump": 1.0, "accel": 1.15, "tough": 1.1, "price": 1800
-	},
-	{
-		"id": "nissan", "name": "نیسان قرمز", "en": "Nissan Pickup",
-		"desc": "وانت افسانه‌ای آسفالت‌خور — سنگین ولی شکست‌ناپذیر",
-		"tex": "res://assets/sprites/nissan_side.png",
-		"jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 2200
-	},
-	{
-		"id": "shahin", "name": "شاهین", "en": "Shahin",
-		"desc": "مشکی اسپرت با خط طلایی — شاه شب‌های تهران",
-		"tex": "res://assets/sprites/shahin_side.png",
-		"jump": 0.9, "accel": 1.3, "tough": 1.0, "price": 2600
-	},
-	{
-		"id": "quick", "name": "کوییک", "en": "Quick",
-		"desc": "نارنجی جیغ جوان — پرش‌های بلند هوایی",
-		"tex": "res://assets/sprites/quick_side.png",
-		"jump": 1.25, "accel": 1.05, "tough": 0.75, "price": 3400
-	},
+        {
+                "id": "boghi", "name": "بوقی", "en": "Boghi",
+                "desc": "پراید فیروزه‌ای معروف محله — ستاره روی جلوپنجره!",
+                "tex": "res://assets/sprites/boghi_side.png",
+                "jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
+        },
+        {
+                "id": "tiba", "name": "تیبا", "en": "Tiba",
+                "desc": "آبی و چابک — سبک برای پرش‌های دقیق",
+                "tex": "res://assets/sprites/tiba_side.png",
+                "jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
+        },
+        {
+                "id": "pride", "name": "پراید قرمز", "en": "Pride RS",
+                "desc": "هاچ‌بک مسابقه‌ای با استریک و اسپویلر — شتاب بالا!",
+                "tex": "res://assets/sprites/pride_side.png",
+                "jump": 0.9, "accel": 1.18, "tough": 0.9, "price": 900
+        },
+        {
+                "id": "pejo", "name": "پژو ۲۰۶", "en": "Peugeot 206",
+                "desc": "نقره‌ای فرمان‌رو — تعادل عالی سرعت و کنترل",
+                "tex": "res://assets/sprites/pejo_side.png",
+                "jump": 1.0, "accel": 1.1, "tough": 0.95, "price": 1200
+        },
+        {
+                "id": "samand", "name": "سمند کلاسیک", "en": "Samand Classic",
+                "desc": "سالخورده‌ی مطمئن محله — مثل دیوار محکم",
+                "tex": "res://assets/sprites/samand_side.png",
+                "jump": 0.95, "accel": 0.9, "tough": 1.35, "price": 1500
+        },
+        {
+                "id": "dena", "name": "دنا پلاس", "en": "Dena Plus",
+                "desc": "سدان سفید ملی — شکوه و آرامش جاده",
+                "tex": "res://assets/sprites/dena_side.png",
+                "jump": 1.0, "accel": 1.15, "tough": 1.1, "price": 1800
+        },
+        {
+                "id": "nissan", "name": "نیسان قرمز", "en": "Nissan Pickup",
+                "desc": "وانت افسانه‌ای آسفالت‌خور — سنگین ولی شکست‌ناپذیر",
+                "tex": "res://assets/sprites/nissan_side.png",
+                "jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 2200
+        },
+        {
+                "id": "shahin", "name": "شاهین", "en": "Shahin",
+                "desc": "مشکی اسپرت با خط طلایی — شاه شب‌های تهران",
+                "tex": "res://assets/sprites/shahin_side.png",
+                "jump": 0.9, "accel": 1.3, "tough": 1.0, "price": 2600
+        },
+        {
+                "id": "quick", "name": "کوییک", "en": "Quick",
+                "desc": "نارنجی جیغ جوان — پرش‌های بلند هوایی",
+                "tex": "res://assets/sprites/quick_side.png",
+                "jump": 1.25, "accel": 1.05, "tough": 0.75, "price": 3400
+        },
 ]
 
 const UPGRADES := [
         {"id": "engine", "name": "موتور", "desc": "سرعت بیشتر", "costs": [120, 260, 520]},
         {"id": "tire", "name": "لاستیک", "desc": "پرش بلندتر", "costs": [100, 220, 450]},
-        {"id": "turbo", "name": "توربو", "desc": "بوست طولانی‌تر", "costs": [140, 300, 600]},
+        {"id": "nitro", "name": "نیترو", "desc": "شتاب آتشین طولانی‌تر", "costs": [140, 300, 600]},
 ]
 
 const I18N := {
@@ -88,7 +88,10 @@ const I18N := {
         "buy": {"fa": "خرید", "en": "Buy"},
         "engine": {"fa": "موتور", "en": "Engine"},
         "tire": {"fa": "لاستیک", "en": "Tire"},
-        "turbo": {"fa": "توربو", "en": "Turbo"},
+        "nitro": {"fa": "نیترو", "en": "Nitro"},
+        "tab_cars": {"fa": "ماشین‌ها", "en": "Cars"},
+        "tab_ups": {"fa": "ارتقا", "en": "Upgrades"},
+        "workshop": {"fa": "کارگاه استاد فنر", "en": "Ustad Faner Workshop"},
         "max": {"fa": "ماکزیمم", "en": "Max"},
         "jump": {"fa": "پرش", "en": "JUMP"},
         "boost": {"fa": "توربو", "en": "TURBO"},
@@ -171,7 +174,7 @@ func load_save() -> void:
         plate_name = str(data.get("plate_name", "بوقی"))
         selected_car = int(data.get("selected_car", 0))
         var up = data.get("upgrades", {})
-        for k in ["engine", "tire", "turbo"]:
+        for k in ["engine", "tire", "nitro"]:
                 upgrades[k] = int(up.get(k, 0))
         var uc = data.get("unlocked_car", [true])
         for i in unlocked_car.size():
@@ -189,7 +192,7 @@ func car_stats() -> Dictionary:
                 "jump": float(c["jump"]) * (1.0 + 0.10 * upgrades["tire"]),
                 "accel": float(c["accel"]) * (1.0 + 0.08 * upgrades["engine"]),
                 "tough": float(c["tough"]),
-                "turbo": 1.2 + 0.5 * upgrades["turbo"],
+                "turbo": 1.2 + 0.5 * upgrades["nitro"],
         }
 
 func add_coins(n: int) -> void:
