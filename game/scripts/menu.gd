@@ -24,22 +24,52 @@ func _mk_label(txt: String, size: int, bold := false) -> Label:
         l.text = txt
         l.add_theme_font_override("font", font_bold if bold else font)
         l.add_theme_font_size_override("font_size", size)
-        l.add_theme_color_override("font_color", Color(0.13, 0.16, 0.22))
+        l.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
         l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         return l
 
-func _mk_button(txt: String, size := 26) -> Button:
+func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
+        var sb := StyleBoxFlat.new()
+        sb.bg_color = bg
+        sb.set_corner_radius_all(radius)
+        sb.border_color = border
+        sb.border_width_left = bw
+        sb.border_width_right = bw
+        sb.border_width_top = bw
+        sb.border_width_bottom = bw + (4 if bw > 0 else 0)
+        if shadow:
+                sb.shadow_color = Color(0.25, 0.16, 0.09, 0.28)
+                sb.shadow_size = 8
+        return sb
+
+func _style_btn(b: Button, primary := true) -> void:
+        var base := Color(0.165, 0.616, 0.561) if primary else Color(0.965, 0.886, 0.737)
+        var dark := Color(0.11, 0.42, 0.385) if primary else Color(0.8, 0.66, 0.42)
+        b.add_theme_stylebox_override("normal", _sb(base, dark, 18, 3))
+        b.add_theme_stylebox_override("hover", _sb(base.lightened(0.07), dark, 18, 3))
+        b.add_theme_stylebox_override("pressed", _sb(dark, dark, 18, 3))
+        b.add_theme_stylebox_override("disabled", _sb(Color(0.87, 0.84, 0.78), Color(0.72, 0.66, 0.56), 18, 3))
+        var fg := Color(1, 1, 1) if primary else Color(0.29, 0.216, 0.157)
+        b.add_theme_color_override("font_color", fg)
+        b.add_theme_color_override("font_hover_color", fg)
+        b.add_theme_color_override("font_focus_color", fg)
+        b.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
+        b.add_theme_color_override("font_disabled_color", Color(0.55, 0.51, 0.46))
+
+func _mk_button(txt: String, size := 26, primary := true) -> Button:
         var b := Button.new()
         b.text = txt
         b.add_theme_font_override("font", font_bold)
         b.add_theme_font_size_override("font_size", size)
         b.custom_minimum_size = Vector2(200, 64)
-        b.modulate = Color(1, 1, 1)
+        _style_btn(b, primary)
         return b
 
 func _build_ui() -> void:
-        var bg := ColorRect.new()
-        bg.color = Color(0.55, 0.85, 0.98)
+        var bg := TextureRect.new()
+        bg.texture = load("res://assets/sprites/menu_bg.png")
+        bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
         bg.set_anchors_preset(Control.PRESET_FULL_RECT)
         add_child(bg)
 
@@ -54,23 +84,36 @@ func _build_ui() -> void:
         hb.custom_minimum_size = Vector2(640, 0)
         panel_home.add_child(hb)
 
-        hb.add_child(_mk_label("بوقی: تور شهرها", 56, true))
+        hb.add_child(_mk_label("بوقی: تور شهرها", 48, true))
         hb.add_child(_mk_label("فصل ۱ — تهران", 26))
 
-        var plate_row := HBoxContainer.new()
-        plate_row.alignment = BoxContainer.ALIGNMENT_CENTER
-        plate_row.add_theme_constant_override("separation", 10)
-        plate_row.add_child(_mk_label(Globals.L("plate_hint"), 24))
+        var plate_box := Control.new()
+        plate_box.custom_minimum_size = Vector2(300, 290)
+        var board := TextureRect.new()
+        board.texture = load("res://assets/sprites/plate_empty.png")
+        board.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        board.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        board.set_anchors_preset(Control.PRESET_FULL_RECT)
+        plate_box.add_child(board)
         plate_edit = LineEdit.new()
         plate_edit.text = Globals.plate_name
         plate_edit.max_length = 12
-        plate_edit.custom_minimum_size = Vector2(220, 52)
         plate_edit.add_theme_font_override("font", font_bold)
-        plate_edit.add_theme_font_size_override("font_size", 24)
+        plate_edit.add_theme_font_size_override("font_size", 32)
         plate_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+        plate_edit.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+        plate_edit.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+        plate_edit.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
+        plate_edit.add_theme_color_override("caret_color", Color(0.29, 0.216, 0.157))
+        plate_edit.add_theme_color_override("font_placeholder_color", Color(0.62, 0.5, 0.38))
+        plate_edit.placeholder_text = "..."
+        plate_edit.anchor_left = 0.16
+        plate_edit.anchor_right = 0.84
+        plate_edit.anchor_top = 0.50
+        plate_edit.anchor_bottom = 0.80
         plate_edit.text_changed.connect(func(_t): _on_plate_changed())
-        plate_row.add_child(plate_edit)
-        hb.add_child(plate_row)
+        plate_box.add_child(plate_edit)
+        hb.add_child(plate_box)
 
         var b_play := _mk_button(Globals.L("play"), 30)
         b_play.pressed.connect(func(): _show(panel_levels))
@@ -105,6 +148,7 @@ func _build_ui() -> void:
                 b.add_theme_font_override("font", font)
                 b.add_theme_font_size_override("font_size", 20)
                 b.disabled = not Globals.level_unlocked(id)
+                _style_btn(b, false)
                 b.pressed.connect(_start_level.bind(id))
                 grid.add_child(b)
         scroll.add_child(grid)
@@ -146,6 +190,7 @@ func _build_ui() -> void:
                 cb.add_theme_font_override("font", font_bold)
                 cb.add_theme_font_size_override("font_size", 22)
                 cb.set_meta("car_index", i)
+                _style_btn(cb, true)
                 cb.pressed.connect(_on_car_button.bind(i))
                 row.add_child(cb)
                 gcol.add_child(row)
@@ -164,6 +209,7 @@ func _build_ui() -> void:
                 ub.add_theme_font_override("font", font_bold)
                 ub.pressed.connect(_on_upgrade.bind(str(u["id"])))
                 ub.name = "ub_" + str(u["id"])
+                _style_btn(ub, false)
                 urow.add_child(ub)
                 gcol.add_child(urow)
 
@@ -172,6 +218,9 @@ func _build_ui() -> void:
         b_back2.pressed.connect(func(): _show(panel_home))
         gv.add_child(b_back2)
         center.add_child(panel_garage)
+
+        for p in [panel_home, panel_levels, panel_garage]:
+                p.add_theme_stylebox_override("panel", _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 26, 5))
 
         _show(panel_home)
 

@@ -35,13 +35,11 @@ var _auto_timer := 0.0
 var _shot_taken := false
 
 var world: Node2D
-var bg_sprite: Sprite2D
-var bg_sprite2: Sprite2D
+var layers: Array = []  # painterly parallax: {s1, s2, w, f}
 var car: Area2D
 var car_sprite: Sprite2D
 var plate_label: Label
 var cam: Camera2D
-var dashes: Array = []
 var hud: CanvasLayer
 var coin_label: Label
 var time_label: Label
@@ -82,44 +80,16 @@ func _ready() -> void:
                 _auto_timer = 0.0
 
 func _build_world() -> void:
-        var sky := ColorRect.new()
-        sky.color = Color(0.52, 0.8, 0.97)
-        sky.size = Vector2(VIEW_W, GROUND_Y)
-        sky.z_index = -12
-        add_child(sky)
+        var backdrop := ColorRect.new()
+        backdrop.color = Color(0.99, 0.9, 0.78)
+        backdrop.size = Vector2(VIEW_W, VIEW_H)
+        backdrop.z_index = -14
+        add_child(backdrop)
 
-        bg_sprite = Sprite2D.new()
-        bg_sprite.texture = load("res://assets/sprites/bg_tehran.png")
-        bg_sprite.centered = false
-        bg_sprite.scale = Vector2(0.9, 0.9)
-        bg_sprite.position = Vector2(0, GROUND_Y - 690)
-        bg_sprite.z_index = -10
-        add_child(bg_sprite)
-        bg_sprite2 = Sprite2D.new()
-        bg_sprite2.texture = bg_sprite.texture
-        bg_sprite2.centered = false
-        bg_sprite2.scale = bg_sprite.scale
-        bg_sprite2.position = bg_sprite.position + Vector2(1728.0, 0)
-        bg_sprite2.z_index = -10
-        add_child(bg_sprite2)
-
-        var road := ColorRect.new()
-        road.color = Color(0.28, 0.29, 0.33)
-        road.position = Vector2(0, GROUND_Y)
-        road.size = Vector2(VIEW_W, VIEW_H - GROUND_Y)
-        add_child(road)
-        var kerb := ColorRect.new()
-        kerb.color = Color(0.9, 0.35, 0.25)
-        kerb.position = Vector2(0, GROUND_Y)
-        kerb.size = Vector2(VIEW_W, 10)
-        add_child(kerb)
-        for i in 14:
-                var d := ColorRect.new()
-                d.color = Color(0.95, 0.92, 0.75)
-                d.position = Vector2(i * 120.0, GROUND_Y + 52)
-                d.size = Vector2(56, 8)
-                add_child(d)
-                dashes.append(d)
+        # painterly parallax: far city (opaque) -> hills -> road
+        _add_layer("res://assets/sprites/bg_far.png", -12, GROUND_Y + 50.0, 1.286, 0.18)
+        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.7)
+        _add_layer("res://assets/sprites/road_strip.png", -4, VIEW_H, 1.286, 1.0, 0.54)
 
         world = Node2D.new()
         world.z_index = 2
@@ -129,6 +99,22 @@ func _build_world() -> void:
         cam.position = Vector2(VIEW_W / 2, VIEW_H / 2)
         add_child(cam)
         cam.make_current()
+
+func _add_layer(path: String, z: int, bottom_y: float, scale: float, factor: float, squash: float = 0.0) -> void:
+        var tex: Texture2D = load(path)
+        var sc := Vector2(scale, scale if squash <= 0.0 else squash)
+        var s1 := Sprite2D.new()
+        s1.texture = tex
+        s1.centered = false
+        s1.z_index = z
+        s1.scale = sc
+        s1.position = Vector2(0.0, bottom_y - tex.get_height() * sc.y)
+        add_child(s1)
+        var s2 := s1.duplicate() as Sprite2D
+        s2.flip_h = true
+        s2.position = s1.position + Vector2(tex.get_width() * scale, 0.0)
+        add_child(s2)
+        layers.append({"s1": s1, "s2": s2, "w": tex.get_width() * scale, "f": factor})
 
 func _build_car(stats: Dictionary) -> void:
         car = Area2D.new()
@@ -147,23 +133,16 @@ func _build_car(stats: Dictionary) -> void:
         car_sprite.position = Vector2(0, -85)
         car.add_child(car_sprite)
         var plate := Panel.new()
-        var sb := StyleBoxFlat.new()
-        sb.bg_color = Color(0.97, 0.96, 0.9)
-        sb.set_corner_radius_all(6)
-        sb.border_width_bottom = 3
-        sb.border_width_top = 3
-        sb.border_width_left = 3
-        sb.border_width_right = 3
-        sb.border_color = Color(0.2, 0.2, 0.25)
+        var sb := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 4)
         plate.add_theme_stylebox_override("panel", sb)
-        plate.custom_minimum_size = Vector2(150, 40)
-        plate.position = Vector2(-75, -230)
-        plate.size = Vector2(150, 40)
+        plate.custom_minimum_size = Vector2(160, 44)
+        plate.position = Vector2(-80, -240)
+        plate.size = Vector2(160, 44)
         plate_label = Label.new()
         plate_label.text = Globals.plate_name
         plate_label.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
         plate_label.add_theme_font_size_override("font_size", 22)
-        plate_label.add_theme_color_override("font_color", Color(0.1, 0.12, 0.2))
+        plate_label.add_theme_color_override("font_color", Color(0.25, 0.16, 0.09))
         plate_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         plate_label.set_anchors_preset(Control.PRESET_FULL_RECT)
         plate.add_child(plate_label)
@@ -190,6 +169,10 @@ func _build_hud() -> void:
         progress.show_percentage = false
         progress.position = Vector2(390, 64)
         progress.size = Vector2(500, 22)
+        var pbg := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 3)
+        var pfill := _sb(Color(0.957, 0.769, 0.188), Color(0.72, 0.52, 0.1), 8, 0, false)
+        progress.add_theme_stylebox_override("background", pbg)
+        progress.add_theme_stylebox_override("fill", pfill)
         hud.add_child(progress)
 
         var pause_btn := Button.new()
@@ -197,6 +180,7 @@ func _build_hud() -> void:
         pause_btn.position = Vector2(1216, 12)
         pause_btn.size = Vector2(52, 52)
         pause_btn.pressed.connect(_toggle_pause)
+        _style_btn(pause_btn, false)
         hud.add_child(pause_btn)
 
         var jump_btn := Button.new()
@@ -206,6 +190,7 @@ func _build_hud() -> void:
         jump_btn.position = Vector2(1060, VIEW_H - 130)
         jump_btn.size = Vector2(190, 100)
         jump_btn.pressed.connect(do_jump)
+        _style_btn(jump_btn, true)
         hud.add_child(jump_btn)
 
         boost_btn = Button.new()
@@ -215,6 +200,7 @@ func _build_hud() -> void:
         boost_btn.position = Vector2(850, VIEW_H - 130)
         boost_btn.size = Vector2(190, 100)
         boost_btn.pressed.connect(_on_boost)
+        _style_btn(boost_btn, true)
         hud.add_child(boost_btn)
 
 func _hud_label(font: FontFile, size: int, pos: Vector2, col: Color) -> Label:
@@ -222,10 +208,40 @@ func _hud_label(font: FontFile, size: int, pos: Vector2, col: Color) -> Label:
         l.add_theme_font_override("font", font)
         l.add_theme_font_size_override("font_size", size)
         l.add_theme_color_override("font_color", col)
+        l.add_theme_color_override("font_outline_color", Color(0.25, 0.16, 0.09))
+        l.add_theme_constant_override("outline_size", 10)
         l.position = pos
         l.text = ""
         hud.add_child(l)
         return l
+
+func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
+        var sb := StyleBoxFlat.new()
+        sb.bg_color = bg
+        sb.set_corner_radius_all(radius)
+        sb.border_color = border
+        sb.border_width_left = bw
+        sb.border_width_right = bw
+        sb.border_width_top = bw
+        sb.border_width_bottom = bw + (4 if bw > 0 else 0)
+        if shadow:
+                sb.shadow_color = Color(0.25, 0.16, 0.09, 0.28)
+                sb.shadow_size = 6
+        return sb
+
+func _style_btn(b: Button, primary := true) -> void:
+        var base := Color(0.165, 0.616, 0.561) if primary else Color(0.965, 0.886, 0.737)
+        var dark := Color(0.11, 0.42, 0.385) if primary else Color(0.8, 0.66, 0.42)
+        b.add_theme_stylebox_override("normal", _sb(base, dark, 18, 3))
+        b.add_theme_stylebox_override("hover", _sb(base.lightened(0.07), dark, 18, 3))
+        b.add_theme_stylebox_override("pressed", _sb(dark, dark, 18, 3))
+        b.add_theme_stylebox_override("disabled", _sb(Color(0.87, 0.84, 0.78), Color(0.72, 0.66, 0.56), 18, 3))
+        var fg := Color(1, 1, 1) if primary else Color(0.29, 0.216, 0.157)
+        b.add_theme_color_override("font_color", fg)
+        b.add_theme_color_override("font_hover_color", fg)
+        b.add_theme_color_override("font_focus_color", fg)
+        b.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
+        b.add_theme_color_override("font_disabled_color", Color(0.55, 0.51, 0.46))
 
 func _unhandled_input(e: InputEvent) -> void:
         if e is InputEventKey and e.pressed:
@@ -289,15 +305,11 @@ func _process(delta: float) -> void:
                 _finish(false)
                 return
 
-        # scroll dashes
-        for d in dashes:
-                d.position.x -= spd * delta * (1.0 - 0.22)
-                if d.position.x < -80:
-                        d.position.x += 14 * 120.0
-        # scroll background parallax
-        var off := fmod(world_x * 0.2, 1728.0)
-        bg_sprite.position.x = -off
-        bg_sprite2.position.x = -off + 1728.0
+        # scroll painterly parallax layers (mirror-tiled)
+        for L in layers:
+                var off := fmod(world_x * float(L["f"]), float(L["w"]))
+                (L["s1"] as Sprite2D).position.x = -off
+                (L["s2"] as Sprite2D).position.x = float(L["w"]) - off
 
         # spawn
         while world_x + VIEW_W > next_obj_x:
@@ -464,12 +476,14 @@ func _finish(win: bool) -> void:
 
 func _show_end(win: bool, stars: int, reward: int) -> void:
         end_panel = PanelContainer.new()
+        end_panel.add_theme_stylebox_override("panel", _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 24, 5))
         var vb := VBoxContainer.new()
         vb.add_theme_constant_override("separation", 12)
         end_panel.add_child(vb)
         end_title = Label.new()
         end_title.text = Globals.L("win") if win else Globals.L("lose")
         end_title.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+        end_title.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
         end_title.add_theme_font_size_override("font_size", 40)
         end_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         vb.add_child(end_title)
@@ -477,11 +491,13 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         end_stars.text = "★★★".substr(0, stars) + "···".substr(0, 3 - stars) if stars > 0 else "---"
         end_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         end_stars.add_theme_font_size_override("font_size", 44)
+        end_stars.add_theme_color_override("font_color", Color(0.72, 0.52, 0.1))
         vb.add_child(end_stars)
         end_reward = Label.new()
         end_reward.text = Globals.L("reward") + ": " + str(reward) + " 🪙"
         end_reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         end_reward.add_theme_font_size_override("font_size", 28)
+        end_reward.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
         vb.add_child(end_reward)
         var hb := HBoxContainer.new()
         hb.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -490,6 +506,7 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         b_retry.text = Globals.L("retry")
         b_retry.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
         b_retry.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/game.tscn"))
+        _style_btn(b_retry, true)
         hb.add_child(b_retry)
         if win and int(lv["id"]) < 50:
                 var b_next := Button.new()
@@ -498,11 +515,13 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
                 b_next.pressed.connect(func():
                         Globals.set_meta("start_level", int(lv["id"]) + 1)
                         get_tree().change_scene_to_file("res://scenes/game.tscn"))
+                _style_btn(b_next, true)
                 hb.add_child(b_next)
         var b_menu := Button.new()
         b_menu.text = Globals.L("menu")
         b_menu.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
         b_menu.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/menu.tscn"))
+        _style_btn(b_menu, false)
         hb.add_child(b_menu)
         vb.add_child(hb)
         end_panel.position = Vector2(VIEW_W / 2 - 260, VIEW_H / 2 - 160)
