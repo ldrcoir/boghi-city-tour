@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://drlsjcbrccqex"
-path="res://.godot/imported/sepand_side.png-de9577d917903514cb9baead2b20e5ec.ctex"
+uid="uid://drmklh3k1rsxw"
+path="res://.godot/imported/quick_side.png-341bb2358f9a1c831dd0b22598184645.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/sepand_side.png"
-dest_files=["res://.godot/imported/sepand_side.png-de9577d917903514cb9baead2b20e5ec.ctex"]
+source_file="res://assets/sprites/quick_side.png"
+dest_files=["res://.godot/imported/quick_side.png-341bb2358f9a1c831dd0b22598184645.ctex"]
 
 [params]
 

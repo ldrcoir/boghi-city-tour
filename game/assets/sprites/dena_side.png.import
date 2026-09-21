@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7ub2gdmgsp6p"
-path="res://.godot/imported/baran_side.png-7b437346d682b216f9188ee576e9f187.ctex"
+uid="uid://4r4ein8bxsrc"
+path="res://.godot/imported/dena_side.png-bafa16b67e6280d6a2a4b70d2dc02294.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/baran_side.png"
-dest_files=["res://.godot/imported/baran_side.png-7b437346d682b216f9188ee576e9f187.ctex"]
+source_file="res://assets/sprites/dena_side.png"
+dest_files=["res://.godot/imported/dena_side.png-bafa16b67e6280d6a2a4b70d2dc02294.ctex"]
 
 [params]
 

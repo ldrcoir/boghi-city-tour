@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cvgut1vxg4ed0"
-path="res://.godot/imported/ezhdeha_side.png-d1b06bd065ea850dd0e9b8b31abefeba.ctex"
+uid="uid://dmm3chrdn7hck"
+path="res://.godot/imported/nissan_side.png-0df1d0f55912cf5fe6f40d2fe911bae0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/ezhdeha_side.png"
-dest_files=["res://.godot/imported/ezhdeha_side.png-d1b06bd065ea850dd0e9b8b31abefeba.ctex"]
+source_file="res://assets/sprites/nissan_side.png"
+dest_files=["res://.godot/imported/nissan_side.png-0df1d0f55912cf5fe6f40d2fe911bae0.ctex"]
 
 [params]
 

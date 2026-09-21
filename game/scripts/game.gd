@@ -38,6 +38,7 @@ var world: Node2D
 var layers: Array = []  # painterly parallax: {s1, s2, w, f}
 var car: Area2D
 var car_sprite: Sprite2D
+var shadow: Sprite2D
 var plate_label: Label
 var cam: Camera2D
 var hud: CanvasLayer
@@ -81,14 +82,14 @@ func _ready() -> void:
 
 func _build_world() -> void:
         var backdrop := ColorRect.new()
-        backdrop.color = Color(0.99, 0.9, 0.78)
+        backdrop.color = Color(0.09, 0.07, 0.11) # پس‌زمینه تیره گرم — نسل ۲
         backdrop.size = Vector2(VIEW_W, VIEW_H)
         backdrop.z_index = -14
         add_child(backdrop)
 
         # painterly parallax: far city (opaque) -> hills -> road
         _add_layer("res://assets/sprites/bg_far.png", -12, GROUND_Y + 50.0, 1.286, 0.18)
-        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.7)
+        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.40)
         _add_layer("res://assets/sprites/road_strip.png", -4, VIEW_H, 1.286, 1.0, 0.54)
 
         world = Node2D.new()
@@ -122,17 +123,22 @@ func _build_car(stats: Dictionary) -> void:
         car.monitoring = true
         var shape := CollisionShape2D.new()
         var rect := RectangleShape2D.new()
-        rect.size = Vector2(215, 145)
+        rect.size = Vector2(235, 160)
         shape.shape = rect
-        shape.position = Vector2(0, -70)
+        shape.position = Vector2(0, -78)
         car.add_child(shape)
         car.area_entered.connect(_on_hit)
         car_sprite = Sprite2D.new()
         car_sprite.texture = load(Globals.CARS[Globals.selected_car]["tex"])
-        var sc := 0.58 # ماشین بزرگ‌تر و جوندار در محیط (درخواست کاربر)
+        var sc := 0.68 # نسل ۲: ماشین واقعی و درشت در محیط (درخواست کاربر)
         car_sprite.scale = Vector2(sc, sc)
         var th := car_sprite.texture.get_height() * sc
         car_sprite.position = Vector2(0, 12.0 - th * 0.5) # چرخ‌ها روی جاده
+        shadow = Sprite2D.new()
+        shadow.texture = _make_shadow_tex()
+        shadow.position = Vector2(CAR_X, GROUND_Y - 6)
+        shadow.z_index = -2
+        add_child(shadow)
         car.add_child(car_sprite)
         var plate := Panel.new()
         var sb := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 4)
@@ -282,7 +288,7 @@ func _process(delta: float) -> void:
                 if _auto_timer > 1.1:
                         _auto_timer = 0.0
                         do_jump()
-                if elapsed > 2.5 and not _shot_taken:
+                if elapsed > 3.2 and not _shot_taken:
                         _shot_taken = true
                         var img := get_viewport().get_texture().get_image()
                         img.save_png("/home/z/my-project/scripts/shot_game.png")
@@ -328,6 +334,10 @@ func _process(delta: float) -> void:
                         on_ground = true
         car.position = Vector2(CAR_X, GROUND_Y + car_y)
         car_sprite.rotation = clamp(vy * 0.00045, -0.3, 0.35)
+        var h: float = clamp(-car_y / 420.0, 0.0, 1.0)
+        shadow.position = Vector2(CAR_X, GROUND_Y - 6)
+        shadow.scale = Vector2(1.0 - 0.4 * h, 1.0 - 0.25 * h)
+        shadow.modulate = Color(1, 1, 1, 0.5 - 0.32 * h)
 
         # move world objects
         for obj in world.get_children():
@@ -532,3 +542,16 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
 
 func _exit_tree() -> void:
         AudioMgr.set_engine(false)
+
+
+func _make_shadow_tex() -> ImageTexture:
+    var sz := Vector2i(180, 56)
+    var img := Image.create(sz.x, sz.y, false, Image.FORMAT_RGBA8)
+    var cx := sz.x / 2.0
+    var cy := sz.y / 2.0
+    for y in sz.y:
+        for x in sz.x:
+            var d := Vector2((x - cx) / (cx - 6.0), (y - cy) / (cy - 4.0)).length()
+            var a: float = clamp(1.0 - d, 0.0, 1.0)
+            img.set_pixel(x, y, Color(0.03, 0.02, 0.05, a * a * 0.9))
+    return ImageTexture.create_from_image(img)
