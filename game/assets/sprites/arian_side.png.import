@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dwi1ynyoad4ra"
-path="res://.godot/imported/plate_empty.png-9f8666b6d80f62a105f945e26c760a9d.ctex"
+uid="uid://76uv0dmvb5g2"
+path="res://.godot/imported/arian_side.png-45d741aa66ebca83979ebdf1bb7c164c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/plate_empty.png"
-dest_files=["res://.godot/imported/plate_empty.png-9f8666b6d80f62a105f945e26c760a9d.ctex"]
+source_file="res://assets/sprites/arian_side.png"
+dest_files=["res://.godot/imported/arian_side.png-45d741aa66ebca83979ebdf1bb7c164c.ctex"]
 
 [params]
 

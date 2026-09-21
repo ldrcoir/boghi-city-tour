@@ -122,15 +122,17 @@ func _build_car(stats: Dictionary) -> void:
         car.monitoring = true
         var shape := CollisionShape2D.new()
         var rect := RectangleShape2D.new()
-        rect.size = Vector2(190, 130)
+        rect.size = Vector2(215, 145)
         shape.shape = rect
-        shape.position = Vector2(0, -75)
+        shape.position = Vector2(0, -70)
         car.add_child(shape)
         car.area_entered.connect(_on_hit)
         car_sprite = Sprite2D.new()
         car_sprite.texture = load(Globals.CARS[Globals.selected_car]["tex"])
-        car_sprite.scale = Vector2(0.45, 0.45)
-        car_sprite.position = Vector2(0, -85)
+        var sc := 0.58 # ماشین بزرگ‌تر و جوندار در محیط (درخواست کاربر)
+        car_sprite.scale = Vector2(sc, sc)
+        var th := car_sprite.texture.get_height() * sc
+        car_sprite.position = Vector2(0, 12.0 - th * 0.5) # چرخ‌ها روی جاده
         car.add_child(car_sprite)
         var plate := Panel.new()
         var sb := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 4)

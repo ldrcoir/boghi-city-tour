@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dwi1ynyoad4ra"
-path="res://.godot/imported/plate_empty.png-9f8666b6d80f62a105f945e26c760a9d.ctex"
+uid="uid://dxyo8th8lfqiq"
+path="res://.godot/imported/karvan_side.png-c44a488b5b03956eb87691e97819d29c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/plate_empty.png"
-dest_files=["res://.godot/imported/plate_empty.png-9f8666b6d80f62a105f945e26c760a9d.ctex"]
+source_file="res://assets/sprites/karvan_side.png"
+dest_files=["res://.godot/imported/karvan_side.png-c44a488b5b03956eb87691e97819d29c.ctex"]
 
 [params]
 

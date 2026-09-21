@@ -7,7 +7,7 @@ var coins: int = 0
 var plate_name: String = "بوقی"
 var selected_car: int = 0
 var upgrades := {"engine": 0, "tire": 0, "turbo": 0}
-var unlocked_car := [true, false, false]
+var unlocked_car: Array = []
 var level_stars := {}  # id -> stars
 var season = null      # parsed season json
 
@@ -25,10 +25,46 @@ const CARS := [
                 "jump": 0.85, "accel": 1.18, "tough": 0.9, "price": 900
         },
         {
-                "id": "zabib", "name": "زبید", "en": "Zabib",
-                "desc": "وانت آبی مهربون، مقاوم به ضربه",
-                "tex": "res://assets/sprites/zabib_side.png",
+                "id": "baran", "name": "باران", "en": "Baran",
+                "desc": "وانت آبی مهربون — مقاوم به ضربه",
+                "tex": "res://assets/sprites/baran_side.png",
                 "jump": 0.95, "accel": 0.9, "tough": 1.35, "price": 1500
+        },
+        {
+                "id": "sepand", "name": "سپند", "en": "Sepand",
+                "desc": "کوچولوی خوش‌دل — سبک و چابک",
+                "tex": "res://assets/sprites/sepand_side.png",
+                "jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
+        },
+        {
+                "id": "shaparak", "name": "شاپرک", "en": "Shaparak",
+                "desc": "پروانه‌ی شهر — پرش‌های شیرین",
+                "tex": "res://assets/sprites/shaparak_side.png",
+                "jump": 1.25, "accel": 0.9, "tough": 0.75, "price": 1200
+        },
+        {
+                "id": "karvan", "name": "کاروان", "en": "Karvan",
+                "desc": "مینی‌بوس سفرکرده — سنگین ولی مقاوم",
+                "tex": "res://assets/sprites/karvan_side.png",
+                "jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 1800
+        },
+        {
+                "id": "ezhdeha", "name": "اژدها", "en": "Ezhdeha",
+                "desc": "شاسی‌بلند سرخِ چینی — نفس آتش!",
+                "tex": "res://assets/sprites/ezhdeha_side.png",
+                "jump": 1.05, "accel": 1.1, "tough": 1.2, "price": 2200
+        },
+        {
+                "id": "arian", "name": "آریان", "en": "Arian",
+                "desc": "سدان ملی — رویای همه‌ی ماشین‌ها!",
+                "tex": "res://assets/sprites/arian_side.png",
+                "jump": 1.0, "accel": 1.15, "tough": 1.1, "price": 2600
+        },
+        {
+                "id": "shahin", "name": "شاهین", "en": "Shahin",
+                "desc": "کوپه آلمانی — شاهِ سرعت",
+                "tex": "res://assets/sprites/shahin_side.png",
+                "jump": 0.9, "accel": 1.3, "tough": 1.0, "price": 3400
         },
 ]
 
@@ -76,6 +112,9 @@ func L(key: String) -> String:
         return key
 
 func _ready() -> void:
+        for i in CARS.size():
+                unlocked_car.append(false)
+        unlocked_car[0] = true
         load_save()
         season = load_season()
 
@@ -132,8 +171,8 @@ func load_save() -> void:
         var up = data.get("upgrades", {})
         for k in ["engine", "tire", "turbo"]:
                 upgrades[k] = int(up.get(k, 0))
-        var uc = data.get("unlocked_car", [true, false, false])
-        for i in 3:
+        var uc = data.get("unlocked_car", [true])
+        for i in unlocked_car.size():
                 unlocked_car[i] = bool(uc[i]) if i < uc.size() else false
         unlocked_car[0] = true
         var ls = data.get("level_stars", {})
