@@ -20,6 +20,8 @@ var toast: Label
 var car_buttons: Array = []
 var up_buttons := {}      # uid -> Button
 var up_dots := {}         # uid -> Label
+var _working := false
+var _demo_timer: Timer
 
 func _ready() -> void:
         font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
@@ -29,8 +31,10 @@ func _ready() -> void:
         _refresh()
         AudioMgr.play_music()
         if OS.get_cmdline_user_args().has("--autotest"):
-                await get_tree().create_timer(1.4).timeout
+                await get_tree().create_timer(1.35).timeout
                 get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_garage.png")
+                await get_tree().create_timer(0.75).timeout
+                get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_garage2.png")
                 get_tree().quit()
 
 func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
@@ -129,8 +133,8 @@ func _build() -> void:
         sparks.emitting = false
         sparks.one_shot = true
         sparks.explosiveness = 1.0
-        sparks.amount = 60
-        sparks.lifetime = 0.6
+        sparks.amount = 90
+        sparks.lifetime = 0.75
         sparks.spread = 180.0
         sparks.initial_velocity_min = 220.0
         sparks.initial_velocity_max = 520.0
@@ -255,6 +259,15 @@ func _build() -> void:
 
         _switch_tab(true)
 
+        # استاد هر از چندی خودش سرِ کار می‌رود — گاراژ همیشه زنده است
+        _demo_timer = Timer.new()
+        _demo_timer.wait_time = 7.0
+        _demo_timer.autostart = true
+        _demo_timer.timeout.connect(_ustad_work)
+        add_child(_demo_timer)
+        # همین که وارد گاراژ می‌شوی، استاد مشغول کار است
+        get_tree().create_timer(0.8).timeout.connect(_ustad_work)
+
 func _car_card(i: int) -> Control:
         var c = Globals.CARS[i]
         var card := PanelContainer.new()
@@ -310,18 +323,34 @@ func _on_upgrade(uid: String) -> void:
         _ustad_work()
 
 func _ustad_work() -> void:
-        # انیمیشن استاد در حال کار: آچار می‌زند، جرقه می‌پاشد، شادی می‌کند
-        sparks.restart()
-        sparks.emitting = true
+        # انیمیشن واقعی «استاد در حال کار»: سه ضربه آچار، جرقه، صدای فلز، لرزش ماشین
+        if _working:
+                return
+        _working = true
         AudioMgr.play_sfx("boost")
+        for i in 3:
+                var raise := create_tween()
+                raise.tween_property(ustad, "rotation_degrees", -17.0, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+                await get_tree().create_timer(0.18).timeout
+                var strike := create_tween()
+                strike.tween_property(ustad, "rotation_degrees", 9.0, 0.09).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+                sparks.restart()
+                sparks.emitting = true
+                AudioMgr.play_sfx("clank")
+                _shake_car()
+                await get_tree().create_timer(0.38).timeout
+        var settle := create_tween()
+        settle.tween_property(ustad, "rotation_degrees", 0.0, 0.22).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+        await settle.finished
+        _working = false
+
+func _shake_car() -> void:
+        # ماشین روی جک با هر ضربه می‌لرزد
+        var base := car_pic.position
         var t := create_tween()
-        t.tween_property(ustad, "rotation_degrees", -14.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-        t.tween_property(ustad, "rotation_degrees", 8.0, 0.1)
-        t.tween_property(ustad, "rotation_degrees", -8.0, 0.1)
-        t.tween_property(ustad, "rotation_degrees", 0.0, 0.12)
-        var hop := create_tween()
-        hop.tween_property(ustad, "scale:y", 0.92, 0.1)
-        hop.tween_property(ustad, "scale:y", 1.0, 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+        t.tween_property(car_pic, "position:x", base.x + 5.0, 0.05)
+        t.tween_property(car_pic, "position:x", base.x - 4.0, 0.05)
+        t.tween_property(car_pic, "position:x", base.x, 0.05)
 
 func _show_toast(msg: String) -> void:
         toast.text = msg
