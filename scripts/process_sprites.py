@@ -12,6 +12,8 @@ os.makedirs(OUT, exist_ok=True)
 
 TARGET_W = {
     "boghi_side.png": 420, "sharare_side.png": 440, "zabib_side.png": 470,
+    "sepand_side.png": 400, "arian_side.png": 480, "shahin_side.png": 480,
+    "ezhdeha_side.png": 470, "shaparak_side.png": 380, "karvan_side.png": 490,
     "coin.png": 120, "cone.png": 130, "passenger.png": 180, "ramp.png": 300,
     "plate_empty.png": 800,
 }
@@ -133,6 +135,8 @@ def keyed_sprite(name, top_only=False, tol=9):
 
 # ---------- cutout sprites: cars, items, name-board ----------
 for n in ["boghi_side.png", "sharare_side.png", "zabib_side.png",
+          "sepand_side.png", "arian_side.png", "shahin_side.png",
+          "ezhdeha_side.png", "shaparak_side.png", "karvan_side.png",
           "coin.png", "cone.png", "passenger.png", "ramp.png"]:
     keyed_sprite(n)
 keyed_sprite("plate_empty.png")  # white paper bg -> sticker

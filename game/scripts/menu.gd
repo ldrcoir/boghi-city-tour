@@ -16,6 +16,10 @@ func _ready() -> void:
         font_display = load("res://assets/fonts/Lalezar-Regular.ttf")
         _build_ui()
         _refresh()
+        if OS.get_cmdline_user_args().has("--garage"):
+                _show(panel_garage)
+        if OS.get_cmdline_user_args().has("--levels"):
+                _show(panel_levels)
         if OS.get_cmdline_user_args().has("--autotest"):
                 await get_tree().create_timer(1.5).timeout
                 get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_menu.png")
