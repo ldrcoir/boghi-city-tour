@@ -3,6 +3,7 @@ extends Control
 
 var font: FontFile
 var font_bold: FontFile
+var font_display: FontFile # فونت فانتزی قصه‌ای برای تیترها و دکمه‌ها
 var panel_home: PanelContainer
 var panel_levels: PanelContainer
 var panel_garage: PanelContainer
@@ -12,6 +13,7 @@ var plate_edit: LineEdit
 func _ready() -> void:
         font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
         font_bold = load("res://assets/fonts/Vazirmatn-Bold.ttf")
+        font_display = load("res://assets/fonts/Lalezar-Regular.ttf")
         _build_ui()
         _refresh()
         if OS.get_cmdline_user_args().has("--autotest"):
@@ -19,10 +21,10 @@ func _ready() -> void:
                 get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_menu.png")
                 get_tree().quit()
 
-func _mk_label(txt: String, size: int, bold := false) -> Label:
+func _mk_label(txt: String, size: int, bold := false, display := false) -> Label:
         var l := Label.new()
         l.text = txt
-        l.add_theme_font_override("font", font_bold if bold else font)
+        l.add_theme_font_override("font", font_display if display else (font_bold if bold else font))
         l.add_theme_font_size_override("font_size", size)
         l.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
         l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -59,7 +61,7 @@ func _style_btn(b: Button, primary := true) -> void:
 func _mk_button(txt: String, size := 26, primary := true) -> Button:
         var b := Button.new()
         b.text = txt
-        b.add_theme_font_override("font", font_bold)
+        b.add_theme_font_override("font", font_display)
         b.add_theme_font_size_override("font_size", size)
         b.custom_minimum_size = Vector2(200, 64)
         _style_btn(b, primary)
@@ -84,8 +86,12 @@ func _build_ui() -> void:
         hb.custom_minimum_size = Vector2(640, 0)
         panel_home.add_child(hb)
 
-        hb.add_child(_mk_label("بوقی: تور شهرها", 48, true))
-        hb.add_child(_mk_label("فصل ۱ — تهران", 26))
+        var title := _mk_label("بوقی: تور شهرها", 56, false, true)
+        title.add_theme_color_override("font_color", Color(0.87, 0.55, 0.09))
+        title.add_theme_color_override("font_outline_color", Color(0.29, 0.16, 0.09))
+        title.add_theme_constant_override("outline_size", 10)
+        hb.add_child(title)
+        hb.add_child(_mk_label("فصل ۱ — تهران", 28, false, true))
 
         var plate_box := Control.new()
         plate_box.custom_minimum_size = Vector2(300, 290)
@@ -130,7 +136,7 @@ func _build_ui() -> void:
         panel_levels = PanelContainer.new()
         var lv := VBoxContainer.new()
         panel_levels.add_child(lv)
-        lv.add_child(_mk_label(Globals.L("levels") + " — " + "تهران", 34, true))
+        lv.add_child(_mk_label(Globals.L("levels") + " — " + "تهران", 36, false, true))
         var scroll := ScrollContainer.new()
         scroll.custom_minimum_size = Vector2(980, 460)
         var grid := GridContainer.new()
@@ -163,7 +169,7 @@ func _build_ui() -> void:
         var gv := VBoxContainer.new()
         gv.add_theme_constant_override("separation", 8)
         panel_garage.add_child(gv)
-        gv.add_child(_mk_label(Globals.L("garage") + " — استاد فنر", 34, true))
+        gv.add_child(_mk_label(Globals.L("garage") + " — استاد فنر", 36, false, true))
         var gscroll := ScrollContainer.new()
         gscroll.custom_minimum_size = Vector2(1000, 470)
         var gcol := VBoxContainer.new()
@@ -187,8 +193,8 @@ func _build_ui() -> void:
                 row.add_child(info)
                 var cb := Button.new()
                 cb.custom_minimum_size = Vector2(170, 56)
-                cb.add_theme_font_override("font", font_bold)
-                cb.add_theme_font_size_override("font_size", 22)
+                cb.add_theme_font_override("font", font_display)
+                cb.add_theme_font_size_override("font_size", 24)
                 cb.set_meta("car_index", i)
                 _style_btn(cb, true)
                 cb.pressed.connect(_on_car_button.bind(i))
