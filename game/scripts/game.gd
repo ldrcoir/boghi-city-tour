@@ -33,6 +33,10 @@ var next_passenger_idx := 0
 var shake := 0.0
 var _auto_timer := 0.0
 var _shot_taken := false
+var brain: CarBrain
+var car_anchor: Control
+var _hit_chat_until := 0.0
+var _boost_in := 0.0
 
 var world: Node2D
 var layers: Array = []  # painterly parallax: {s1, s2, w, f}
@@ -79,6 +83,17 @@ func _ready() -> void:
         _build_car(stats)
         _build_hud()
         AudioMgr.play_music()
+        # مغز بوقی: ماشینِ تو همین اول مسابقه گاز می‌زند!
+        brain = CarBrain.new()
+        add_child(brain)
+        car_anchor = Control.new()
+        car_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        car_anchor.size = Vector2(0, 0)
+        hud.add_child(car_anchor)
+        _boost_in = 13.0 + randf() * 6.0
+        get_tree().create_timer(0.7).timeout.connect(func():
+                if brain != null and not ended and car_anchor != null:
+                        brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "go"))
         mission_label.text = Globals.L("mission") + " " + str(lv["id"]) + ": " + str(lv["name"]) + " — " + Globals.L("type_" + str(lv["type"]))
         if autotest:
                 time_left = 999
@@ -347,6 +362,8 @@ func _on_boost() -> void:
         turbo_left = float(Globals.car_stats()["turbo"])
         turbo_meter = 0.0
         AudioMgr.play_sfx("boost")
+        if brain != null:
+                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "nitro")
 
 func _toggle_pause() -> void:
         var t := get_tree()
@@ -413,6 +430,22 @@ func _process(delta: float) -> void:
         shadow.position = Vector2(CAR_X, GROUND_Y - 6)
         shadow.scale = Vector2(1.0 - 0.4 * h, 1.0 - 0.25 * h)
         shadow.modulate = Color(1, 1, 1, 0.5 - 0.32 * h)
+
+        # لنگرِ حباب گفتار — بالای سر ماشین (مختصات صفحه)
+        if car_anchor != null:
+                var sp: Vector2 = car_sprite.get_global_transform_with_canvas().origin
+                car_anchor.position = sp + Vector2(0.0, -140.0)
+
+        # بوست مخفی بوقی — سیستم طرف بوقی است! هر چند ثانیه نیترویش را پر می‌کند
+        if brain != null and Globals.selected_car == 0 and not autotest:
+                _boost_in -= delta
+                if _boost_in <= 0.0 and turbo_meter < 0.62:
+                        _boost_in = 13.0 + randf() * 7.0
+                        turbo_meter = 1.0
+                        nitro_bar.modulate = Color(1.6, 1.4, 0.7)
+                        var tw := create_tween()
+                        tw.tween_property(nitro_bar, "modulate", Color(1, 1, 1), 0.8)
+                        brain.say(car_anchor, "boghi", "boost")
 
         # move world objects
         for obj in world.get_children():
@@ -552,6 +585,9 @@ func _on_hit(a: Area2D) -> void:
                         slow_until = elapsed + 1.1
                         shake = 9.0
                         AudioMgr.play_sfx("crash")
+                        if brain != null and elapsed > _hit_chat_until:
+                                _hit_chat_until = elapsed + 5.0
+                                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "hit")
 
 func _finish(win: bool) -> void:
         if ended:
@@ -569,6 +605,8 @@ func _finish(win: bool) -> void:
                 AudioMgr.play_sfx("win")
         else:
                 AudioMgr.play_sfx("fail")
+        if brain != null and car_anchor != null:
+                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "win" if win else "lose")
         _show_end(win, stars, reward)
 
 func _show_end(win: bool, stars: int, reward: int) -> void:

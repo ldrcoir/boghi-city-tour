@@ -22,6 +22,7 @@ var up_buttons := {}      # uid -> Button
 var up_dots := {}         # uid -> Label
 var _working := false
 var _demo_timer: Timer
+var brain: CarBrain
 
 func _ready() -> void:
         font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
@@ -30,7 +31,18 @@ func _ready() -> void:
         _build()
         _refresh()
         AudioMgr.play_music()
+        # مغز بوقی در کارگاه: ماشین‌ها و استاد فنر حرف می‌زنند
+        brain = CarBrain.new()
+        add_child(brain)
+        CarBrain.add_breathing(car_pic, 3.0, 1.4)
+        brain.start_idle_chatter(
+                func(cid: String) -> Control:
+                        return ustad if cid == "ustad" else car_pic,
+                func() -> Array:
+                        return [str(Globals.CARS[Globals.selected_car]["id"]), "ustad"], 9.0, 16.0)
         if OS.get_cmdline_user_args().has("--autotest"):
+                if brain != null:
+                        brain.say(car_pic, str(Globals.CARS[Globals.selected_car]["id"]), "select")
                 await get_tree().create_timer(1.35).timeout
                 get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_garage.png")
                 await get_tree().create_timer(0.75).timeout
@@ -308,9 +320,16 @@ func _on_car_button(i: int) -> void:
                 AudioMgr.play_sfx("coin")
         elif not Globals.buy_car(i):
                 _show_toast("سکه کافی نداری! مأموریت برو 🪙")
+                if brain != null:
+                        brain.say(car_pic, str(Globals.CARS[Globals.selected_car]["id"]), "poor")
                 return
+        else:
+                AudioMgr.play_sfx("win")
         _refresh()
         _ustad_work()
+        if brain != null:
+                var cid := str(Globals.CARS[Globals.selected_car]["id"])
+                brain.say(car_pic, cid, "select")
 
 func _on_upgrade(uid: String) -> void:
         if not Globals.do_upgrade(uid):
@@ -321,6 +340,8 @@ func _on_upgrade(uid: String) -> void:
         AudioMgr.play_sfx("clank")
         _refresh()
         _ustad_work()
+        if brain != null:
+                brain.say(car_pic, str(Globals.CARS[Globals.selected_car]["id"]), "upgrade")
 
 func _ustad_work() -> void:
         # انیمیشن واقعی «استاد در حال کار»: سه ضربه آچار، جرقه، صدای فلز، لرزش ماشین
@@ -328,6 +349,8 @@ func _ustad_work() -> void:
                 return
         _working = true
         AudioMgr.play_sfx("boost")
+        if brain != null and _rng_ustad():
+                brain.say(ustad, "ustad", "idle")
         for i in 3:
                 var raise := create_tween()
                 raise.tween_property(ustad, "rotation_degrees", -17.0, 0.18).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
@@ -351,6 +374,9 @@ func _shake_car() -> void:
         t.tween_property(car_pic, "position:x", base.x + 5.0, 0.05)
         t.tween_property(car_pic, "position:x", base.x - 4.0, 0.05)
         t.tween_property(car_pic, "position:x", base.x, 0.05)
+
+func _rng_ustad() -> bool:
+        return randf() < 0.45
 
 func _show_toast(msg: String) -> void:
         toast.text = msg
