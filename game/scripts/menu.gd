@@ -9,6 +9,9 @@ var panel_home: PanelContainer
 var panel_levels: PanelContainer
 var coin_label: Label
 var plate_edit: LineEdit
+var brain: CarBrain
+var boghi_car: TextureRect
+var pride_car: TextureRect
 
 const COL_GOLD := Color(0.96, 0.76, 0.25)
 const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
@@ -23,11 +26,24 @@ func _ready() -> void:
         font_display = load("res://assets/fonts/Lalezar-Regular.ttf")
         _build_ui()
         _refresh()
+        # مغز بوقی: ماشین‌های پارک‌شده زنده‌اند و حرف می‌زنند
+        brain = CarBrain.new()
+        add_child(brain)
+        if boghi_car != null:
+                CarBrain.add_breathing(boghi_car, 4.0, 1.25)
+        if pride_car != null:
+                CarBrain.add_breathing(pride_car, 3.0, 1.5)
+        brain.start_idle_chatter(
+                func(cid: String) -> Control:
+                        return boghi_car if cid == "boghi" else pride_car,
+                func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
         if OS.get_cmdline_user_args().has("--garage"):
                 get_tree().change_scene_to_file("res://scenes/garage.tscn")
         if OS.get_cmdline_user_args().has("--levels"):
                 _show(panel_levels)
         if OS.get_cmdline_user_args().has("--autotest"):
+                if brain != null and boghi_car != null:
+                        brain.say(boghi_car, "boghi", "select")
                 await get_tree().create_timer(1.5).timeout
                 get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_menu.png")
                 get_tree().quit()
@@ -151,8 +167,20 @@ func _add_parked_cars() -> void:
         c1.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         c1.position = Vector2(48, 512)
         c1.size = Vector2(360, 190)
+        c1.pivot_offset = Vector2(180, 190)
         c1.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(c1)
+        boghi_car = c1
+        # لمسِ بوقی: بوقی با صدای شیطون می‌گوید «منو انتخاب کن!»
+        var tap1 := Button.new()
+        tap1.flat = true
+        tap1.position = Vector2(48, 512)
+        tap1.size = Vector2(360, 190)
+        tap1.modulate.a = 0.0
+        tap1.pressed.connect(func():
+                if brain != null and boghi_car != null:
+                        brain.say(boghi_car, "boghi", "idle"))
+        add_child(tap1)
         var sh2 := Sprite2D.new()
         sh2.texture = _make_shadow_tex()
         sh2.position = Vector2(628, 686)
@@ -164,10 +192,34 @@ func _add_parked_cars() -> void:
         c2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         c2.position = Vector2(468, 538)
         c2.size = Vector2(320, 162)
+        c2.pivot_offset = Vector2(160, 162)
         c2.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(c2)
+        pride_car = c2
+        var tap2 := Button.new()
+        tap2.flat = true
+        tap2.position = Vector2(468, 538)
+        tap2.size = Vector2(320, 162)
+        tap2.modulate.a = 0.0
+        tap2.pressed.connect(func():
+                if brain != null and pride_car != null:
+                        brain.say(pride_car, "pride", "idle"))
+        add_child(tap2)
 
 func _build_title() -> void:
+        # لوگوی رسمی بازی — اگر نبود، تیتر متنی می‌ماند
+        var logo_path := "res://assets/sprites/logo.png"
+        if ResourceLoader.exists(logo_path):
+                var logo := TextureRect.new()
+                logo.texture = load(logo_path)
+                logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                logo.position = Vector2(520, 8)
+                logo.size = Vector2(560, 130)
+                logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                add_child(logo)
+                CarBrain.add_breathing(logo, 2.5, 1.6)
+                return
         var title := _mk_label("بوقی: تور شهرها", 58, false, true, COL_GOLD)
         title.add_theme_color_override("font_outline_color", Color(0.10, 0.06, 0.03))
         title.add_theme_constant_override("outline_size", 14)
@@ -290,7 +342,7 @@ func _build_levels_panel() -> void:
         add_child(center)
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۲ — بیلد تست", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۰٫۳ — ماشین‌های زبان‌باز", 15, true, false, Color(1, 1, 1, 0.6))
         v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         v.position = Vector2(1000, 692)
         v.custom_minimum_size = Vector2(256, 0)

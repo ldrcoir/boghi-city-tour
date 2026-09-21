@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const APK_PATH = "/apk/BoghiCityTour_v0.2_test.apk";
+const APK_PATH = "/apk/BoghiCityTour_v0.3_test.apk";
 
 const SCREENSHOTS = [
-  { src: "/apk/shot_menu_v5.png", alt: "منوی حرفه‌ای با بوقی قرمز خندون و چشم‌های آبی روی جاده غروب تهران" },
-  { src: "/apk/shot_garage_v5a.png", alt: "کارگاه استاد فنر — جرقه‌ها هنگام تعمیر بوقی قرمز با لبخند بزرگ" },
-  { src: "/apk/shot_garage_v5b.png", alt: "استاد فنر سیبیل‌دار وسط ضربه آچار — انیمیشن کار" },
-  { src: "/apk/shot_game_v5.png", alt: "گیم‌پلی: بوقی قرمز با چشم‌های خوشگل و دکمه نیترو در تهران" },
+  { src: "/apk/shot_menu_v6.png", alt: "منو با لوگوی رسمی و حباب گفتار بوقی — ماشین‌ها حرف می‌زنند!" },
+  { src: "/apk/shot_garage_v6a.png", alt: "کارگاه استاد فنر با حباب گفتار ماشین و جرقه‌های تعمیر" },
+  { src: "/apk/shot_garage_v6b.png", alt: "استاد فنر سیبیل‌دار وسط کار — گاراژ زنده و پرحرف" },
+  { src: "/apk/shot_game_v5.png", alt: "گیم‌پلی: بوقی قرمز با چشم‌های خوشگل و نیترو در تهران" },
 ];
 
 const STEPS = [
-  { n: "۱", t: "دانلود", d: "دکمه بزرگ نارنجی را بزن تا فایل APK (۶۹ مگابایت) دانلود شود." },
+  { n: "۱", t: "دانلود", d: "دکمه بزرگ نارنجی را بزن تا فایل APK (۷۰ مگابایت) دانلود شود." },
   { n: "۲", t: "اجازه نصب", d: "روی فایل دانلودشده بزن؛ اگر پرسید، «اجازه نصب از منابع ناشناس» را برای مرورگرت فعال کن." },
   { n: "۳", t: "بازی!", d: "نصب که تمام شد آیکون بوقی قرمز را از منوی گوشی باز کن و اسم بچه را بنویس — سفر شروع می‌شود!" },
 ];
@@ -37,19 +37,19 @@ export default function Home() {
       <div className="flex-1 w-full max-w-3xl mx-auto px-4 pt-10 pb-6">
         {/* هدر */}
         <header className="text-center mb-8">
-          <div className="inline-block rounded-3xl bg-amber-950/40 border-2 border-amber-500/30 p-4 shadow-2xl shadow-black/40 mb-4">
+          <div className="inline-block rounded-3xl bg-amber-950/40 border-2 border-amber-500/30 p-3 shadow-2xl shadow-black/40 mb-4">
             <img
-              src="/apk/boghi_icon.png"
-              alt="آیکون بازی بوقی: ماشین قرمز زنده با چشم‌های بامزه"
-              className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover"
+              src="/apk/logo_card.png"
+              alt="لوگوی رسمی بوقی: تور شهرها — ماشین قرمز زنده با چشم‌های آبی و لبخند بزرگ، از استودیو ایماروید"
+              className="w-[300px] sm:w-[360px] rounded-2xl"
             />
           </div>
           <h1 className="font-display-fa text-4xl sm:text-5xl text-amber-300 drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]">
             بوقی: تور شهرها
           </h1>
           <p className="mt-2 text-amber-100/85 text-sm sm:text-base leading-7 max-w-md mx-auto">
-            فصل ۱ تهران — ۵۰ مأموریت با بوقی قرمز، نیترو، کارگاه استاد فنر و
-            ۱۲ ماشین ایرانی
+            فصل ۱ تهران — ۵۰ مأموریت با ماشین‌های زبان‌باز، نیترو، کارگاه استاد فنر و
+            ۱۲ ماشین ایرانی با شخصیت
           </p>
         </header>
 
@@ -60,10 +60,10 @@ export default function Home() {
         >
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-amber-200/90 mb-5">
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
-              نسخه ۰.۲.۰ (تست خانوادگی)
+              نسخه ۰.۳.۰ (تست خانوادگی)
             </span>
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
-              ۶۹ مگابایت
+              ۷۰ مگابایت
             </span>
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
               اندروید ۷ به بالا
@@ -112,14 +112,14 @@ export default function Home() {
 
         {/* چه چیزهایی تازه است */}
         <section aria-label="امکانات جدید این نسخه" className="mt-6 rounded-2xl border border-amber-400/25 bg-black/25 p-5 text-sm text-amber-100/85 leading-7">
-          <p className="font-display-fa text-lg text-amber-300 mb-2">تازه‌های نسخه ۰.۲ 🏁</p>
+          <p className="font-display-fa text-lg text-amber-300 mb-2">تازه‌های نسخه ۰.۳ — ماشین‌های زبان‌باز! 🗯️</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>چشم‌های خوشگل و لبخند بزرگ برگشت! بوقی قرمز حالا مثل کانسپت اصلی زنده و خندونه 😍</li>
-            <li>بوقی زرد جدید — داداش آفتابی بوقی، فقط ۸۰۰ سکه!</li>
-            <li>ماشین‌های مسابقه‌ای قرمز: پژو ۲۰۶ مسابقه‌ای و دنا مسابقه‌ای با استریک سفید</li>
-            <li>منوی حرفه‌ای و بزرگ‌تر — با بوقی و پراید پارک‌شده روی جاده</li>
-            <li>استاد فنر فقط سیبیل! + انیمیشن واقعی کار با آچار، جرقه و صدای فلز</li>
-            <li>نیترو با شعله آتشین، گیج و دکمه مخصوص 🔥</li>
+            <li>ماشین‌ها حرف می‌زنند! هر ماشین شخصیت، لقب و صدای مخصوص خودش را دارد — مثل انیمیشن‌های معروف ماشین‌ها</li>
+            <li>بوقی شیطونِ محل است: لمسش کن تا با صدای شیطنتی بگوید «منو انتخاب کن!»</li>
+            <li>بوست مخفی بوقی — سیستم طرف بوقی است! هر چند ثانیه نیتروش را خودش پر می‌کند 😎</li>
+            <li>استاد فنر هم وسط کار آچار می‌زند و حرف می‌زند</li>
+            <li>لوگوی رسمی بازی در منو + صدای لاله‌زبانِ زنده برای هر ۱۲ ماشین</li>
+            <li>حباب‌های گفتار با افکت تایپ، جست‌وخیز و نفس‌کشیدن ماشین‌ها</li>
           </ul>
         </section>
 
@@ -152,7 +152,7 @@ export default function Home() {
       </div>
 
       <footer className="mt-auto w-full border-t border-amber-400/15 bg-black/30 py-4 text-center text-xs text-amber-200/60">
-        بوقی: تور شهرها · نسخه تست ۰.۲.۰ · ساخته‌شده با ❤ برای بچه‌ها
+        بوقی: تور شهرها · نسخه تست ۰.۳.۰ · ساخته‌شده با ❤ برای بچه‌ها
       </footer>
     </main>
   );
