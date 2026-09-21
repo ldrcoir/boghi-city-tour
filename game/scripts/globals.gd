@@ -11,61 +11,63 @@ var unlocked_car: Array = []
 var level_stars := {}  # id -> stars
 var season = null      # parsed season json
 
+# رشته ماشین‌ها: نام‌های واقعی و آشنای خیابان‌های ایران (درخواست کاربر)
+# ترتیب = نردبان قیمت؛ پراید/تیبا/پژو/سمند/دنا/نیسان/شاهین/کوییک
 const CARS := [
-        {
-                "id": "boghi", "name": "بوقی", "en": "Boghi",
-                "desc": "متعادل و بامزه — ستاره روی کاپوت!",
-                "tex": "res://assets/sprites/boghi_side.png",
-                "jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
-        },
-        {
-                "id": "sharare", "name": "شراره", "en": "Sharare",
-                "desc": "شتاب بالا، کمی عصبانی!",
-                "tex": "res://assets/sprites/sharare_side.png",
-                "jump": 0.85, "accel": 1.18, "tough": 0.9, "price": 900
-        },
-        {
-                "id": "baran", "name": "باران", "en": "Baran",
-                "desc": "وانت آبی مهربون — مقاوم به ضربه",
-                "tex": "res://assets/sprites/baran_side.png",
-                "jump": 0.95, "accel": 0.9, "tough": 1.35, "price": 1500
-        },
-        {
-                "id": "sepand", "name": "سپند", "en": "Sepand",
-                "desc": "کوچولوی خوش‌دل — سبک و چابک",
-                "tex": "res://assets/sprites/sepand_side.png",
-                "jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
-        },
-        {
-                "id": "shaparak", "name": "شاپرک", "en": "Shaparak",
-                "desc": "پروانه‌ی شهر — پرش‌های شیرین",
-                "tex": "res://assets/sprites/shaparak_side.png",
-                "jump": 1.25, "accel": 0.9, "tough": 0.75, "price": 1200
-        },
-        {
-                "id": "karvan", "name": "کاروان", "en": "Karvan",
-                "desc": "مینی‌بوس سفرکرده — سنگین ولی مقاوم",
-                "tex": "res://assets/sprites/karvan_side.png",
-                "jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 1800
-        },
-        {
-                "id": "ezhdeha", "name": "اژدها", "en": "Ezhdeha",
-                "desc": "شاسی‌بلند سرخِ چینی — نفس آتش!",
-                "tex": "res://assets/sprites/ezhdeha_side.png",
-                "jump": 1.05, "accel": 1.1, "tough": 1.2, "price": 2200
-        },
-        {
-                "id": "arian", "name": "آریان", "en": "Arian",
-                "desc": "سدان ملی — رویای همه‌ی ماشین‌ها!",
-                "tex": "res://assets/sprites/arian_side.png",
-                "jump": 1.0, "accel": 1.15, "tough": 1.1, "price": 2600
-        },
-        {
-                "id": "shahin", "name": "شاهین", "en": "Shahin",
-                "desc": "کوپه آلمانی — شاهِ سرعت",
-                "tex": "res://assets/sprites/shahin_side.png",
-                "jump": 0.9, "accel": 1.3, "tough": 1.0, "price": 3400
-        },
+	{
+		"id": "boghi", "name": "بوقی", "en": "Boghi",
+		"desc": "پراید فیروزه‌ای معروف محله — ستاره روی جلوپنجره!",
+		"tex": "res://assets/sprites/boghi_side.png",
+		"jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
+	},
+	{
+		"id": "tiba", "name": "تیبا", "en": "Tiba",
+		"desc": "آبی و چابک — سبک برای پرش‌های دقیق",
+		"tex": "res://assets/sprites/tiba_side.png",
+		"jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
+	},
+	{
+		"id": "pride", "name": "پراید قرمز", "en": "Pride RS",
+		"desc": "هاچ‌بک مسابقه‌ای با استریک و اسپویلر — شتاب بالا!",
+		"tex": "res://assets/sprites/pride_side.png",
+		"jump": 0.9, "accel": 1.18, "tough": 0.9, "price": 900
+	},
+	{
+		"id": "pejo", "name": "پژو ۲۰۶", "en": "Peugeot 206",
+		"desc": "نقره‌ای فرمان‌رو — تعادل عالی سرعت و کنترل",
+		"tex": "res://assets/sprites/pejo_side.png",
+		"jump": 1.0, "accel": 1.1, "tough": 0.95, "price": 1200
+	},
+	{
+		"id": "samand", "name": "سمند کلاسیک", "en": "Samand Classic",
+		"desc": "سالخورده‌ی مطمئن محله — مثل دیوار محکم",
+		"tex": "res://assets/sprites/samand_side.png",
+		"jump": 0.95, "accel": 0.9, "tough": 1.35, "price": 1500
+	},
+	{
+		"id": "dena", "name": "دنا پلاس", "en": "Dena Plus",
+		"desc": "سدان سفید ملی — شکوه و آرامش جاده",
+		"tex": "res://assets/sprites/dena_side.png",
+		"jump": 1.0, "accel": 1.15, "tough": 1.1, "price": 1800
+	},
+	{
+		"id": "nissan", "name": "نیسان قرمز", "en": "Nissan Pickup",
+		"desc": "وانت افسانه‌ای آسفالت‌خور — سنگین ولی شکست‌ناپذیر",
+		"tex": "res://assets/sprites/nissan_side.png",
+		"jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 2200
+	},
+	{
+		"id": "shahin", "name": "شاهین", "en": "Shahin",
+		"desc": "مشکی اسپرت با خط طلایی — شاه شب‌های تهران",
+		"tex": "res://assets/sprites/shahin_side.png",
+		"jump": 0.9, "accel": 1.3, "tough": 1.0, "price": 2600
+	},
+	{
+		"id": "quick", "name": "کوییک", "en": "Quick",
+		"desc": "نارنجی جیغ جوان — پرش‌های بلند هوایی",
+		"tex": "res://assets/sprites/quick_side.png",
+		"jump": 1.25, "accel": 1.05, "tough": 0.75, "price": 3400
+	},
 ]
 
 const UPGRADES := [

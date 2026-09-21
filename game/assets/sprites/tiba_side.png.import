@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dapceae2hftm6"
-path="res://.godot/imported/shaparak_side.png-59a94c9fa81ac93a59f4b280ef1b5fe5.ctex"
+uid="uid://clocbfockvo6"
+path="res://.godot/imported/tiba_side.png-50089d09696f10c86f65efcb87b58301.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/shaparak_side.png"
-dest_files=["res://.godot/imported/shaparak_side.png-59a94c9fa81ac93a59f4b280ef1b5fe5.ctex"]
+source_file="res://assets/sprites/tiba_side.png"
+dest_files=["res://.godot/imported/tiba_side.png-50089d09696f10c86f65efcb87b58301.ctex"]
 
 [params]
 

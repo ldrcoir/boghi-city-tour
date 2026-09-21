@@ -1,0 +1,976 @@
+<!doctype html>
+<html dir="rtl" lang="fa-IR">
+<head>
+
+	
+	
+	
+	
+	<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script data-cfasync="false" data-no-defer="1" data-no-minify="1" data-no-optimize="1">var ewww_webp_supported=!1;function check_webp_feature(A,e){var w;e=void 0!==e?e:function(){},ewww_webp_supported?e(ewww_webp_supported):((w=new Image).onload=function(){ewww_webp_supported=0<w.width&&0<w.height,e&&e(ewww_webp_supported)},w.onerror=function(){e&&e(!1)},w.src="data:image/webp;base64,"+{alpha:"UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA=="}[A])}check_webp_feature("alpha");</script><script data-cfasync="false" data-no-defer="1" data-no-minify="1" data-no-optimize="1">var Arrive=function(c,w){"use strict";if(c.MutationObserver&&"undefined"!=typeof HTMLElement){var r,a=0,u=(r=HTMLElement.prototype.matches||HTMLElement.prototype.webkitMatchesSelector||HTMLElement.prototype.mozMatchesSelector||HTMLElement.prototype.msMatchesSelector,{matchesSelector:function(e,t){return e instanceof HTMLElement&&r.call(e,t)},addMethod:function(e,t,r){var a=e[t];e[t]=function(){return r.length==arguments.length?r.apply(this,arguments):"function"==typeof a?a.apply(this,arguments):void 0}},callCallbacks:function(e,t){t&&t.options.onceOnly&&1==t.firedElems.length&&(e=[e[0]]);for(var r,a=0;r=e[a];a++)r&&r.callback&&r.callback.call(r.elem,r.elem);t&&t.options.onceOnly&&1==t.firedElems.length&&t.me.unbindEventWithSelectorAndCallback.call(t.target,t.selector,t.callback)},checkChildNodesRecursively:function(e,t,r,a){for(var i,n=0;i=e[n];n++)r(i,t,a)&&a.push({callback:t.callback,elem:i}),0<i.childNodes.length&&u.checkChildNodesRecursively(i.childNodes,t,r,a)},mergeArrays:function(e,t){var r,a={};for(r in e)e.hasOwnProperty(r)&&(a[r]=e[r]);for(r in t)t.hasOwnProperty(r)&&(a[r]=t[r]);return a},toElementsArray:function(e){return e=void 0!==e&&("number"!=typeof e.length||e===c)?[e]:e}}),e=(l.prototype.addEvent=function(e,t,r,a){a={target:e,selector:t,options:r,callback:a,firedElems:[]};return this._beforeAdding&&this._beforeAdding(a),this._eventsBucket.push(a),a},l.prototype.removeEvent=function(e){for(var t,r=this._eventsBucket.length-1;t=this._eventsBucket[r];r--)e(t)&&(this._beforeRemoving&&this._beforeRemoving(t),(t=this._eventsBucket.splice(r,1))&&t.length&&(t[0].callback=null))},l.prototype.beforeAdding=function(e){this._beforeAdding=e},l.prototype.beforeRemoving=function(e){this._beforeRemoving=e},l),t=function(i,n){var o=new e,l=this,s={fireOnAttributesModification:!1};return o.beforeAdding(function(t){var e=t.target;e!==c.document&&e!==c||(e=document.getElementsByTagName("html")[0]);var r=new MutationObserver(function(e){n.call(this,e,t)}),a=i(t.options);r.observe(e,a),t.observer=r,t.me=l}),o.beforeRemoving(function(e){e.observer.disconnect()}),this.bindEvent=function(e,t,r){t=u.mergeArrays(s,t);for(var a=u.toElementsArray(this),i=0;i<a.length;i++)o.addEvent(a[i],e,t,r)},this.unbindEvent=function(){var r=u.toElementsArray(this);o.removeEvent(function(e){for(var t=0;t<r.length;t++)if(this===w||e.target===r[t])return!0;return!1})},this.unbindEventWithSelectorOrCallback=function(r){var a=u.toElementsArray(this),i=r,e="function"==typeof r?function(e){for(var t=0;t<a.length;t++)if((this===w||e.target===a[t])&&e.callback===i)return!0;return!1}:function(e){for(var t=0;t<a.length;t++)if((this===w||e.target===a[t])&&e.selector===r)return!0;return!1};o.removeEvent(e)},this.unbindEventWithSelectorAndCallback=function(r,a){var i=u.toElementsArray(this);o.removeEvent(function(e){for(var t=0;t<i.length;t++)if((this===w||e.target===i[t])&&e.selector===r&&e.callback===a)return!0;return!1})},this},i=new function(){var s={fireOnAttributesModification:!1,onceOnly:!1,existing:!1};function n(e,t,r){return!(!u.matchesSelector(e,t.selector)||(e._id===w&&(e._id=a++),-1!=t.firedElems.indexOf(e._id)))&&(t.firedElems.push(e._id),!0)}var c=(i=new t(function(e){var t={attributes:!1,childList:!0,subtree:!0};return e.fireOnAttributesModification&&(t.attributes=!0),t},function(e,i){e.forEach(function(e){var t=e.addedNodes,r=e.target,a=[];null!==t&&0<t.length?u.checkChildNodesRecursively(t,i,n,a):"attributes"===e.type&&n(r,i)&&a.push({callback:i.callback,elem:r}),u.callCallbacks(a,i)})})).bindEvent;return i.bindEvent=function(e,t,r){t=void 0===r?(r=t,s):u.mergeArrays(s,t);var a=u.toElementsArray(this);if(t.existing){for(var i=[],n=0;n<a.length;n++)for(var o=a[n].querySelectorAll(e),l=0;l<o.length;l++)i.push({callback:r,elem:o[l]});if(t.onceOnly&&i.length)return r.call(i[0].elem,i[0].elem);setTimeout(u.callCallbacks,1,i)}c.call(this,e,t,r)},i},o=new function(){var a={};function i(e,t){return u.matchesSelector(e,t.selector)}var n=(o=new t(function(){return{childList:!0,subtree:!0}},function(e,r){e.forEach(function(e){var t=e.removedNodes,e=[];null!==t&&0<t.length&&u.checkChildNodesRecursively(t,r,i,e),u.callCallbacks(e,r)})})).bindEvent;return o.bindEvent=function(e,t,r){t=void 0===r?(r=t,a):u.mergeArrays(a,t),n.call(this,e,t,r)},o};d(HTMLElement.prototype),d(NodeList.prototype),d(HTMLCollection.prototype),d(HTMLDocument.prototype),d(Window.prototype);var n={};return s(i,n,"unbindAllArrive"),s(o,n,"unbindAllLeave"),n}function l(){this._eventsBucket=[],this._beforeAdding=null,this._beforeRemoving=null}function s(e,t,r){u.addMethod(t,r,e.unbindEvent),u.addMethod(t,r,e.unbindEventWithSelectorOrCallback),u.addMethod(t,r,e.unbindEventWithSelectorAndCallback)}function d(e){e.arrive=i.bindEvent,s(i,e,"unbindArrive"),e.leave=o.bindEvent,s(o,e,"unbindLeave")}}(window,void 0),ewww_webp_supported=!1;function check_webp_feature(e,t){var r;ewww_webp_supported?t(ewww_webp_supported):((r=new Image).onload=function(){ewww_webp_supported=0<r.width&&0<r.height,t(ewww_webp_supported)},r.onerror=function(){t(!1)},r.src="data:image/webp;base64,"+{alpha:"UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAARBxAR/Q9ERP8DAABWUDggGAAAABQBAJ0BKgEAAQAAAP4AAA3AAP7mtQAAAA==",animation:"UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA"}[e])}function ewwwLoadImages(e){if(e){for(var t=document.querySelectorAll(".batch-image img, .image-wrapper a, .ngg-pro-masonry-item a, .ngg-galleria-offscreen-seo-wrapper a"),r=0,a=t.length;r<a;r++)ewwwAttr(t[r],"data-src",t[r].getAttribute("data-webp")),ewwwAttr(t[r],"data-thumbnail",t[r].getAttribute("data-webp-thumbnail"));for(var i=document.querySelectorAll("div.woocommerce-product-gallery__image"),r=0,a=i.length;r<a;r++)ewwwAttr(i[r],"data-thumb",i[r].getAttribute("data-webp-thumb"))}for(var n=document.querySelectorAll("video"),r=0,a=n.length;r<a;r++)ewwwAttr(n[r],"poster",e?n[r].getAttribute("data-poster-webp"):n[r].getAttribute("data-poster-image"));for(var o,l=document.querySelectorAll("img.ewww_webp_lazy_load"),r=0,a=l.length;r<a;r++)e&&(ewwwAttr(l[r],"data-lazy-srcset",l[r].getAttribute("data-lazy-srcset-webp")),ewwwAttr(l[r],"data-srcset",l[r].getAttribute("data-srcset-webp")),ewwwAttr(l[r],"data-lazy-src",l[r].getAttribute("data-lazy-src-webp")),ewwwAttr(l[r],"data-src",l[r].getAttribute("data-src-webp")),ewwwAttr(l[r],"data-orig-file",l[r].getAttribute("data-webp-orig-file")),ewwwAttr(l[r],"data-medium-file",l[r].getAttribute("data-webp-medium-file")),ewwwAttr(l[r],"data-large-file",l[r].getAttribute("data-webp-large-file")),null!=(o=l[r].getAttribute("srcset"))&&!1!==o&&o.includes("R0lGOD")&&ewwwAttr(l[r],"src",l[r].getAttribute("data-lazy-src-webp"))),l[r].className=l[r].className.replace(/\bewww_webp_lazy_load\b/,"");for(var s=document.querySelectorAll(".ewww_webp"),r=0,a=s.length;r<a;r++)e?(ewwwAttr(s[r],"srcset",s[r].getAttribute("data-srcset-webp")),ewwwAttr(s[r],"src",s[r].getAttribute("data-src-webp")),ewwwAttr(s[r],"data-orig-file",s[r].getAttribute("data-webp-orig-file")),ewwwAttr(s[r],"data-medium-file",s[r].getAttribute("data-webp-medium-file")),ewwwAttr(s[r],"data-large-file",s[r].getAttribute("data-webp-large-file")),ewwwAttr(s[r],"data-large_image",s[r].getAttribute("data-webp-large_image")),ewwwAttr(s[r],"data-src",s[r].getAttribute("data-webp-src"))):(ewwwAttr(s[r],"srcset",s[r].getAttribute("data-srcset-img")),ewwwAttr(s[r],"src",s[r].getAttribute("data-src-img"))),s[r].className=s[r].className.replace(/\bewww_webp\b/,"ewww_webp_loaded");window.jQuery&&jQuery.fn.isotope&&jQuery.fn.imagesLoaded&&(jQuery(".fusion-posts-container-infinite").imagesLoaded(function(){jQuery(".fusion-posts-container-infinite").hasClass("isotope")&&jQuery(".fusion-posts-container-infinite").isotope()}),jQuery(".fusion-portfolio:not(.fusion-recent-works) .fusion-portfolio-wrapper").imagesLoaded(function(){jQuery(".fusion-portfolio:not(.fusion-recent-works) .fusion-portfolio-wrapper").isotope()}))}function ewwwWebPInit(e){ewwwLoadImages(e),ewwwNggLoadGalleries(e),document.arrive(".ewww_webp",function(){ewwwLoadImages(e)}),document.arrive(".ewww_webp_lazy_load",function(){ewwwLoadImages(e)}),document.arrive("videos",function(){ewwwLoadImages(e)}),"loading"==document.readyState?document.addEventListener("DOMContentLoaded",ewwwJSONParserInit):("undefined"!=typeof galleries&&ewwwNggParseGalleries(e),ewwwWooParseVariations(e))}function ewwwAttr(e,t,r){null!=r&&!1!==r&&e.setAttribute(t,r)}function ewwwJSONParserInit(){"undefined"!=typeof galleries&&check_webp_feature("alpha",ewwwNggParseGalleries),check_webp_feature("alpha",ewwwWooParseVariations)}function ewwwWooParseVariations(e){if(e)for(var t=document.querySelectorAll("form.variations_form"),r=0,a=t.length;r<a;r++){var i=t[r].getAttribute("data-product_variations"),n=!1;try{for(var o in i=JSON.parse(i))void 0!==i[o]&&void 0!==i[o].image&&(void 0!==i[o].image.src_webp&&(i[o].image.src=i[o].image.src_webp,n=!0),void 0!==i[o].image.srcset_webp&&(i[o].image.srcset=i[o].image.srcset_webp,n=!0),void 0!==i[o].image.full_src_webp&&(i[o].image.full_src=i[o].image.full_src_webp,n=!0),void 0!==i[o].image.gallery_thumbnail_src_webp&&(i[o].image.gallery_thumbnail_src=i[o].image.gallery_thumbnail_src_webp,n=!0),void 0!==i[o].image.thumb_src_webp&&(i[o].image.thumb_src=i[o].image.thumb_src_webp,n=!0));n&&ewwwAttr(t[r],"data-product_variations",JSON.stringify(i))}catch(e){}}}function ewwwNggParseGalleries(e){if(e)for(var t in galleries){var r=galleries[t];galleries[t].images_list=ewwwNggParseImageList(r.images_list)}}function ewwwNggLoadGalleries(e){e&&document.addEventListener("ngg.galleria.themeadded",function(e,t){window.ngg_galleria._create_backup=window.ngg_galleria.create,window.ngg_galleria.create=function(e,t){var r=$(e).data("id");return galleries["gallery_"+r].images_list=ewwwNggParseImageList(galleries["gallery_"+r].images_list),window.ngg_galleria._create_backup(e,t)}})}function ewwwNggParseImageList(e){for(var t in e){var r=e[t];if(void 0!==r["image-webp"]&&(e[t].image=r["image-webp"],delete e[t]["image-webp"]),void 0!==r["thumb-webp"]&&(e[t].thumb=r["thumb-webp"],delete e[t]["thumb-webp"]),void 0!==r.full_image_webp&&(e[t].full_image=r.full_image_webp,delete e[t].full_image_webp),void 0!==r.srcsets)for(var a in r.srcsets)nggSrcset=r.srcsets[a],void 0!==r.srcsets[a+"-webp"]&&(e[t].srcsets[a]=r.srcsets[a+"-webp"],delete e[t].srcsets[a+"-webp"]);if(void 0!==r.full_srcsets)for(var i in r.full_srcsets)nggFSrcset=r.full_srcsets[i],void 0!==r.full_srcsets[i+"-webp"]&&(e[t].full_srcsets[i]=r.full_srcsets[i+"-webp"],delete e[t].full_srcsets[i+"-webp"])}return e}check_webp_feature("alpha",ewwwWebPInit);</script><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v22.3 (Yoast SEO v28.4) - https://yoast.com/product/yoast-seo-premium-wordpress/ -->
+	<title>معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار | مجله بازار</title>
+	<meta name="description" content="در این مقاله می‌خواهیم به سراغ محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار رفته‌ایم. با مجله بازار همراه باشید." />
+	<link rel="canonical" href="https://mag.cafebazaar.ir/the-most-popular-iranian-motorbike-games-on-cafe-bazzar/" />
+	<meta property="og:locale" content="fa_IR" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار" />
+	<meta property="og:description" content="در این مقاله می‌خواهیم به سراغ محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار رفته‌ایم. با مجله بازار همراه باشید." />
+	<meta property="og:url" content="https://mag.cafebazaar.ir/the-most-popular-iranian-motorbike-games-on-cafe-bazzar/" />
+	<meta property="og:site_name" content="مجله بازار" />
+	<meta property="article:published_time" content="2026-04-20T14:36:12+00:00" />
+	<meta property="article:modified_time" content="2026-04-26T07:11:22+00:00" />
+	<meta property="og:image" content="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic.jpg" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="675" />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta name="author" content="سورنا رضایی" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"Article","@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#article","isPartOf":{"@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/"},"author":{"name":"سورنا رضایی","@id":"https:\/\/mag.cafebazaar.ir\/#\/schema\/person\/be14f6f329ae2b3da3cd21e668ed952c"},"headline":"معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار","datePublished":"2026-04-20T14:36:12+00:00","dateModified":"2026-04-26T07:11:22+00:00","mainEntityOfPage":{"@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/"},"wordCount":89,"commentCount":1,"image":{"@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#primaryimage"},"thumbnailUrl":"https:\/\/mag.cafebazaar.ir\/wp-content\/uploads\/2026\/04\/Iranian-motorbike-games-main-pic.jpg","keywords":["بازار","کافه بازار"],"articleSection":["اخبار بازی","انتخاب سردبیر","برترین‌ها"],"inLanguage":"fa-IR","potentialAction":[{"@type":"CommentAction","name":"Comment","target":["https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#respond"]}]},{"@type":"WebPage","@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/","url":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/","name":"معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار | مجله بازار","isPartOf":{"@id":"https:\/\/mag.cafebazaar.ir\/#website"},"primaryImageOfPage":{"@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#primaryimage"},"image":{"@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#primaryimage"},"thumbnailUrl":"https:\/\/mag.cafebazaar.ir\/wp-content\/uploads\/2026\/04\/Iranian-motorbike-games-main-pic.jpg","datePublished":"2026-04-20T14:36:12+00:00","dateModified":"2026-04-26T07:11:22+00:00","author":{"@id":"https:\/\/mag.cafebazaar.ir\/#\/schema\/person\/be14f6f329ae2b3da3cd21e668ed952c"},"description":"در این مقاله می‌خواهیم به سراغ محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار رفته‌ایم. با مجله بازار همراه باشید.","inLanguage":"fa-IR","potentialAction":[{"@type":"ReadAction","target":["https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/"]}]},{"@type":"ImageObject","inLanguage":"fa-IR","@id":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar\/#primaryimage","url":"https:\/\/mag.cafebazaar.ir\/wp-content\/uploads\/2026\/04\/Iranian-motorbike-games-main-pic.jpg","contentUrl":"https:\/\/mag.cafebazaar.ir\/wp-content\/uploads\/2026\/04\/Iranian-motorbike-games-main-pic.jpg","width":1200,"height":675},{"@type":"WebSite","@id":"https:\/\/mag.cafebazaar.ir\/#website","url":"https:\/\/mag.cafebazaar.ir\/","name":"مجله بازار","description":"دنیای آموزش و اخبار بازی‌ها و اپلیکیشن‌های اندروید","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/mag.cafebazaar.ir\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"fa-IR"},{"@type":"Person","@id":"https:\/\/mag.cafebazaar.ir\/#\/schema\/person\/be14f6f329ae2b3da3cd21e668ed952c","name":"سورنا رضایی","image":{"@type":"ImageObject","inLanguage":"fa-IR","@id":"https:\/\/secure.gravatar.com\/avatar\/c4cc03c61d27ed3f8cb9ab43d629c4a83957e8ededbad8060b84e846cd686aff?s=96&d=retro&r=g","url":"https:\/\/secure.gravatar.com\/avatar\/c4cc03c61d27ed3f8cb9ab43d629c4a83957e8ededbad8060b84e846cd686aff?s=96&d=retro&r=g","contentUrl":"https:\/\/secure.gravatar.com\/avatar\/c4cc03c61d27ed3f8cb9ab43d629c4a83957e8ededbad8060b84e846cd686aff?s=96&d=retro&r=g","caption":"سورنا رضایی"},"url":"https:\/\/mag.cafebazaar.ir\/author\/sourena\/"}]}</script>
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='dns-prefetch' href='//cdn.jsdelivr.net' />
+<link rel="alternate" type="application/rss+xml" title="مجله بازار &raquo; معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در  بازار خوراک دیدگاه‌ها" href="https://mag.cafebazaar.ir/the-most-popular-iranian-motorbike-games-on-cafe-bazzar/feed/" />
+<style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link data-minify="1" rel='stylesheet' id='lightgallery-css' href='https://mag.cafebazaar.ir/wp-content/cache/min/1/wp-content/themes/cafeBazar/assets/css/lightgallery.css?ver=1787931864' media='all' />
+<link data-minify="1" rel='stylesheet' id='style-css' href='https://mag.cafebazaar.ir/wp-content/cache/min/1/wp-content/themes/cafeBazar/style.css?ver=1787931864' media='all' />
+<link data-minify="1" rel='stylesheet' id='home-css' href='https://mag.cafebazaar.ir/wp-content/cache/min/1/wp-content/themes/cafeBazar/assets/css/home.css?ver=1787931864' media='all' />
+<link data-minify="1" rel='stylesheet' id='editor-css' href='https://mag.cafebazaar.ir/wp-content/cache/min/1/wp-content/themes/cafeBazar/assets/css/editor.css?ver=1787931864' media='all' />
+<link data-minify="1" rel='stylesheet' id='wpdiscuz-frontend-rtl-css-css' href='https://mag.cafebazaar.ir/wp-content/cache/min/1/wp-content/plugins/wpdiscuz/themes/default/style-rtl.css?ver=1787931864' media='all' />
+<style id="wpdiscuz-frontend-rtl-css-inline-css">
+ #wpdcom .wpd-blog-administrator .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-administrator .wpd-comment-author, #wpdcom .wpd-blog-administrator .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-administrator .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment.wpd-reply .wpd-comment-wrap.wpd-blog-administrator{border-right:3px solid #00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-administrator .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-administrator .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-administrator .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-editor .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-editor .wpd-comment-author, #wpdcom .wpd-blog-editor .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-editor .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment.wpd-reply .wpd-comment-wrap.wpd-blog-editor{border-right:3px solid #00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-editor .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-editor .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-editor .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-author .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-author .wpd-comment-author, #wpdcom .wpd-blog-author .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-author .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-author .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-author .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-author .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-contributor .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-contributor .wpd-comment-author, #wpdcom .wpd-blog-contributor .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-contributor .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-contributor .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-contributor .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-contributor .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-subscriber .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-subscriber .wpd-comment-author, #wpdcom .wpd-blog-subscriber .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-subscriber .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-subscriber .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom .wpd-blog-wpseo_manager .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-wpseo_manager .wpd-comment-author, #wpdcom .wpd-blog-wpseo_manager .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-wpseo_manager .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-wpseo_manager .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-wpseo_manager .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-wpseo_manager .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-wpseo_editor .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-wpseo_editor .wpd-comment-author, #wpdcom .wpd-blog-wpseo_editor .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-wpseo_editor .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-wpseo_editor .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-wpseo_editor .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-wpseo_editor .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-manage_schema_options .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-manage_schema_options .wpd-comment-author, #wpdcom .wpd-blog-manage_schema_options .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-manage_schema_options .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-manage_schema_options .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-manage_schema_options .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-manage_schema_options .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-post_author .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-post_author .wpd-comment-author, #wpdcom .wpd-blog-post_author .wpd-comment-author a{color:#00B38F}#wpdcom .wpd-blog-post_author .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-1 .wpd-comment .wpd-blog-post_author .wpd-avatar img{border-color:#00B38F}#wpdcom.wpd-layout-2 .wpd-comment.wpd-reply .wpd-comment-wrap.wpd-blog-post_author{border-right:3px solid #00B38F}#wpdcom.wpd-layout-2 .wpd-comment .wpd-blog-post_author .wpd-avatar img{border-bottom-color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-post_author .wpd-comment-subheader{border-top:1px dashed #00B38F}#wpdcom.wpd-layout-3 .wpd-reply .wpd-blog-post_author .wpd-comment-right{border-right:1px solid #00B38F}#wpdcom .wpd-blog-guest .wpd-comment-label{color:#ffffff;background-color:#00B38F;border:none}#wpdcom .wpd-blog-guest .wpd-comment-author, #wpdcom .wpd-blog-guest .wpd-comment-author a{color:#00B38F}#wpdcom.wpd-layout-3 .wpd-blog-guest .wpd-comment-subheader{border-top:1px dashed #00B38F}#comments, #respond, .comments-area, #wpdcom{}#wpdcom .ql-editor > *{color:#777777}#wpdcom .ql-editor::before{}#wpdcom .ql-toolbar{border:1px solid #DDDDDD;border-top:none}#wpdcom .ql-container{border:1px solid #DDDDDD;border-bottom:none}#wpdcom .wpd-form-row .wpdiscuz-item input[type="text"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="email"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="url"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="color"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="date"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="datetime"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="datetime-local"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="month"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="number"], #wpdcom .wpd-form-row .wpdiscuz-item input[type="time"], #wpdcom textarea, #wpdcom select{border:1px solid #DDDDDD;color:#777777}#wpdcom .wpd-form-row .wpdiscuz-item textarea{border:1px solid #DDDDDD}#wpdcom input::placeholder, #wpdcom textarea::placeholder, #wpdcom input::-moz-placeholder, #wpdcom textarea::-webkit-input-placeholder{}#wpdcom .wpd-comment-text{color:#777777}#wpdcom .wpd-thread-head .wpd-thread-info{border-bottom:2px solid #00B38F}#wpdcom .wpd-thread-head .wpd-thread-info.wpd-reviews-tab svg{fill:#00B38F}#wpdcom .wpd-thread-head .wpdiscuz-user-settings{border-bottom:2px solid #00B38F}#wpdcom .wpd-thread-head .wpdiscuz-user-settings:hover{color:#00B38F}#wpdcom .wpd-comment .wpd-follow-link:hover{color:#00B38F}#wpdcom .wpd-comment-status .wpd-sticky{color:#00B38F}#wpdcom .wpd-thread-filter .wpdf-active{color:#00B38F;border-bottom-color:#00B38F}#wpdcom .wpd-inline-filter-cta{border:1px dashed #33c3a6;background:#e6f8f4}#wpdcom .wpd-inline-filter-cta .wpd-current-view i{color:#00B38F}#wpdcom .wpd-filter-view-all:hover{background:#00B38F}#wpdcom .wpdiscuz-item .wpdiscuz-rating > label{color:#DDDDDD}#wpdcom .wpdiscuz-item .wpdiscuz-rating:not(:checked) > label:hover, .wpdiscuz-rating:not(:checked) > label:hover ~ label{}#wpdcom .wpdiscuz-item .wpdiscuz-rating > input ~ label:hover, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:not(:checked) ~ label:hover ~ label, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:not(:checked) ~ label:hover ~ label{color:#FFED85}#wpdcom .wpdiscuz-item .wpdiscuz-rating > input:checked ~ label:hover, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:checked ~ label:hover, #wpdcom .wpdiscuz-item .wpdiscuz-rating > label:hover ~ input:checked ~ label, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:checked + label:hover ~ label, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:checked ~ label:hover ~ label, .wpd-custom-field .wcf-active-star, #wpdcom .wpdiscuz-item .wpdiscuz-rating > input:checked ~ label{color:#FFD700}#wpd-post-rating .wpd-rating-wrap .wpd-rating-stars svg .wpd-star{fill:#DDDDDD}#wpd-post-rating .wpd-rating-wrap .wpd-rating-stars svg .wpd-active{fill:#FFD700}#wpd-post-rating .wpd-rating-wrap .wpd-rate-starts svg .wpd-star{fill:#DDDDDD}#wpd-post-rating .wpd-rating-wrap .wpd-rate-starts:hover svg .wpd-star{fill:#FFED85}#wpd-post-rating.wpd-not-rated .wpd-rating-wrap .wpd-rate-starts svg:hover ~ svg .wpd-star{fill:#DDDDDD}.wpdiscuz-post-rating-wrap .wpd-rating .wpd-rating-wrap .wpd-rating-stars svg .wpd-star{fill:#DDDDDD}.wpdiscuz-post-rating-wrap .wpd-rating .wpd-rating-wrap .wpd-rating-stars svg .wpd-active{fill:#FFD700}#wpdcom .wpd-comment .wpd-follow-active{color:#ff7a00}#wpdcom .page-numbers{color:#555;border:#555 1px solid}#wpdcom span.current{background:#555}#wpdcom.wpd-layout-1 .wpd-new-loaded-comment > .wpd-comment-wrap > .wpd-comment-right{background:#FFFAD6}#wpdcom.wpd-layout-2 .wpd-new-loaded-comment.wpd-comment > .wpd-comment-wrap > .wpd-comment-right{background:#FFFAD6}#wpdcom.wpd-layout-2 .wpd-new-loaded-comment.wpd-comment.wpd-reply > .wpd-comment-wrap > .wpd-comment-right{background:transparent}#wpdcom.wpd-layout-2 .wpd-new-loaded-comment.wpd-comment.wpd-reply > .wpd-comment-wrap{background:#FFFAD6}#wpdcom.wpd-layout-3 .wpd-new-loaded-comment.wpd-comment > .wpd-comment-wrap > .wpd-comment-right{background:#FFFAD6}#wpdcom .wpd-follow:hover i, #wpdcom .wpd-unfollow:hover i, #wpdcom .wpd-comment .wpd-follow-active:hover i{color:#00B38F}#wpdcom .wpdiscuz-readmore{cursor:pointer;color:#00B38F}.wpd-custom-field .wcf-pasiv-star, #wpcomm .wpdiscuz-item .wpdiscuz-rating > label{color:#DDDDDD}.wpd-wrapper .wpd-list-item.wpd-active{border-top:3px solid #00B38F}#wpdcom.wpd-layout-2 .wpd-comment.wpd-reply.wpd-unapproved-comment .wpd-comment-wrap{border-right:3px solid #FFFAD6}#wpdcom.wpd-layout-3 .wpd-comment.wpd-reply.wpd-unapproved-comment .wpd-comment-right{border-right:1px solid #FFFAD6}#wpdcom .wpd-prim-button{background-color:#009f4d;color:#FFFFFF}#wpdcom .wpd_label__check i.wpdicon-on{color:#009f4d;border:1px solid #80cfa6}#wpd-bubble-wrapper #wpd-bubble-all-comments-count{color:#1DB99A}#wpd-bubble-wrapper > div{background-color:#1DB99A}#wpd-bubble-wrapper > #wpd-bubble #wpd-bubble-add-message{background-color:#1DB99A}#wpd-bubble-wrapper > #wpd-bubble #wpd-bubble-add-message::before{border-left-color:#1DB99A;border-right-color:#1DB99A}#wpd-bubble-wrapper.wpd-right-corner > #wpd-bubble #wpd-bubble-add-message::before{border-left-color:#1DB99A;border-right-color:#1DB99A}.wpd-inline-icon-wrapper path.wpd-inline-icon-first{fill:#1DB99A}.wpd-inline-icon-count{background-color:#1DB99A}.wpd-inline-icon-count::before{border-left-color:#1DB99A}.wpd-inline-form-wrapper::before{border-bottom-color:#1DB99A}.wpd-inline-form-question{background-color:#1DB99A}.wpd-inline-form{background-color:#1DB99A}.wpd-last-inline-comments-wrapper{border-color:#1DB99A}.wpd-last-inline-comments-wrapper::before{border-bottom-color:#1DB99A}.wpd-last-inline-comments-wrapper .wpd-view-all-inline-comments{background:#1DB99A}.wpd-last-inline-comments-wrapper .wpd-view-all-inline-comments:hover,.wpd-last-inline-comments-wrapper .wpd-view-all-inline-comments:active,.wpd-last-inline-comments-wrapper .wpd-view-all-inline-comments:focus{background-color:#1DB99A}#wpdcom .ql-snow .ql-tooltip[data-mode="link"]::before{content:"لینک را وارد کنید:"}#wpdcom .ql-snow .ql-tooltip.ql-editing a.ql-action::after{content:"ذخیره کردن"}.comments-area{width:auto}
+/*# sourceURL=wpdiscuz-frontend-rtl-css-inline-css */
+</style>
+<link rel='stylesheet' id='wpdiscuz-combo-css-css' href='https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/css/wpdiscuz-combo.min.css' media='all' />
+<script id="jquery-core-js" src="https://mag.cafebazaar.ir/wp-includes/js/jquery/jquery.min.js"></script>
+<script id="jquery-migrate-js" src="https://mag.cafebazaar.ir/wp-includes/js/jquery/jquery-migrate.min.js"></script>
+<link rel="https://api.w.org/" href="https://mag.cafebazaar.ir/wp-json/" /><link rel="alternate" title="JSON" type="application/json" href="https://mag.cafebazaar.ir/wp-json/wp/v2/posts/157906" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://mag.cafebazaar.ir/xmlrpc.php?rsd" />
+<link rel='shortlink' href='https://mag.cafebazaar.ir/?p=157906' />
+<meta name="google-site-verification" content="MJbk_fXtf5HMxONrO4YhJU23RpvZDUM0XJckvjF_F74" />
+
+<script>document.addEventListener('DOMContentLoaded',function(){var persian={'0':'۰','1':'۱','2':'۲','3':'۳','4':'۴','5':'۵','6':'۶','7':'۷','8':'۸','9':'۹'};function traverse(e){if(3===e.nodeType){var a=e.data.match(/[0-9]/g);if(null!==a&&0!==a.length)for(var t=0;t<a.length;t++)e.data=e.data.replace(a[t],persian[a[t]])}for(var n=0;n<e.childNodes.length;n++)traverse(e.childNodes[n])}traverse(document.body)})</script>
+
+<link rel="manifest" href="/manifest.json">
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P56ZF88');</script>
+<!-- End Google Tag Manager --><style>.wp-block-gallery.is-cropped .blocks-gallery-item picture{height:100%;width:100%;}</style><link rel="icon" href="https://mag.cafebazaar.ir/wp-content/uploads/2024/04/cropped-cropped-Single-Sign-Colored-1-1-32x32.webp" sizes="32x32" />
+<link rel="icon" href="https://mag.cafebazaar.ir/wp-content/uploads/2024/04/cropped-cropped-Single-Sign-Colored-1-1-192x192.webp" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://mag.cafebazaar.ir/wp-content/uploads/2024/04/cropped-cropped-Single-Sign-Colored-1-1-180x180.webp" />
+<meta name="msapplication-TileImage" content="https://mag.cafebazaar.ir/wp-content/uploads/2024/04/cropped-cropped-Single-Sign-Colored-1-1-270x270.webp" />
+	<script async src="https://news.google.com/swg/js/v1/swg-merch.js"></script>
+<meta name="generator" content="WP Rocket 3.19.4" data-wpr-features="wpr_minify_css wpr_preload_links wpr_desktop" /></head>
+<body class="wp-singular post-template-default single single-post postid-157906 single-format-standard wp-theme-cafeBazar inner-page">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P56ZF88"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div data-rocket-location-hash="99bb46786fd5bd31bcd7bdc067ad247a" id="wrapper">
+<header data-rocket-location-hash="c68188da780f11c554c4d18cceaef351" id="header">
+	<div data-rocket-location-hash="40f22408a88335a0945fffe944caafc3" class="container">
+		<div class="row">
+		    <div class="col-6 col-lg-2 d-flex align-items-center">
+			    				<a class="header-logo" href="https://mag.cafebazaar.ir" title="مجله بازار">
+					<img width="214" height="96" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-2-.png" class="attachment-full size-full" alt="" decoding="async" />				</a>
+				                                    <a class="header-logo-sticky" href="https://mag.cafebazaar.ir" title="مجله بازار">
+                        <img width="1213" height="700" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-and-logotype.png" class="attachment-full size-full" alt="" decoding="async" fetchpriority="high" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-and-logotype.png 1213w, https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-and-logotype-300x173.png 300w, https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-and-logotype-1024x591.png 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-and-logotype-768x443.png 768w" sizes="(max-width: 1213px) 100vw, 1213px" />                    </a>
+                			</div>
+			<div class="col-4 col-lg-8 d-none d-lg-flex align-items-center">
+				<nav class="wrap-menu"><ul id="menu-%d9%81%d9%87%d8%b1%d8%b3%d8%aa-%d8%a7%d8%b5%d9%84%db%8c" class="header-menu"><li id="menu-item-12571" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-12571"><a href="https://mag.cafebazaar.ir/category/news/">خبر</a>
+<ul class="sub-menu">
+	<li id="menu-item-12573" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12573"><a href="https://mag.cafebazaar.ir/category/news/minecraft-news/">آخرین اخبار ماینکرافت</a></li>
+	<li id="menu-item-12574" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12574"><a href="https://mag.cafebazaar.ir/category/news/gta-news/">آخرین اخبار جی‌تی‌ای</a></li>
+	<li id="menu-item-12575" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12575"><a href="https://mag.cafebazaar.ir/category/news/spongebob-news/">آخرین اخبار باب اسفنجی و پاتریک</a></li>
+	<li id="menu-item-12576" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12576"><a href="https://mag.cafebazaar.ir/category/news/cod-news/">آخرین اخبار کالاف دیوتی موبایل</a></li>
+</ul>
+</li>
+<li id="menu-item-55265" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-55265"><a href="https://mag.cafebazaar.ir/category/news/cinema-anime/">سینما و انیمیشن</a>
+<ul class="sub-menu">
+	<li id="menu-item-139667" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139667"><a href="https://mag.cafebazaar.ir/most-anticipated-movies-2026/">موردانتظارترین فیلم‌های ۲۰۲۶</a></li>
+	<li id="menu-item-135829" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135829"><a href="https://mag.cafebazaar.ir/the-most-anticipated-anime-2026/">بهترین انیمه‌های ۲۰۲۶</a></li>
+	<li id="menu-item-135826" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135826"><a href="https://mag.cafebazaar.ir/2025-best-upcoming-films/">بهترین فیلم‌های سال ۲۰۲۵</a></li>
+	<li id="menu-item-135828" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135828"><a href="https://mag.cafebazaar.ir/best-action-movies/">جدیدترین فیلم‌های اکشن ۲۰۲۵</a></li>
+</ul>
+</li>
+<li id="menu-item-12577" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-has-children menu-item-12577"><a href="https://mag.cafebazaar.ir/category/editors-suggestions/">برترین‌ها</a>
+<ul class="sub-menu">
+	<li id="menu-item-135825" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-135825"><a href="https://cafebazaar.ir/pages/home-game">بهترین بازی‌های ۲۰۲۵ + دانلود</a></li>
+	<li id="menu-item-139668" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139668"><a href="https://mag.cafebazaar.ir/best-offline-android-game/">بهترین بازی‌های آفلاین اندروید</a></li>
+	<li id="menu-item-139670" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139670"><a href="https://mag.cafebazaar.ir/best-offline-shooter-action-games/">بهترین بازی‌های شوتر آفلاین اندروید</a></li>
+	<li id="menu-item-139671" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139671"><a href="https://mag.cafebazaar.ir/top-heaviest-android-games/">بهترین بازی‌های سنگین اندروید</a></li>
+	<li id="menu-item-139669" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139669"><a href="https://mag.cafebazaar.ir/best-offline-high-graphic-games/">بهترین بازی‌های آفلاین اندروید با گرافیک بالا</a></li>
+	<li id="menu-item-139672" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139672"><a href="https://mag.cafebazaar.ir/high-graphics-android-games/">گرافیکی ترین بازی‌های اندروید</a></li>
+	<li id="menu-item-139673" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139673"><a href="https://mag.cafebazaar.ir/best-strategy-games/">بهترین بازی‌های استراتژیک اندروید</a></li>
+</ul>
+</li>
+<li id="menu-item-12578" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12578"><a href="https://mag.cafebazaar.ir/category/tips/">ترفندها</a></li>
+<li id="menu-item-12579" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12579"><a href="https://mag.cafebazaar.ir/category/guides/">راهنما و آموزش</a></li>
+<li id="menu-item-12580" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12580"><a href="https://mag.cafebazaar.ir/category/reviews/">نقد و بررسی</a></li>
+<li id="menu-item-57961" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-57961"><a href="https://mag.cafebazaar.ir/video/">ویدیو مگ</a>
+<ul class="sub-menu">
+	<li id="menu-item-57963" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57963"><a href="https://mag.cafebazaar.ir/movie-cat/movie/">تماشای فیلم</a></li>
+	<li id="menu-item-57962" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57962"><a href="https://mag.cafebazaar.ir/movie-cat/minecraft/">ماینکرافت</a></li>
+	<li id="menu-item-57964" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57964"><a href="https://mag.cafebazaar.ir/movie-cat/anime/">انیمه</a></li>
+	<li id="menu-item-57965" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57965"><a href="https://mag.cafebazaar.ir/movie-cat/video-game/">بازی</a></li>
+	<li id="menu-item-57966" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57966"><a href="https://mag.cafebazaar.ir/movie-cat/tv-series/">تماشای سریال</a></li>
+	<li id="menu-item-57967" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57967"><a href="https://mag.cafebazaar.ir/movie-cat/spongebob/">باب اسفنجی</a></li>
+	<li id="menu-item-57968" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57968"><a href="https://mag.cafebazaar.ir/movie-cat/gta/">جی تی ای</a></li>
+	<li id="menu-item-57969" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57969"><a href="https://mag.cafebazaar.ir/movie-cat/call-of-duty/">کالاف دیوتی</a></li>
+</ul>
+</li>
+</ul></nav>			</div>
+			<div class="col-6 col-lg-2 d-flex align-items-center justify-content-end">
+			                    <div class="header-search"><i class="icon-search"></i><span></span></div>
+				<div class="header-mm"><i class="icon-menu"></i><i class="icon-menu2"></i></div>
+			</div>
+		</div>
+	</div>
+</header>
+<main data-rocket-location-hash="2d7563295bae679a1242eeb05b1c9130" id="main" class="site-main">
+    <div data-rocket-location-hash="0841f15ebf099eeaba6f2c7f735d0671" class="container">
+    <div class="row">
+        <div class="col-lg-8 order-1 order-md-1 mx-auto">
+            <article class="single-top post-157906 post type-post status-publish format-standard has-post-thumbnail hentry category-game-news category-editors-choice category-editors-suggestions tag-935 tag-1136" id="post-157906">
+                <div class="thumbnail thumbnail2">
+                        <div class="thumbnail-post-img mb-4">
+        <img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic-768x432.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />        <div class="details-thumbnail">
+                <div class="category-post">
+        <a href="https://mag.cafebazaar.ir/category/news/game-news/" rel="category tag">اخبار بازی</a> <a href="https://mag.cafebazaar.ir/category/editors-choice/" rel="category tag">انتخاب سردبیر</a> <a href="https://mag.cafebazaar.ir/category/editors-suggestions/" rel="category tag">برترین‌ها</a>    </div>
+
+<div class="title-site">
+    <h1 class="title-heading">معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در  بازار</h1>
+</div>
+
+<div class="post-info-col">
+    <div class="post-meta-wrapper">
+        <div class="post-meta-right">
+            <div class="post-author"><span class="author-avatar"><img alt='' src='https://secure.gravatar.com/avatar/c4cc03c61d27ed3f8cb9ab43d629c4a83957e8ededbad8060b84e846cd686aff?s=40&#038;d=retro&#038;r=g' srcset='https://secure.gravatar.com/avatar/c4cc03c61d27ed3f8cb9ab43d629c4a83957e8ededbad8060b84e846cd686aff?s=80&#038;d=retro&#038;r=g 2x' class='avatar avatar-40 photo' height='40' width='40' decoding='async'/></span><div class="author-details"><span class="author-name"><a href="https://mag.cafebazaar.ir/author/sourena/">سورنا رضایی</a></span></div></div>
+            <div class="datepost">
+              2026/04/26            </div>
+
+            <a href="#comments-single" class="comments">
+                <i class="icon-comment"></i>
+                <span class="comment-count">
+                    1 دیدگاه                </span>
+            </a>
+        </div>
+
+        <div class="post-meta-left">
+            <a href="https://www.google.com/preferences/source?q=mag.cafebazaar.ir" target="_blank" class="google-source-custom-btn">
+                <span>مجله بازار رو به منابع منتخب در گوگل اضافه کن</span>
+                <svg class="google-icon" width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.14C3.15 21.32 7.22 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.62H1.18C.43 8.12 0 9.81 0 12s.43 3.88 1.18 5.38l4.09-3.14z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.15 2.68 1.18 6.62l4.09 3.14c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>        </div>
+    </div>
+
+                </div>
+                <div class="editor-content main-content content2">
+    <div class="socials socials-share">
+    <div class="share-icon">
+        <span>اشتراک گذاری:</span>
+        <a href="https://telegram.me/share/url?url=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F&amp;text=%D9%85%D8%B9%D8%B1%D9%81%DB%8C+%D9%85%D8%AD%D8%A8%D9%88%D8%A8%E2%80%8C%D8%AA%D8%B1%DB%8C%D9%86+%D8%A8%D8%A7%D8%B2%DB%8C%E2%80%8C%D9%87%D8%A7%DB%8C+%D9%85%D9%88%D8%AA%D9%88%D8%B1%D8%B3%D9%88%D8%A7%D8%B1%DB%8C+%D8%A7%DB%8C%D8%B1%D8%A7%D9%86%DB%8C+%D8%AF%D8%B1++%D8%A8%D8%A7%D8%B2%D8%A7%D8%B1:https%3A%2F%2Fmag.cafebazaar.ir" title="telegram" rel="noreferrer nofollow noopener" target="_blank"><i class="icon-telegram"></i></a><a href="https://twitter.com/share/url?url=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F&amp;text=%D9%85%D8%B9%D8%B1%D9%81%DB%8C+%D9%85%D8%AD%D8%A8%D9%88%D8%A8%E2%80%8C%D8%AA%D8%B1%DB%8C%D9%86+%D8%A8%D8%A7%D8%B2%DB%8C%E2%80%8C%D9%87%D8%A7%DB%8C+%D9%85%D9%88%D8%AA%D9%88%D8%B1%D8%B3%D9%88%D8%A7%D8%B1%DB%8C+%D8%A7%DB%8C%D8%B1%D8%A7%D9%86%DB%8C+%D8%AF%D8%B1++%D8%A8%D8%A7%D8%B2%D8%A7%D8%B1:https%3A%2F%2Fmag.cafebazaar.ir" title="twitter" rel="noreferrer nofollow noopener" target="_blank"><i class="icon-twitter"></i></a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F&amp;t=%D9%85%D8%B9%D8%B1%D9%81%DB%8C+%D9%85%D8%AD%D8%A8%D9%88%D8%A8%E2%80%8C%D8%AA%D8%B1%DB%8C%D9%86+%D8%A8%D8%A7%D8%B2%DB%8C%E2%80%8C%D9%87%D8%A7%DB%8C+%D9%85%D9%88%D8%AA%D9%88%D8%B1%D8%B3%D9%88%D8%A7%D8%B1%DB%8C+%D8%A7%DB%8C%D8%B1%D8%A7%D9%86%DB%8C+%D8%AF%D8%B1++%D8%A8%D8%A7%D8%B2%D8%A7%D8%B1" title="Share on Facebook" target="_blank" rel="noreferrer nofollow noopener"><i class="icon-facebook"></i></a><a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F&amp;title=%D9%85%D8%B9%D8%B1%D9%81%DB%8C+%D9%85%D8%AD%D8%A8%D9%88%D8%A8%E2%80%8C%D8%AA%D8%B1%DB%8C%D9%86+%D8%A8%D8%A7%D8%B2%DB%8C%E2%80%8C%D9%87%D8%A7%DB%8C+%D9%85%D9%88%D8%AA%D9%88%D8%B1%D8%B3%D9%88%D8%A7%D8%B1%DB%8C+%D8%A7%DB%8C%D8%B1%D8%A7%D9%86%DB%8C+%D8%AF%D8%B1++%D8%A8%D8%A7%D8%B2%D8%A7%D8%B1&amp;source=https%3A%2F%2Fmag.cafebazaar.ir" target="_blank" title="Share on LinkedIn" rel="noreferrer nofollow noopener" ><i class="icon-linkedin"></i></a><a href="mailto:&amp;url=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F&amp;title=%D9%85%D8%B9%D8%B1%D9%81%DB%8C+%D9%85%D8%AD%D8%A8%D9%88%D8%A8%E2%80%8C%D8%AA%D8%B1%DB%8C%D9%86+%D8%A8%D8%A7%D8%B2%DB%8C%E2%80%8C%D9%87%D8%A7%DB%8C+%D9%85%D9%88%D8%AA%D9%88%D8%B1%D8%B3%D9%88%D8%A7%D8%B1%DB%8C+%D8%A7%DB%8C%D8%B1%D8%A7%D9%86%DB%8C+%D8%AF%D8%B1++%D8%A8%D8%A7%D8%B2%D8%A7%D8%B1&amp;source=https%3A%2F%2Fmag.cafebazaar.ir" target="_blank" title="Share on email" rel="noreferrer nofollow noopener" ><i class="icon-email"></i></a>    </div>
+
+</div>
+    <p>در این مقاله می‌خواهیم به سراغ <strong>محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار</strong> رفته و با آن‌ها بیشتر آشنا شویم. با <a href="https://mag.cafebazaar.ir/">مجله بازار</a> همراه باشید.</p>
+<p>به قسمت ششم محبوب‌ترین بازی‌های بازار رسیده‌ایم و اینبار قرار است نگاهی به عناوین موتورسواری ایرانی داشته باشیم. اگرچه موتورسواری به اندازه اتومبیلرانی در میان کودکان و نوجوانان محبوب است، در حوزه بازی‌های ویدیویی چندان مورد استقبال قرار نگرفته و به همین دلیل، تعداد عناوین ساخته شده توسط توسعه‌دهندگان ایرانی چندان بالا و چشمگیر نیست؛ بر عکس چیزی که در سبک اتومبیلرانی شاهد بودیم و مجبور شدیم در دو قسمت به معرفی‌شان بپردازیم.</p>
+<p>در ادامه و با معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار همراه باشید.</p>
+<a href="https://mag.cafebazaar.ir/movies/easily-trap-the-warden-in-minecraft/" target="_blank" rel="noopener"><img decoding="async" class="aligncenter wp-image-155010 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/02/4-warden-in-minecraft.png" alt="" width="750" height="422" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/02/4-warden-in-minecraft.png 750w, https://mag.cafebazaar.ir/wp-content/uploads/2026/02/4-warden-in-minecraft-300x169.png 300w" sizes="(max-width: 750px) 100vw, 750px" /></a>
+<h2>شیرو موتوری</h2>
+<p><strong>تعداد دانلودها: 340 هزار نفر / امتیاز: 4.4 از 5</strong></p>
+<img decoding="async" class="alignnone wp-image-157912 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1.jpg" alt="بازی‌های موتورسواری ایرانی در کافه بازار" width="1200" height="750" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1-300x188.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1-1024x640.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1-768x480.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+<p>شیرو موتوری محصول پیسا گیمز بوده و بیش از 1 هزار و 600 نظر خود را درباره کیفیت آن گفته‌اند. مانند موتوری، دوربینش از کنار بوده و در آن باید فردی موتورسوار را کنترل کنید. بازی مزبور دو بخش دارد: بخش داستانی و بخش امتیازی. در بخش داستانی اتفاقات حول محور شخصیتی به نام شیرو چرخیده و در بخش امتیازی هم باید عملکرد خود را به رخ دیگران بکشید. با جمع‌آوری سکه می‌توانید موتورهای جدیدی خریده و از همه مهمتر، حرکاتی که با هر کدام از موتورها قابل‌انجام است، با یکدیگر فرق دارد.</p>
+<span class='maxbutton-1-container mb-container'><a class="maxbutton-1 maxbutton maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf" href="https://cafebazaar.ir/app/ir.pisagames.shiro"><span class='mb-text'>دانلود بازی شیرو موتوری از بازار</span></a></span>
+<h2>موتوریس</h2>
+<p><strong>تعداد دانلودها: 520 هزار نفر / امتیاز: 4.4 از 5</strong></p>
+<img decoding="async" class="alignnone wp-image-157913 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2.jpg" alt="بازی‌های موتورسواری ایرانی در کافه بازار" width="1200" height="750" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2-300x188.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2-1024x640.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2-768x480.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+<p>بازی موتوریس محصول پارسیس گیمز بوده و بیش از 2 هزار نفر در نظرسنجی پیرامون کیفیت آن شرکت کرده‌اند. در عنوان مزبور می‌توانید موتور سنگین مد نظر خود را از میان 13 محصول متفاوت از برندهای مختلف (دوکاتی، سوزوکی، هوندا، کاوازاکی، BMW و &#8230;) انتخاب کنید. جزئیات در مدلسازی‌ها رعایت شده و امکان ارتقای هر کدام از موتورها وجود دارد.</p>
+<span class='maxbutton-3-container mb-container'><a class="maxbutton-3 maxbutton maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af" title="بیشتر بخوانید" href="https://mag.cafebazaar.ir/battlefield-6-new-mode-operation-augur/"><span class='mb-text'>بخش جدید بتلفیلد ۶ با عنوان Operation Augur معرفی شد</span></a></span>
+<p>رقابت‌های بازی موتوریس در پیست‌های مختلف رخ می‌دهد که در مکان‌های متفاوتی واقع شده است؛ زمان‌های مربوط به پیست‌ها هم با یکدیگر متفاوت بوده تا احساس یکنواختی نداشته باشید. همچنین می‌توانید موتور را در سه دوربین متفاوت کنترل کنید. در ضمن، تنظیمات گرافیکی متعددی در نظر گرفته شده تا بواسطه تغییر آن‌ها بتوانید بازی را روی تلفن‌های همراه ضعیف‌تر هم اجرا کنید.</p>
+<span class='maxbutton-1-container mb-container'><a class="maxbutton-1 maxbutton maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf" href="https://cafebazaar.ir/app/com.ParsisGames.MotoRace"><span class='mb-text'>دانلود بازی موتوریس از بازار</span></a></span>
+<h2>موتوری</h2>
+<p><strong>تعداد دانلودها: 1 میلیون و 800 هزار نفر / امتیاز: 4.6 از 5</strong></p>
+<img decoding="async" class="alignnone wp-image-157914 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3.jpg" alt="" width="1200" height="750" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3-300x188.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3-1024x640.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3-768x480.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+<p>بازی موتوری محصول استودیو گلیم گیمز بوده و نزدیک به 300 هزار نفر کیفیت آن را ارزیابی کرده‌اند. عنوان مزبور دوربینی از بغل داشته و در آن باید کنترل یک فرد موتورسوار را به دست گرفته و بیشترین مسافت ممکن را با پشت سر گذاشتن موانع و انجام حرکات نمایشی طی کنید. یکی از ویژگی‌های خاص موتوری، طراحی هنری و فضاسازی طنزآلودش است که آن را از تمامی محصولات مشابه متمایز می‌کند؛ برای مثال، وقتی شخصیت اصلی تصادف کند و بمیرد، برایش یک آگهی ترحیم به نمایش آمده که شامل امتیازات جمع‌آوری شده و دیگر جزئیات است.</p>
+<p><a href="https://mag.cafebazaar.ir/movies/titanic-movie/" target="_blank" rel="noopener"><img decoding="async" class="aligncenter wp-image-143482 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2025/12/04-Titanic-min.png" alt="" width="750" height="422" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2025/12/04-Titanic-min.png 750w, https://mag.cafebazaar.ir/wp-content/uploads/2025/12/04-Titanic-min-300x169.png 300w" sizes="(max-width: 750px) 100vw, 750px" /></a><br />
+بازی موتوری قابلیت‌های دیگری هم دارد؛ می‌توانید چهره شخصیت اصلی و حتی جنسیت او را مطابق با سلیقه خود تغییر دهید و امکان انتخاب انواع مختلف موتورها (از اسکوتر شهری گرفته تا کراس و موتورهای قدیمی) هم وجود دارد.</p>
+<span class='maxbutton-1-container mb-container'><a class="maxbutton-1 maxbutton maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf" href="https://cafebazaar.ir/app/com.glimgames.motori"><span class='mb-text'>دانلود بازی موتوری از بازار</span></a></span>
+<h2>گشت پلیس 1 (موتور پلیس)</h2>
+<p><strong>تعداد دانلودها: 3 میلیون و 100 هزار نفر / امتیاز: 4.4 از 5</strong></p>
+<img decoding="async" class="alignnone wp-image-157915 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4.jpg" alt="" width="1200" height="750" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4-300x188.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4-1024x640.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4-768x480.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+<p>بازی گشت پلیس 1 محصول استودیو بازی سازی نور و حرکت بوده و نزدیک به 70 هزار نفر دیدگاه خود را پیرامون کیفیت آن در بازار به اشتراک گذاشته‌اند. عنوان مزبور درباره یک پلیس موتورسوار به نام آرش است که ماموریت دارد سارقان را در تهران بزرگ متوقف و دستگیر کند. نقشه بازی بصورت جهان باز (Open-World) طراحی شده و می‌توانید بدون محدودیت در محله‌های مشهور شهر رانندگی کنید. همچنین می‌توانید انواع مختلف ماموریت‌ها حول محور دستگیری سارقان و خلافکاران را انجام دهید.</p>
+<span class='maxbutton-2-container mb-container'><a class="maxbutton-2 maxbutton maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf" href="https://mag.cafebazaar.ir/movies/spongebob-in-attack-on-titan-universe/"><span class='mb-text'>باب اسفنجی در دنیای اتک آن تایتان! باب در نقش لیوای آکرمن</span></a></span>
+<p>از دیگر ویژگی‌های مثبت بازی گشت پلیس 1 می‌توان به انواع موتورهای مشهور مثل هوندا CBR و سوزوکی اشاره کرد که قابلیت شخصی‌سازی و ارتقا عملکرد فنی‌شان وجود دارد. همچنین عنوان مزبور با همکاری نیروی انتظامی ساخته شده، دوبلورهای نام آشنای کشورمان در صداگذاری‌اش حضور داشته‌اند و دوربین اول شخص دارد که هیجان بازی را دوچندان می‌کند.</p>
+<span class='maxbutton-1-container mb-container'><a class="maxbutton-1 maxbutton maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf" href="https://cafebazaar.ir/app/com.ALM.PolicePatrol"><span class='mb-text'>دانلود بازی گشت پلیس 1 از بازار </span></a></span>
+<h2>موتوری 2 داستانی</h2>
+<p><strong>تعداد دانلودها: 4 میلیون نفر / امتیاز: 4.5 از 5</strong></p>
+<img decoding="async" class="alignnone wp-image-157916 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5.jpg" alt="" width="1200" height="750" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5-300x188.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5-1024x640.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5-768x480.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+<p>موتوری 2 داستانی محصول گلیم گیمز بوده و بیش از 147 هزار نفر دیدگاه خود را پیرامون آن ثبت کرده‌اند. سازندگان تمام تلاش خود را به کار گرفتند تا هر چیزی که در قسمت اول قابل‌انجام بود را گسترش داده و محصول بهتری را ارائه دهند. در نسخه جدید تعداد موتورهای قابل‌انتخاب بیشتر شده، حرکت‌های نمایشی بیشتری قابل‌انجام هستند و نه تنها چهره، بلکه لباس شخصیت اصلی را هم می‌توانید مطابق میل خود تغییر دهید.</p>
+<span class='maxbutton-3-container mb-container'><a class="maxbutton-3 maxbutton maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af" title="بیشتر بخوانید" href="https://mag.cafebazaar.ir/ten-anime-perfect-score-rotten-tomatoes/"><span class='mb-text'>۱۰ انیمه که امتیاز کامل را از راتن تومیتوز دریافت کرده‌اند</span></a></span>
+<p>داستان بازی موتوری 2 در چهار شهر مختلف روایت شده و اینبار شخصیت‌های بیشتری سر راه شما قرار می‌گیرند. در ضمن، اگر نمی‌توانید پول زیادی جمع‌آوری کنید تا آیتم‌ها را بخرید، می‌توانید خرید اقساطی انجام دهید!</p>
+<span class='maxbutton-1-container mb-container'><a class="maxbutton-1 maxbutton maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf" href="https://cafebazaar.ir/app/com.glimgames.motori2"><span class='mb-text'>دانلود بازی موتوری 2 داستانی از بازار</span></a></span>
+<p><strong>نظر شما در رابطه با محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار چیست؟</strong><strong> </strong>نظرات‌تان را با ما و دیگر کاربران <strong>مجله بازار</strong> به اشتراک بگذارید.</p>
+<hr />
+<p style="text-align: center;"><strong><a href="https://www.youtube.com/watch?v=NbTKNPjHKs0">رازهای یوتوب فارسی؛ میزگیم با سک‌شات – قسمت اول</a></strong></p>
+<img decoding="async" class="alignnone wp-image-157907 size-full" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5.jpg" alt="بازی‌های موتورسواری ایرانی در کافه بازار" width="1200" height="675" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5-768x432.jpg 768w" sizes="(max-width: 1200px) 100vw, 1200px" />
+        <div class="tags_post">
+        <i class="icon-tag"></i>
+        <span>تگ ها</span>
+         <a href="https://mag.cafebazaar.ir/tag/%d8%a8%d8%a7%d8%b2%d8%a7%d8%b1/" rel="tag">بازار</a> <a href="https://mag.cafebazaar.ir/tag/%da%a9%d8%a7%d9%81%d9%87-%d8%a8%d8%a7%d8%b2%d8%a7%d8%b1/" rel="tag">کافه بازار</a>    </div>
+<div class="ballyfoot-banner" style="margin: 25px 0;">
+    <a href="https://B2n.ir/dy5271" target="_blank">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/08/Funtomcraft-Banner-1.jpg.webp"  type="image/webp"><img src="https://mag.cafebazaar.ir/wp-content/uploads/2026/08/Funtomcraft-Banner-1.jpg" alt="فانتوم کرفت" data-eio="p"></picture>
+    </a>
+</div></div>
+    <div class="section-blog section-base my-3" id="news-related">
+        <div class="title-site inner-title mb-3">
+            <h4 class="title-heading">بررسی های مرتبط</h4>
+        </div>
+        <div class="blog-carousel owl-carousel">
+            <article class="card-item">
+    <a href="https://mag.cafebazaar.ir/mads-mikkelsen-modern-warfare-4-villain-hollywood-gaming/" class="card-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/call-of-duty-modern-warfare-4-1-300x250.jpg.webp"  type="image/webp"><img width="300" height="250" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/call-of-duty-modern-warfare-4-1-300x250.jpg" class="attachment-img_games size-img_games wp-post-image" alt="" full="" decoding="async" data-eio="p" /></picture>    </a>
+    <div class="card-content">
+        <div class="card-title-row">
+                                     <a href="https://mag.cafebazaar.ir/mads-mikkelsen-modern-warfare-4-villain-hollywood-gaming/">
+                <h3>مدز میکلسن در مدرن وارفر ۴؛ وقتی هالیوود تسلیم دنیای بازی می‌شود</h3>
+            </a>
+        </div>
+        <div class="post-details">
+            <span class="date">2026/09/21</span>
+            <a href="https://mag.cafebazaar.ir/mads-mikkelsen-modern-warfare-4-villain-hollywood-gaming/">
+                <i class="icon-arrow-up-left2"></i>
+            </a>
+        </div>
+    </div>
+</article><article class="card-item">
+    <a href="https://mag.cafebazaar.ir/ea-sports-fc-27-review/" class="card-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/fc-27-300x250.jpg.webp"  type="image/webp"><img width="300" height="250" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/fc-27-300x250.jpg" class="attachment-img_games size-img_games wp-post-image" alt="بررسی بازی EA SPORTS FC 27 | توپ تکراری فوتبال" full="" decoding="async" data-eio="p" /></picture>    </a>
+    <div class="card-content">
+        <div class="card-title-row">
+             <div class="points">6.5</div>                         <a href="https://mag.cafebazaar.ir/ea-sports-fc-27-review/">
+                <h3>بررسی بازی EA SPORTS FC 27 | توپ تکراری فوتبال</h3>
+            </a>
+        </div>
+        <div class="post-details">
+            <span class="date"></span>
+            <a href="https://mag.cafebazaar.ir/ea-sports-fc-27-review/">
+                <i class="icon-arrow-up-left2"></i>
+            </a>
+        </div>
+    </div>
+</article><article class="card-item">
+    <a href="https://mag.cafebazaar.ir/fall-2026-popular-anime-new-season/" class="card-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/fall-2026-popular-anime-new-season-300x250.jpg.webp"  type="image/webp"><img width="300" height="250" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/fall-2026-popular-anime-new-season-300x250.jpg" class="attachment-img_games size-img_games wp-post-image" alt="انیمه های محبوب که پاییز ۲۰۲۶ با فصل جدیدشان بر‌می‌گردند" full="" decoding="async" data-eio="p" /></picture>    </a>
+    <div class="card-content">
+        <div class="card-title-row">
+                                     <a href="https://mag.cafebazaar.ir/fall-2026-popular-anime-new-season/">
+                <h3>انیمه های محبوب که پاییز ۲۰۲۶ با فصل جدیدشان بر‌می‌گردند</h3>
+            </a>
+        </div>
+        <div class="post-details">
+            <span class="date">2026/09/20</span>
+            <a href="https://mag.cafebazaar.ir/fall-2026-popular-anime-new-season/">
+                <i class="icon-arrow-up-left2"></i>
+            </a>
+        </div>
+    </div>
+</article><article class="card-item">
+    <a href="https://mag.cafebazaar.ir/mizgame-why-no-one-loves-new-wolverine-game/" class="card-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/mizgame-wolverine-300x250.jpg.webp"  type="image/webp"><img width="300" height="250" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/mizgame-wolverine-300x250.jpg" class="attachment-img_games size-img_games wp-post-image" alt="بازی ولورین" full="" decoding="async" data-eio="p" /></picture>    </a>
+    <div class="card-content">
+        <div class="card-title-row">
+                                     <a href="https://mag.cafebazaar.ir/mizgame-why-no-one-loves-new-wolverine-game/">
+                <h3>میزگیم سه لبه؛ چرا بازی ولورین رو کسی دوست نداره + ۲ بازی مخفی</h3>
+            </a>
+        </div>
+        <div class="post-details">
+            <span class="date"></span>
+            <a href="https://mag.cafebazaar.ir/mizgame-why-no-one-loves-new-wolverine-game/">
+                <i class="icon-arrow-up-left2"></i>
+            </a>
+        </div>
+    </div>
+</article>        </div>
+    </div>
+                                    <div class="section-comment" id="comments-single">
+                        <div class="title-site inner-title mb-3">
+                            <h4 class="title-heading">نظرات</h4>
+                        </div>
+                        <div class="editor-content">
+                            <div class="comment-wrapper">
+                                    <div class="wpdiscuz_top_clearing"></div>
+    <div id='comments' class='comments-area'><div id='respond' style='width: 0;height: 0;clear: both;margin: 0;padding: 0;'></div>    <div id="wpdcom" class="wpdiscuz_unauth wpd-default wpd-layout-2 wpd-comments-open">
+                    <div class="wc_social_plugin_wrapper">
+                            </div>
+            <div class="wpd-form-wrap">
+                <div class="wpd-form-head">
+                                            <div class="wpd-sbs-toggle">
+                            <i class="far fa-envelope"></i> <span
+                                class="wpd-sbs-title">اشتراک در</span>
+                            <i class="fas fa-caret-down"></i>
+                        </div>
+                                            <div class="wpd-auth">
+                                                <div class="wpd-login">
+                            <a rel="nofollow" href="https://mag.cafebazaar.ir/bzypzy/?redirect_to=https%3A%2F%2Fmag.cafebazaar.ir%2Fthe-most-popular-iranian-motorbike-games-on-cafe-bazzar%2F"><i class='fas fa-sign-in-alt'></i> وارد شدن</a>                        </div>
+                    </div>
+                </div>
+                                                    <div class="wpdiscuz-subscribe-bar wpdiscuz-hidden">
+                                                    <form action="https://mag.cafebazaar.ir/wp-admin/admin-ajax.php?action=wpdAddSubscription"
+                                  method="post" id="wpdiscuz-subscribe-form">
+                                <div class="wpdiscuz-subscribe-form-intro">اطلاع از </div>
+                                <div class="wpdiscuz-subscribe-form-option"
+                                     style="width:40%;">
+                                    <select class="wpdiscuz_select" name="wpdiscuzSubscriptionType">
+                                                                                    <option value="post">نظرات جدید دنبال شده</option>
+                                                                                                                                <option
+                                                value="all_comment" >پاسخ جدید به دیدگاه های من</option>
+                                                                                </select>
+                                </div>
+                                                                    <div class="wpdiscuz-item wpdiscuz-subscribe-form-email">
+                                        <input class="email" type="email" name="wpdiscuzSubscriptionEmail"
+                                               required="required" value=""
+                                               placeholder="ایمیل"/>
+                                    </div>
+                                                                    <div class="wpdiscuz-subscribe-form-button">
+                                    <input id="wpdiscuz_subscription_button" class="wpd-prim-button wpd_not_clicked"
+                                           type="submit"
+                                           value="›"
+                                           name="wpdiscuz_subscription_button"/>
+                                </div>
+                                <input type="hidden" id="wpdiscuz_subscribe_form_nonce" name="wpdiscuz_subscribe_form_nonce" value="28ac7d7c5d" /><input type="hidden" name="_wp_http_referer" value="/the-most-popular-iranian-motorbike-games-on-cafe-bazzar/" />                            </form>
+                                                </div>
+                            <div
+            class="wpd-form wpd-form-wrapper wpd-main-form-wrapper" id='wpd-main-form-wrapper-0_0'>
+                                        <form  method="post" enctype="multipart/form-data" data-uploading="false" class="wpd_comm_form wpd_main_comm_form"                >
+                                        <div class="wpd-field-comment">
+                        <div class="wpdiscuz-item wc-field-textarea">
+                            <div class="wpdiscuz-textarea-wrap ">
+                                                                                                        <div class="wpd-avatar">
+                                        <img alt='guest' src='https://secure.gravatar.com/avatar/ece9ac521c0dd168b5fdc4c4f2bd0255cb5012e85215a69b3073c7c5fd6fc21c?s=56&#038;d=retro&#038;r=g' srcset='https://secure.gravatar.com/avatar/ece9ac521c0dd168b5fdc4c4f2bd0255cb5012e85215a69b3073c7c5fd6fc21c?s=112&#038;d=retro&#038;r=g 2x' class='avatar avatar-56 photo' height='56' width='56' decoding='async'/>                                    </div>
+                                                <div id="wpd-editor-wraper-0_0" style="display: none;">
+                <div id="wpd-editor-char-counter-0_0"
+                     class="wpd-editor-char-counter"></div>
+                <label style="display: none;" for="wc-textarea-0_0">Label</label>
+                <textarea id="wc-textarea-0_0" name="wc_comment"
+                          class="wc_comment wpd-field"></textarea>
+                <div id="wpd-editor-0_0"></div>
+                        <div id="wpd-editor-toolbar-0_0">
+                            <button title="توپر"
+                        class="ql-bold"  ></button>
+                                <button title="کج"
+                        class="ql-italic"  ></button>
+                                <button title="زیرخط دار"
+                        class="ql-underline"  ></button>
+                                <button title="خط خورده"
+                        class="ql-strike"  ></button>
+                                <button title="لیست مرتب"
+                        class="ql-list" value='ordered' ></button>
+                                <button title="لیست نامرتب"
+                        class="ql-list" value='bullet' ></button>
+                                <button title="نقل قول"
+                        class="ql-blockquote"  ></button>
+                                <button title="بلوک کد"
+                        class="ql-code-block"  ></button>
+                                <button title="لینک"
+                        class="ql-link"  ></button>
+                                <button title="سورس کد"
+                        class="ql-sourcecode"  data-wpde_button_name='sourcecode'>{}</button>
+                                <button title="اسپویل کننده"
+                        class="ql-spoiler"  data-wpde_button_name='spoiler'>[+]</button>
+                            <div class="wpd-editor-buttons-right">
+                            </div>
+        </div>
+                    </div>
+                                        </div>
+                        </div>
+                    </div>
+                    <div class="wpd-form-foot" >
+                        <div class="wpdiscuz-textarea-foot">
+                                                        <div class="wpdiscuz-button-actions"></div>
+                        </div>
+                                <div class="wpd-form-row">
+                    <div class="wpd-form-col-full">
+                        <div class="wpdiscuz-item wc_name-wrapper wpd-has-icon">
+                                    <div class="wpd-field-icon"><i
+                            class="fas fa-user"></i>
+                    </div>
+                                    <input id="wc_name-0_0" value="" required='required' aria-required='true'                       class="wc_name wpd-field" type="text"
+                       name="wc_name"
+                       placeholder="نام و نام خانوادگی*"
+                       maxlength="50" pattern='.{3,50}'                       title="">
+                <label for="wc_name-0_0"
+                       class="wpdlb">نام و نام خانوادگی*</label>
+                            </div>
+                        <div class="wpdiscuz-item wc_email-wrapper wpd-has-icon">
+                                    <div class="wpd-field-icon"><i
+                            class="fas fa-at"></i>
+                    </div>
+                                    <input id="wc_email-0_0" value="" required='required' aria-required='true'                       class="wc_email wpd-field" type="email"
+                       name="wc_email"
+                       placeholder="ایمیل*"/>
+                <label for="wc_email-0_0"
+                       class="wpdlb">ایمیل*</label>
+                            </div>
+                    <div class="wc-field-submit">
+                                                <label class="wpd_label"
+                           wpd-tooltip="درباره ی پاسخ های جدید به این دیدگاه اطلاع بده">
+                        <input id="wc_notification_new_comment-0_0"
+                               class="wc_notification_new_comment-0_0 wpd_label__checkbox"
+                               value="comment" type="checkbox"
+                               name="wpdiscuz_notification_type" />
+                        <span class="wpd_label__text">
+                                <span class="wpd_label__check">
+                                    <i class="fas fa-bell wpdicon wpdicon-on"></i>
+                                    <i class="fas fa-bell-slash wpdicon wpdicon-off"></i>
+                                </span>
+                            </span>
+                    </label>
+                            <input id="wpd-field-submit-0_0"
+                   class="wc_comm_submit wpd_not_clicked wpd-prim-button" type="submit"
+                   name="submit" value="افزودن"
+                   aria-label="افزودن"/>
+        </div>
+                </div>
+                    <div class="clearfix"></div>
+        </div>
+                            </div>
+                                        <input type="hidden" class="wpdiscuz_unique_id" value="0_0"
+                           name="wpdiscuz_unique_id">
+                                    </form>
+                        </div>
+                <div id="wpdiscuz_hidden_secondary_form" style="display: none;">
+                    <div
+            class="wpd-form wpd-form-wrapper wpd-secondary-form-wrapper" id='wpd-secondary-form-wrapper-wpdiscuzuniqueid' style='display: none;'>
+                            <div class="wpd-secondary-forms-social-content"></div>
+                <div class="clearfix"></div>
+                                        <form  method="post" enctype="multipart/form-data" data-uploading="false" class="wpd_comm_form wpd-secondary-form-wrapper"                >
+                                        <div class="wpd-field-comment">
+                        <div class="wpdiscuz-item wc-field-textarea">
+                            <div class="wpdiscuz-textarea-wrap ">
+                                                                                                        <div class="wpd-avatar">
+                                        <img alt='guest' src='https://secure.gravatar.com/avatar/cc1141b60f5fa227fc92e0ed4bf8eae1ddbdb233ab42e9230435cd47e50eb167?s=56&#038;d=retro&#038;r=g' srcset='https://secure.gravatar.com/avatar/cc1141b60f5fa227fc92e0ed4bf8eae1ddbdb233ab42e9230435cd47e50eb167?s=112&#038;d=retro&#038;r=g 2x' class='avatar avatar-56 photo' height='56' width='56' decoding='async'/>                                    </div>
+                                                <div id="wpd-editor-wraper-wpdiscuzuniqueid" style="display: none;">
+                <div id="wpd-editor-char-counter-wpdiscuzuniqueid"
+                     class="wpd-editor-char-counter"></div>
+                <label style="display: none;" for="wc-textarea-wpdiscuzuniqueid">Label</label>
+                <textarea id="wc-textarea-wpdiscuzuniqueid" name="wc_comment"
+                          class="wc_comment wpd-field"></textarea>
+                <div id="wpd-editor-wpdiscuzuniqueid"></div>
+                        <div id="wpd-editor-toolbar-wpdiscuzuniqueid">
+                            <button title="توپر"
+                        class="ql-bold"  ></button>
+                                <button title="کج"
+                        class="ql-italic"  ></button>
+                                <button title="زیرخط دار"
+                        class="ql-underline"  ></button>
+                                <button title="خط خورده"
+                        class="ql-strike"  ></button>
+                                <button title="لیست مرتب"
+                        class="ql-list" value='ordered' ></button>
+                                <button title="لیست نامرتب"
+                        class="ql-list" value='bullet' ></button>
+                                <button title="نقل قول"
+                        class="ql-blockquote"  ></button>
+                                <button title="بلوک کد"
+                        class="ql-code-block"  ></button>
+                                <button title="لینک"
+                        class="ql-link"  ></button>
+                                <button title="سورس کد"
+                        class="ql-sourcecode"  data-wpde_button_name='sourcecode'>{}</button>
+                                <button title="اسپویل کننده"
+                        class="ql-spoiler"  data-wpde_button_name='spoiler'>[+]</button>
+                            <div class="wpd-editor-buttons-right">
+                            </div>
+        </div>
+                    </div>
+                                        </div>
+                        </div>
+                    </div>
+                    <div class="wpd-form-foot" >
+                        <div class="wpdiscuz-textarea-foot">
+                                                        <div class="wpdiscuz-button-actions"></div>
+                        </div>
+                                <div class="wpd-form-row">
+                    <div class="wpd-form-col-full">
+                        <div class="wpdiscuz-item wc_name-wrapper wpd-has-icon">
+                                    <div class="wpd-field-icon"><i
+                            class="fas fa-user"></i>
+                    </div>
+                                    <input id="wc_name-wpdiscuzuniqueid" value="" required='required' aria-required='true'                       class="wc_name wpd-field" type="text"
+                       name="wc_name"
+                       placeholder="نام و نام خانوادگی*"
+                       maxlength="50" pattern='.{3,50}'                       title="">
+                <label for="wc_name-wpdiscuzuniqueid"
+                       class="wpdlb">نام و نام خانوادگی*</label>
+                            </div>
+                        <div class="wpdiscuz-item wc_email-wrapper wpd-has-icon">
+                                    <div class="wpd-field-icon"><i
+                            class="fas fa-at"></i>
+                    </div>
+                                    <input id="wc_email-wpdiscuzuniqueid" value="" required='required' aria-required='true'                       class="wc_email wpd-field" type="email"
+                       name="wc_email"
+                       placeholder="ایمیل*"/>
+                <label for="wc_email-wpdiscuzuniqueid"
+                       class="wpdlb">ایمیل*</label>
+                            </div>
+                    <div class="wc-field-submit">
+                                                <label class="wpd_label"
+                           wpd-tooltip="درباره ی پاسخ های جدید به این دیدگاه اطلاع بده">
+                        <input id="wc_notification_new_comment-wpdiscuzuniqueid"
+                               class="wc_notification_new_comment-wpdiscuzuniqueid wpd_label__checkbox"
+                               value="comment" type="checkbox"
+                               name="wpdiscuz_notification_type" />
+                        <span class="wpd_label__text">
+                                <span class="wpd_label__check">
+                                    <i class="fas fa-bell wpdicon wpdicon-on"></i>
+                                    <i class="fas fa-bell-slash wpdicon wpdicon-off"></i>
+                                </span>
+                            </span>
+                    </label>
+                            <input id="wpd-field-submit-wpdiscuzuniqueid"
+                   class="wc_comm_submit wpd_not_clicked wpd-prim-button" type="submit"
+                   name="submit" value="افزودن"
+                   aria-label="افزودن"/>
+        </div>
+                </div>
+                    <div class="clearfix"></div>
+        </div>
+                            </div>
+                                        <input type="hidden" class="wpdiscuz_unique_id" value="wpdiscuzuniqueid"
+                           name="wpdiscuz_unique_id">
+                                    </form>
+                        </div>
+                </div>
+                    </div>
+                        <div id="wpd-threads" class="wpd-thread-wrapper">
+                <div class="wpd-thread-head">
+                    <div class="wpd-thread-info "
+                         data-comments-count="1">
+                        <span class='wpdtc' title='1'>1</span> دیدگاه                    </div>
+                                        <div class="wpd-space"></div>
+                    <div class="wpd-thread-filter">
+                                                    <div class="wpd-filter wpdf-reacted wpd_not_clicked " data-filter-type="most_reacted"
+                                 wpd-tooltip="اکثرا واکنش نشان داده اند">
+                                <i class="fas fa-bolt"></i></div>
+                                                        <div class="wpd-filter wpdf-hottest wpd_not_clicked " data-filter-type="hottest_thread"
+                                 wpd-tooltip="داغ ترین موضوع دیدگاه">
+                                <i class="fas fa-fire"></i></div>
+                                                        <div class="wpd-filter wpdf-sorting ">
+                                                                        <span class="wpdiscuz-sort-button wpdiscuz-date-sort-asc wpdiscuz-sort-button-active"
+                                              data-sorting="oldest">قدیمی‌ترین</span>
+                                                                        <i class="fas fa-sort-down"></i>
+                                <div class="wpdiscuz-sort-buttons">
+                                                                            <span class="wpdiscuz-sort-button wpdiscuz-date-sort-desc"
+                                              data-sorting="newest">تازه‌ترین</span>
+                                                                                <span class="wpdiscuz-sort-button wpdiscuz-vote-sort-up"
+                                              data-sorting="by_vote">بیشترین رأی</span>
+                                                                        </div>
+                            </div>
+                                                </div>
+                    <div class="wpd-filter-container wpdiscuz-hidden"></div>
+                </div>
+                                <div class="wpd-thread-list">
+                    <div id='wpd-comm-100626_0' class='comment even thread-even depth-1 wpd-comment wpd_comment_level-1'><div class="wpd-comment-wrap wpd-blog-guest">
+    <div id="comment-100626" class="wpd-comment-right">
+    <div class="wpd-comment-header">
+    <div class="wpd-avatar ">
+    <img alt='جاوا پلیر' src='https://secure.gravatar.com/avatar/7cef726f06bdba786706394ae8c9bb7ff9d7d8fc3cfd70ff0456cecc5973184c?s=64&#038;d=retro&#038;r=g' srcset='https://secure.gravatar.com/avatar/7cef726f06bdba786706394ae8c9bb7ff9d7d8fc3cfd70ff0456cecc5973184c?s=128&#038;d=retro&#038;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' decoding='async'/>
+</div>
+    <div class="wpd-user-info">
+    <div class="wpd-uinfo-top">
+    <div class="wpd-comment-author ">
+    جاوا پلیر
+</div>
+    
+    
+    
+    <div class="wpd-space"></div>
+</div>
+    <div class="wpd-uinfo-bottom">
+    
+    
+    <div class="wpd-comment-date" title="20 آوریل 2026 18:07">
+    <i class='far fa-clock' aria-hidden='true'></i>
+    5 ماه قبل
+</div>
+</div>
+</div>
+    
+</div>
+    <div class="wpd-comment-text">
+    <p>اکثرشون رو بازی کردم و باهاشون خاطره دارم</p>
+
+</div>
+    <div class="wpd-comment-footer">
+    <div class="wpd-vote">
+    <div class="wpd-vote-up wpd_not_clicked">
+        <svg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='plus' class='svg-inline--fa fa-plus fa-w-14' role='img' xmlns='https://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z'></path></svg>
+    </div>
+    <div class='wpd-vote-result' title='0'>0</div>
+    <div class="wpd-vote-down wpd_not_clicked">
+        <svg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='minus' class='svg-inline--fa fa-minus fa-w-14' role='img' xmlns='https://www.w3.org/2000/svg' viewBox='0 0 448 512'><path d='M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z'></path></svg>
+    </div>
+</div>
+    <div class="wpd-reply-button">
+    <svg xmlns='https://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z'/><path d='M0 0h24v24H0z' fill='none'/></svg>
+    <span>پاسخ</span>
+</div>
+    <div class="wpd-space"></div>
+    
+    
+</div>
+</div>
+</div><div id='wpdiscuz_form_anchor-100626_0'></div></div>                    <div class="wpdiscuz-comment-pagination">
+                                            </div>
+                </div>
+            </div>
+                </div>
+        </div>
+    <div id="wpdiscuz-loading-bar"
+         class="wpdiscuz-loading-bar-unauth"></div>
+    <div id="wpdiscuz-comment-message"
+         class="wpdiscuz-comment-message-unauth"></div>
+                                </div>
+                        </div>
+                    </div>
+                            </article>
+        </div>
+        <div class="col-lg-4 order-2 order-md-2">
+            <div class="sidebar sidebar-post">
+                <div class="sidebarList favorite-news">
+    <div class="sidebarList-box">
+        <div class="title-site">
+            <h2 class="title-heading">محبوب ترین های هر ماه</h2>
+        </div>
+                                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/gta-6-new-trailer-live-stream/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-300x169.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-1024x576.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-768x432.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless.jpg" class="attachment-full size-full wp-post-image" alt="پخش زنده تریلر جی تی ای 6 به همراه جایزه برای بیننده‌ها" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/08/GTA-Live-16x9-Textless-768x432.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/gta-news/'>آخرین اخبار جی‌تی‌ای</a>        </div>
+        <a href="https://mag.cafebazaar.ir/gta-6-new-trailer-live-stream/">
+            <h3>پخش زنده تریلر بازی جی تی ای 6 به همراه جایزه برای بیننده‌ها</h3>
+        </a>
+    </div>
+</article>                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/miraculous-season-7-synopsis/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-300x169.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-1024x576.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-768x432.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis.jpg" class="attachment-full size-full wp-post-image" alt="خلاصه داستان فصل هفتم انیمیشن دختر کفشدوزکی Miraculous: Tales of Ladybug &amp; Cat Noir" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/miraculous-season-7-synopsis-768x432.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/cinema-anime/'>اخبار سینما و انیمیشن</a>        </div>
+        <a href="https://mag.cafebazaar.ir/miraculous-season-7-synopsis/">
+            <h3>خلاصه داستان فصل هفتم انیمیشن دختر کفشدوزکی منتشر شد</h3>
+        </a>
+    </div>
+</article>                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/kpop-demon-hunters-2-demons-world-war-concept-trailer/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-300x169.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-1024x576.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-768x432.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2.jpg" class="attachment-full size-full wp-post-image" alt="شکارچیان شیطان کی‌پاپ 2" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/kpop-demon-hunters-2-768x432.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/cinema-anime/'>اخبار سینما و انیمیشن</a>        </div>
+        <a href="https://mag.cafebazaar.ir/kpop-demon-hunters-2-demons-world-war-concept-trailer/">
+            <h3>تریلر مفهومی انیمیشن شکارچیان شیطان کی‌پاپ 2؛ جنگ جهانی شیطان‌ها</h3>
+        </a>
+    </div>
+</article>                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/review-of-the-series-the-man-of-three-thousand-faces-part-2/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-300x169.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-1024x576.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-768x432.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review.jpg" class="attachment-full size-full wp-post-image" alt="نقد سریال مرد سه‌ هزار چهره؛ قسمت دوم | همه دارند مرز می‌شکنند" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/the-man-of-three-thousand-faces-part-2-review-768x432.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/cinema-anime/'>اخبار سینما و انیمیشن</a>        </div>
+        <a href="https://mag.cafebazaar.ir/review-of-the-series-the-man-of-three-thousand-faces-part-2/">
+            <h3>نقد سریال مرد سه‌ هزار چهره؛ قسمت دوم | همه دارند مرز می‌شکنند</h3>
+        </a>
+    </div>
+</article>                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/minecraft-cushion-update-lets-players-finally-sit-in-game/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-300x156.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-1024x533.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-768x400.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="625" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37.jpg" class="attachment-full size-full wp-post-image" alt="" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-300x156.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-1024x533.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/07/Screenshot-1405-04-18-at-05.31.37-768x400.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/minecraft-news/'>آخرین اخبار ماینکرافت</a>        </div>
+        <a href="https://mag.cafebazaar.ir/minecraft-cushion-update-lets-players-finally-sit-in-game/">
+            <h3>آپدیت کوسن ماینکرفت به بازیکنان اجازه می‌دهد سرانجام پس از ۱۷ سال در بازی بتوانند بنشینند</h3>
+        </a>
+    </div>
+</article>                            <article class="post-item-dark">
+    <a href="https://mag.cafebazaar.ir/hotel-transylvania-live-action-trailer-fanmade/" class="post-item-image">
+        <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1.jpg.webp 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-300x169.jpg.webp 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-1024x576.jpg.webp 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-768x432.jpg.webp 768w" sizes='auto, (max-width: 1200px) 100vw, 1200px' type="image/webp"><img width="1200" height="675" src="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1.jpg" class="attachment-full size-full wp-post-image" alt="فیلم هتل ترانسیلوانیا" loading="lazy" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1.jpg 1200w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-300x169.jpg 300w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-1024x576.jpg 1024w, https://mag.cafebazaar.ir/wp-content/uploads/2026/09/hotel-transylvania-movie-1-768x432.jpg 768w" sizes="auto, (max-width: 1200px) 100vw, 1200px" data-eio="p" /></picture>    </a>
+    <div class="post-content">
+        <div class="post-cat-dark">
+            <a href='https://mag.cafebazaar.ir/category/news/cinema-anime/'>اخبار سینما و انیمیشن</a>        </div>
+        <a href="https://mag.cafebazaar.ir/hotel-transylvania-live-action-trailer-fanmade/">
+            <h3>تریلر نسخه لایو-اکشن انیمیشن هتل ترانسیلوانیا؛ تقابل دنیای انسان‌ها و هیولاها</h3>
+        </a>
+    </div>
+</article>                                    </div>
+        <a href="https://www.youtube.com/@BazaarStreetGame" target="_blank">
+        <div class="poster-col">
+            <div class="poster-img">
+                <picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y.jpg.webp 823w, https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y-271x300.jpg.webp 271w, https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y-768x851.jpg.webp 768w" sizes='(max-width: 823px) 100vw, 823px' type="image/webp"><img width="823" height="912" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y.jpg" class="attachment-full size-full" alt="" decoding="async" srcset="https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y.jpg 823w, https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y-271x300.jpg 271w, https://mag.cafebazaar.ir/wp-content/uploads/2024/05/photo_5933888445372023611_y-768x851.jpg 768w" sizes="(max-width: 823px) 100vw, 823px" data-eio="p" /></picture>            </div>
+            <a href="https://www.youtube.com/@BazaarStreetGame" target="_blank">
+                <div class="poster-btn">برو به چنل<i class="icon-shareposter"></i></div>
+                </a>         </div>
+        </a>     </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+<footer data-rocket-location-hash="f3d1c58420f95d002618d3b7cfb851a5" id="footer">
+    <div data-rocket-location-hash="ca23f7c07336b7cf8c7766d2ffffc9d9" class="container">
+		<div class="row">
+		    <div class="col-md-4">
+                <div class="footer-box">
+                                            <a class="footer-logo" href="https://mag.cafebazaar.ir" title="مجله بازار">
+                            <img width="214" height="96" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-2-.png" class="attachment-full size-full" alt="" decoding="async" loading="lazy" />                        </a>
+                                        <div class="copy-right">
+                                                    <p>کپی رایت © ۱۴۰۴</p>
+                                                                            <p>کلیه حقوق برای بازار مگ محفوظ است.</p>
+                                            </div>
+                </div>
+			</div>
+			 <div class="col-md-5">
+                 <div class="footer-menu d-flex justify-content-between">
+                     <div class="wrap-ft-menu">
+                         <div class="menu-%d9%81%d9%88%d8%aa%d8%b11-container"><ul id="menu-%d9%81%d9%88%d8%aa%d8%b11" class="footer-sub-menu"><li id="menu-item-12617" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12617"><a href="https://mag.cafebazaar.ir/category/news/game-news/">اخبار بازی‌ها</a></li>
+<li id="menu-item-12619" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12619"><a href="https://mag.cafebazaar.ir/category/tips/game-tips/">ترفندهای بازی</a></li>
+</ul></div>                     </div>
+                     <div class="wrap-ft-menu">
+                         <div class="menu-%d9%81%d9%88%d8%aa%d8%b12-container"><ul id="menu-%d9%81%d9%88%d8%aa%d8%b12" class="footer-sub-menu"><li id="menu-item-12621" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12621"><a href="https://mag.cafebazaar.ir/category/news/app-news/">اخبار برنامه‌ها</a></li>
+<li id="menu-item-12623" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12623"><a href="https://mag.cafebazaar.ir/category/editors-suggestions/best-games/">برترین‌های بازی</a></li>
+</ul></div>                     </div>
+                     <div class="wrap-ft-menu">
+                         <div class="menu-%d9%81%d9%88%d8%aa%d8%b13-container"><ul id="menu-%d9%81%d9%88%d8%aa%d8%b13" class="footer-sub-menu"><li id="menu-item-12624" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12624"><a href="https://mag.cafebazaar.ir/category/news/cinema-anime/">اخبار سینما</a></li>
+<li id="menu-item-12622" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12622"><a href="https://mag.cafebazaar.ir/category/cinema/">سینما و انیمه</a></li>
+</ul></div>                     </div>
+                 </div>
+			 </div>
+			<div class="col-md-3">
+                <div class="footer-socials">
+                    <a href='https://www.youtube.com/@BazaarStreetGame' target='_blank' rel='nofollow noopener noreferrer' title='Youtube'><i class='icon-youtube'><span class='icon-title-youtube'></span></i><i class='icon-arrow-up-left2'></i></a>
+<a href='https://cafebazaar.ir' target='_blank' rel='nofollow noopener noreferrer' title='Aparat'><i class='icon-aparat'><span class='icon-title-aparat'></span></i><i class='icon-arrow-up-left2'></i></a>
+<a href='https://www.instagram.com/bazaarappstore/?hl=en-gb' target='_blank' rel='nofollow noopener noreferrer' title='Instagram'><i class='icon-instagram'><span class='icon-title-instagram'></span></i><i class='icon-arrow-up-left2'></i></a>
+                </div>
+			</div>
+		</div>
+	</div>	
+</footer></div>
+
+<div data-rocket-location-hash="088e1a578dc2bb3352c82b3d507a255f" class="search-pup-up">
+    <div data-rocket-location-hash="f8ab775afcb7759c6c19f3e6f32c2688" class="fd-outer search-close">
+        <div data-rocket-location-hash="4631121dfef5a51ca25cf0410409da46" class="fd-inner">
+            <label>بازگشت</label>
+        </div>
+    </div>
+    <div data-rocket-location-hash="e5ff722a18906cb8ac9eaac29e0eedc4" class="col-lg-8 mx-auto form-wrap">
+        <form action="https://mag.cafebazaar.ir" class="search-form" method="get">
+            <input id="search-text" type="search" name="s" placeholder="جستجو عبارت مورد نظر" autocomplete="off">
+        </form>
+        <div data-rocket-location-hash="58d88380954b88c628cec03aa3dca832" class="search-results-box"></div>
+    </div>
+</div><div data-rocket-location-hash="2874c23cf0b9ee3308ee35cfd8690bb6" id="mask"></div>
+<div data-rocket-location-hash="fd142cc872ef30f5c52f6faeeb11a165" id="menumobile">
+	<div data-rocket-location-hash="4bd017a5204aed5de791518717a78992" class="title-mm">
+		<img width="214" height="96" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-2-.png" class="attachment-full size-full" alt="" decoding="async" loading="lazy" />		<span id="nomenumobile"><i class="icon-close"></i></span>
+	</div>
+		 <div data-rocket-location-hash="46ff892c7f57d484eb90c7241a137d0d" class="main-mm-title">فهرست</div><div data-rocket-location-hash="8dc0c25c54e82acd8a2c3920dc2c751f" class="main-mm"><ul id="menu-%d9%81%d9%87%d8%b1%d8%b3%d8%aa-%d8%a7%d8%b5%d9%84%db%8c-1" class="menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-12571"><a href="https://mag.cafebazaar.ir/category/news/">خبر</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12573"><a href="https://mag.cafebazaar.ir/category/news/minecraft-news/">آخرین اخبار ماینکرافت</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12574"><a href="https://mag.cafebazaar.ir/category/news/gta-news/">آخرین اخبار جی‌تی‌ای</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12575"><a href="https://mag.cafebazaar.ir/category/news/spongebob-news/">آخرین اخبار باب اسفنجی و پاتریک</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12576"><a href="https://mag.cafebazaar.ir/category/news/cod-news/">آخرین اخبار کالاف دیوتی موبایل</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-55265"><a href="https://mag.cafebazaar.ir/category/news/cinema-anime/">سینما و انیمیشن</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139667"><a href="https://mag.cafebazaar.ir/most-anticipated-movies-2026/">موردانتظارترین فیلم‌های ۲۰۲۶</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135829"><a href="https://mag.cafebazaar.ir/the-most-anticipated-anime-2026/">بهترین انیمه‌های ۲۰۲۶</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135826"><a href="https://mag.cafebazaar.ir/2025-best-upcoming-films/">بهترین فیلم‌های سال ۲۰۲۵</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-135828"><a href="https://mag.cafebazaar.ir/best-action-movies/">جدیدترین فیلم‌های اکشن ۲۰۲۵</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-has-children menu-item-12577"><a href="https://mag.cafebazaar.ir/category/editors-suggestions/">برترین‌ها</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-135825"><a href="https://cafebazaar.ir/pages/home-game">بهترین بازی‌های ۲۰۲۵ + دانلود</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139668"><a href="https://mag.cafebazaar.ir/best-offline-android-game/">بهترین بازی‌های آفلاین اندروید</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139670"><a href="https://mag.cafebazaar.ir/best-offline-shooter-action-games/">بهترین بازی‌های شوتر آفلاین اندروید</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139671"><a href="https://mag.cafebazaar.ir/top-heaviest-android-games/">بهترین بازی‌های سنگین اندروید</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139669"><a href="https://mag.cafebazaar.ir/best-offline-high-graphic-games/">بهترین بازی‌های آفلاین اندروید با گرافیک بالا</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139672"><a href="https://mag.cafebazaar.ir/high-graphics-android-games/">گرافیکی ترین بازی‌های اندروید</a></li>
+	<li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-139673"><a href="https://mag.cafebazaar.ir/best-strategy-games/">بهترین بازی‌های استراتژیک اندروید</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12578"><a href="https://mag.cafebazaar.ir/category/tips/">ترفندها</a></li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12579"><a href="https://mag.cafebazaar.ir/category/guides/">راهنما و آموزش</a></li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-12580"><a href="https://mag.cafebazaar.ir/category/reviews/">نقد و بررسی</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-57961"><a href="https://mag.cafebazaar.ir/video/">ویدیو مگ</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57963"><a href="https://mag.cafebazaar.ir/movie-cat/movie/">تماشای فیلم</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57962"><a href="https://mag.cafebazaar.ir/movie-cat/minecraft/">ماینکرافت</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57964"><a href="https://mag.cafebazaar.ir/movie-cat/anime/">انیمه</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57965"><a href="https://mag.cafebazaar.ir/movie-cat/video-game/">بازی</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57966"><a href="https://mag.cafebazaar.ir/movie-cat/tv-series/">تماشای سریال</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57967"><a href="https://mag.cafebazaar.ir/movie-cat/spongebob/">باب اسفنجی</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57968"><a href="https://mag.cafebazaar.ir/movie-cat/gta/">جی تی ای</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57969"><a href="https://mag.cafebazaar.ir/movie-cat/call-of-duty/">کالاف دیوتی</a></li>
+</ul>
+</li>
+</ul></div></div>
+
+<div data-rocket-location-hash="4bb4d3682058b079794aeb7cd91c638b" id="mask2"></div>
+<div data-rocket-location-hash="51e1f978da600c4d788f184a487dbf54" id="menumobile2">
+	<div data-rocket-location-hash="f977d4997d7865bccf65c1bb1825330f" class="title-mm">
+		<picture><source srcset="https://mag.cafebazaar.ir/wp-content/uploads/2024/11/Group-3886293.png.webp"  type="image/webp"><img width="150" height="96" src="https://mag.cafebazaar.ir/wp-content/uploads/2024/11/Group-3886293.png" class="attachment-full size-full" alt="" decoding="async" loading="lazy" data-eio="p" /></picture>		<span id="nomenumobile2"><i class="icon-close"></i></span>
+	</div>
+	<div data-rocket-location-hash="34527f6e4383ab94d4589633a4cb35f6" class="main-mm"><ul id="menu-%d9%81%d9%87%d8%b1%d8%b3%d8%aa-%d8%aa%d8%a7%d9%be-%d9%81%db%8c%d9%84%d9%85-%d9%87%d8%a7" class="menu"><li id="menu-item-57106" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-57106"><a href="https://mag.cafebazaar.ir/">مجله بازار</a></li>
+<li id="menu-item-57107" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-57107"><a href="https://mag.cafebazaar.ir/video">ویدیو مگ</a></li>
+</ul></div>		 <div data-rocket-location-hash="3cccf640b0389af7bf72750f2195fbd6" class="main-mm-title movie"><i class="icon-moviemm-cat"></i>دسته بندی ها</div><div data-rocket-location-hash="36a6bbe909fc29f8865ceae1e6e88a46" class="main-mm"><ul id="menu-%d9%81%d9%87%d8%b1%d8%b3%d8%aa-%d8%af%d8%b3%d8%aa%d9%87-%d8%a8%d9%86%d8%af%db%8c-%d9%81%db%8c%d9%84%d9%85" class="menu"><li id="menu-item-57108" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57108"><a href="https://mag.cafebazaar.ir/movie-cat/anime/">انیمه</a></li>
+<li id="menu-item-57109" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57109"><a href="https://mag.cafebazaar.ir/movie-cat/movie/">تماشای فیلم</a></li>
+<li id="menu-item-57110" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57110"><a href="https://mag.cafebazaar.ir/movie-cat/minecraft/">ماینکرافت</a></li>
+<li id="menu-item-57111" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57111"><a href="https://mag.cafebazaar.ir/movie-cat/spongebob/">باب اسفنجی</a></li>
+<li id="menu-item-57112" class="menu-item menu-item-type-taxonomy menu-item-object-movie_cat menu-item-57112"><a href="https://mag.cafebazaar.ir/movie-cat/video-game/">بازی</a></li>
+</ul></div>		 <div data-rocket-location-hash="5c07240613f11283e1199cc9613e9d4d" class="main-mm-title movie"><i class="icon-moviemm-link"></i>لینک ها</div><div data-rocket-location-hash="459728ed1effb200bc1658b2532de854" class="main-mm"><ul id="menu-%d9%81%d9%87%d8%b1%d8%b3%d8%aa-%d9%84%db%8c%d9%86%da%a9-%d9%81%db%8c%d9%84%d9%85" class="menu"><li id="menu-item-57119" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-57119"><a href="https://mag.cafebazaar.ir/category/cinema/">سینما</a></li>
+<li id="menu-item-57121" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-57121"><a href="https://mag.cafebazaar.ir/category/editors-suggestions/">برترین‌ها</a></li>
+</ul></div></div><script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/cafeBazar/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<!--noptimize--><!--email_off--><style type='text/css'>.maxbutton-1-container.mb-container{display:block;margin:30px 0px 30px 0px}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf{position:relative;text-decoration:none;display:inline-block;vertical-align:middle;width:auto;height:48px;border:1px solid #009f4d;border-radius:12px 12px 12px 12px;background-color:#12cd6c;box-shadow:0px 0px 2px 0px rgba(255, 255, 255, 0)}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf:hover{border-color:#009f4d;background-color:white;box-shadow:0px 0px 2px 0px rgba(255, 255, 255, 0)}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf .mb-text{color:#ffffff;font-size:16px;text-align:center;font-style:normal;font-weight:bold;line-height:1em;box-sizing:border-box;display:block;background-color:unset;padding:0px 8px 0px 8px;text-shadow:0px 0px 0px rgba(255, 255, 255, 0)}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf:hover .mb-text{color:#000000;text-shadow:0px 0px 0px rgba(255, 255, 255, 0)}@media only screen and (min-width:0px) and (max-width:480px){.maxbutton-1-container.mb-container{width:90%;float:none}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf{width:90%}.maxbutton-1-container.mb-container .maxbutton-1.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d8a8d8b2-d8b1d986daaf .mb-text{font-size:12px}}
+.maxbutton-3-container.mb-container{display:block;margin:20px 0px 20px 0px}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af{position:relative;text-decoration:none;display:inline-block;vertical-align:middle;width:auto;height:48px;border:2px solid rgba(255, 255, 255, 0);border-radius:8px 8px 8px 8px;background-color:rgba(238, 240, 239, 0);box-shadow:0px 0px 0px 0px rgba(255, 255, 255, 0)}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af:hover{border-color:rgba(255, 255, 255, 0);background-color:rgba(238, 240, 239, 0);box-shadow:0px 0px 0px 0px rgba(51, 51, 51, 0)}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af .mb-text{color:#009f4d;font-size:16px;text-align:center;font-style:normal;font-weight:normal;line-height:1em;box-sizing:border-box;display:block;background-color:unset;padding:0px 0px 0px 0px;text-shadow:0px 0px 0px #505ac7}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af:hover .mb-text{color:#009f4d;text-shadow:0px 0px 0px #333333}@media only screen and (min-width:0px) and (max-width:480px){.maxbutton-3-container.mb-container{width:90%;float:none}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af{width:90%}.maxbutton-3-container.mb-container .maxbutton-3.maxbutton.maxbutton-d8a8db8cd8b4d8aad8b1-d8a8d8aed988d8a7d986db8cd8af .mb-text{font-size:12px}}
+.maxbutton-2-container.mb-container{display:block;margin:30px 0px 30px 0px}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf{position:relative;text-decoration:none;display:inline-block;vertical-align:middle;width:auto;height:48px;border:1px solid #009f4d;border-radius:12px 12px 12px 12px;background-color:white;box-shadow:0px 0px 2px 0px rgba(255, 255, 255, 0)}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf:hover{border-color:#009f4d;background-color:white;box-shadow:0px 0px 2px 0px rgba(255, 255, 255, 0)}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf .mb-text{color:#009f4d;font-size:16px;text-align:center;font-style:normal;font-weight:bold;line-height:1em;box-sizing:border-box;display:block;background-color:unset;padding:0px 8px 0px 8px;text-shadow:0px 0px 0px rgba(255, 255, 255, 0)}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf:hover .mb-text{color:#000000;text-shadow:0px 0px 0px rgba(255, 255, 255, 0)}@media only screen and (min-width:0px) and (max-width:480px){.maxbutton-2-container.mb-container{width:90%;float:none}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf{width:90%}.maxbutton-2-container.mb-container .maxbutton-2.maxbutton.maxbutton-d8afdaa9d985d987-d8b3d981db8cd8af-d8b1d986daaf .mb-text{font-size:12px}}
+</style><!--/email_off--><!--/noptimize-->
+<div id='wpd-editor-source-code-wrapper-bg'></div><div id='wpd-editor-source-code-wrapper'><textarea id='wpd-editor-source-code'></textarea><button id='wpd-insert-source-code'>Insert</button><input type='hidden' id='wpd-editor-uid' /></div><script id="rocket-browser-checker-js-after">
+"use strict";var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||!1,descriptor.configurable=!0,"value"in descriptor&&(descriptor.writable=!0),Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){return protoProps&&defineProperties(Constructor.prototype,protoProps),staticProps&&defineProperties(Constructor,staticProps),Constructor}}();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor))throw new TypeError("Cannot call a class as a function")}var RocketBrowserCompatibilityChecker=function(){function RocketBrowserCompatibilityChecker(options){_classCallCheck(this,RocketBrowserCompatibilityChecker),this.passiveSupported=!1,this._checkPassiveOption(this),this.options=!!this.passiveSupported&&options}return _createClass(RocketBrowserCompatibilityChecker,[{key:"_checkPassiveOption",value:function(self){try{var options={get passive(){return!(self.passiveSupported=!0)}};window.addEventListener("test",null,options),window.removeEventListener("test",null,options)}catch(err){self.passiveSupported=!1}}},{key:"initRequestIdleCallback",value:function(){!1 in window&&(window.requestIdleCallback=function(cb){var start=Date.now();return setTimeout(function(){cb({didTimeout:!1,timeRemaining:function(){return Math.max(0,50-(Date.now()-start))}})},1)}),!1 in window&&(window.cancelIdleCallback=function(id){return clearTimeout(id)})}},{key:"isDataSaverModeOn",value:function(){return"connection"in navigator&&!0===navigator.connection.saveData}},{key:"supportsLinkPrefetch",value:function(){var elem=document.createElement("link");return elem.relList&&elem.relList.supports&&elem.relList.supports("prefetch")&&window.IntersectionObserver&&"isIntersecting"in IntersectionObserverEntry.prototype}},{key:"isSlowConnection",value:function(){return"connection"in navigator&&"effectiveType"in navigator.connection&&("2g"===navigator.connection.effectiveType||"slow-2g"===navigator.connection.effectiveType)}}]),RocketBrowserCompatibilityChecker}();
+//# sourceURL=rocket-browser-checker-js-after
+</script>
+<script id="rocket-preload-links-js-extra">
+var RocketPreloadLinksConfig = {"excludeUris":"/%d9%81%db%8c%d9%84%d9%85-%d9%87%d8%a7/|/(?:.+/)?feed(?:/(?:.+/?)?)?$|/(?:.+/)?embed/|/(index.php/)?(.*)wp-json(/.*|$)|/refer/|/go/|/recommend/|/recommends/","usesTrailingSlash":"1","imageExt":"jpg|jpeg|gif|png|tiff|bmp|webp|avif|pdf|doc|docx|xls|xlsx|php","fileExt":"jpg|jpeg|gif|png|tiff|bmp|webp|avif|pdf|doc|docx|xls|xlsx|php|html|htm","siteUrl":"https://mag.cafebazaar.ir","onHoverDelay":"100","rateThrottle":"3"};
+//# sourceURL=rocket-preload-links-js-extra
+</script>
+<script id="rocket-preload-links-js-after">
+(function() {
+"use strict";var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e=function(){function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e}}();function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var t=function(){function n(e,t){i(this,n),this.browser=e,this.config=t,this.options=this.browser.options,this.prefetched=new Set,this.eventTime=null,this.threshold=1111,this.numOnHover=0}return e(n,[{key:"init",value:function(){!this.browser.supportsLinkPrefetch()||this.browser.isDataSaverModeOn()||this.browser.isSlowConnection()||(this.regex={excludeUris:RegExp(this.config.excludeUris,"i"),images:RegExp(".("+this.config.imageExt+")$","i"),fileExt:RegExp(".("+this.config.fileExt+")$","i")},this._initListeners(this))}},{key:"_initListeners",value:function(e){-1<this.config.onHoverDelay&&document.addEventListener("mouseover",e.listener.bind(e),e.listenerOptions),document.addEventListener("mousedown",e.listener.bind(e),e.listenerOptions),document.addEventListener("touchstart",e.listener.bind(e),e.listenerOptions)}},{key:"listener",value:function(e){var t=e.target.closest("a"),n=this._prepareUrl(t);if(null!==n)switch(e.type){case"mousedown":case"touchstart":this._addPrefetchLink(n);break;case"mouseover":this._earlyPrefetch(t,n,"mouseout")}}},{key:"_earlyPrefetch",value:function(t,e,n){var i=this,r=setTimeout(function(){if(r=null,0===i.numOnHover)setTimeout(function(){return i.numOnHover=0},1e3);else if(i.numOnHover>i.config.rateThrottle)return;i.numOnHover++,i._addPrefetchLink(e)},this.config.onHoverDelay);t.addEventListener(n,function e(){t.removeEventListener(n,e,{passive:!0}),null!==r&&(clearTimeout(r),r=null)},{passive:!0})}},{key:"_addPrefetchLink",value:function(i){return this.prefetched.add(i.href),new Promise(function(e,t){var n=document.createElement("link");n.rel="prefetch",n.href=i.href,n.onload=e,n.onerror=t,document.head.appendChild(n)}).catch(function(){})}},{key:"_prepareUrl",value:function(e){if(null===e||"object"!==(void 0===e?"undefined":r(e))||!1 in e||-1===["http:","https:"].indexOf(e.protocol))return null;var t=e.href.substring(0,this.config.siteUrl.length),n=this._getPathname(e.href,t),i={original:e.href,protocol:e.protocol,origin:t,pathname:n,href:t+n};return this._isLinkOk(i)?i:null}},{key:"_getPathname",value:function(e,t){var n=t?e.substring(this.config.siteUrl.length):e;return n.startsWith("/")||(n="/"+n),this._shouldAddTrailingSlash(n)?n+"/":n}},{key:"_shouldAddTrailingSlash",value:function(e){return this.config.usesTrailingSlash&&!e.endsWith("/")&&!this.regex.fileExt.test(e)}},{key:"_isLinkOk",value:function(e){return null!==e&&"object"===(void 0===e?"undefined":r(e))&&(!this.prefetched.has(e.href)&&e.origin===this.config.siteUrl&&-1===e.href.indexOf("?")&&-1===e.href.indexOf("#")&&!this.regex.excludeUris.test(e.href)&&!this.regex.images.test(e.href))}}],[{key:"run",value:function(){"undefined"!=typeof RocketPreloadLinksConfig&&new n(new RocketBrowserCompatibilityChecker({capture:!0,passive:!0}),RocketPreloadLinksConfig).init()}}]),n}();t.run();
+}());
+
+//# sourceURL=rocket-preload-links-js-after
+</script>
+<script id="like-button-js-extra">
+var like_button_vars = {"ajaxurl":"https://mag.cafebazaar.ir/wp-admin/admin-ajax.php","nonce":"945173a767"};
+//# sourceURL=like-button-js-extra
+</script>
+<script id="like-button-js" src="https://mag.cafebazaar.ir/wp-content/themes/cafeBazar/js/like-button.js"></script>
+<script id="hlsjs-js" src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script id="pageswichjs-js" src="https://mag.cafebazaar.ir/wp-content/themes/cafeBazar/assets/js/pageswich.js"></script>
+<script id="lightgalleryjs-js" src="https://mag.cafebazaar.ir/wp-content/themes/cafeBazar/assets/js/lightgallery.js"></script>
+<script id="customjs-js-extra">
+var ajax_data = {"url":"https://mag.cafebazaar.ir/wp-admin/admin-ajax.php"};
+//# sourceURL=customjs-js-extra
+</script>
+<script id="customjs-js" src="https://mag.cafebazaar.ir/wp-content/themes/cafeBazar/assets/js/custom.js"></script>
+<script async data-wp-strategy="async" fetchpriority="low" id="comment-reply-js" src="https://mag.cafebazaar.ir/wp-includes/js/comment-reply.min.js"></script>
+<script id="wpdiscuz-combo-js-js-extra">
+var wpdiscuzAjaxObj = {"wc_hide_replies_text":"\u0645\u062e\u0641\u06cc \u06a9\u0631\u062f\u0646 \u067e\u0627\u0633\u062e \u0647\u0627","wc_show_replies_text":"\u0646\u0645\u0627\u06cc\u0634 \u067e\u0627\u0633\u062e \u0647\u0627","wc_msg_required_fields":"\u0644\u0637\u0641\u0627 \u0641\u06cc\u0644\u062f \u0647\u0627\u06cc \u062e\u0648\u0627\u0633\u062a\u0647 \u0634\u062f\u0647 \u0631\u0627 \u067e\u0631 \u06a9\u0646\u06cc\u062f","wc_msg_comment_is_trash":"This comment is not acceptable.","wc_msg_comment_is_spam":"This comment is not acceptable.","wc_invalid_field":"\u0628\u0639\u0636\u06cc \u0627\u0632 \u0641\u06cc\u0644\u062f \u0647\u0627 \u0646\u0627\u0645\u0639\u062a\u0628\u0631 \u0647\u0633\u062a\u0646\u062f","wc_error_empty_text":"\u0644\u0637\u0641\u0627 \u0628\u0631\u0627\u06cc \u0627\u0631\u0633\u0627\u0644 \u0646\u0638\u0631 \u0627\u06cc\u0646 \u0642\u0633\u0645\u062a \u0631\u0627 \u067e\u0631 \u06a9\u0646\u06cc\u062f","wc_error_url_text":"\u067e\u06cc\u0648\u0646\u062f \u0646\u0627\u0645\u0639\u062a\u0628\u0631 \u0627\u0633\u062a","wc_error_email_text":"\u0622\u062f\u0631\u0633 \u0627\u06cc\u0645\u06cc\u0644 \u0646\u0627\u0645\u0639\u062a\u0628\u0631 \u0627\u0633\u062a.","wc_invalid_captcha":"\u06a9\u062f \u06a9\u067e\u0686\u0627\u06cc \u0646\u0627\u0645\u0639\u062a\u0628\u0631","wc_login_to_vote":"\u0628\u0631\u0627\u06cc \u0631\u0623\u06cc \u062f\u0627\u062f\u0646 \u0645\u06cc\u200c\u0628\u0627\u06cc\u0633\u062a \u0648\u0627\u0631\u062f \u0634\u0648\u06cc\u062f","wc_deny_voting_from_same_ip":"\u0634\u0645\u0627 \u0645\u062c\u0627\u0632 \u0628\u0647 \u0631\u0623\u06cc \u062f\u0627\u062f\u0646 \u0628\u0647 \u0627\u06cc\u0646 \u062f\u06cc\u062f\u06af\u0627\u0647 \u0646\u06cc\u0633\u062a\u06cc\u062f","wc_self_vote":"\u0646\u0645\u06cc\u062a\u0648\u0627\u0646\u06cc\u062f \u0628\u0647 \u062f\u06cc\u062f\u06af\u0627\u0647 \u062e\u0648\u062f\u062a\u0627\u0646 \u0631\u0627\u06cc \u062f\u0647\u06cc\u062f","wc_vote_only_one_time":"\u0642\u0628\u0644\u0627 \u0628\u0647 \u0627\u06cc\u0646 \u067e\u06cc\u0627\u0645 \u0631\u0627\u06cc \u062f\u0627\u062f\u06cc\u062f","wc_voting_error":"\u062e\u0637\u0627\u06cc \u0631\u0627\u06cc \u062f\u0647\u06cc","wc_banned_user":"\u0634\u0645\u0627 \u0645\u0645\u0646\u0648\u0639 \u0647\u0633\u062a\u06cc\u062f","wc_rate_limit_exceeded":"Too many requests. Please slow down.","wc_comment_edit_not_possible":"\u0645\u062a\u0627\u0633\u0641\u06cc\u0645\u060c \u062f\u06cc\u06af\u0631 \u0646\u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u06cc\u062f \u0627\u06cc\u0646 \u062f\u06cc\u062f\u06af\u0627\u0647 \u0631\u0627 \u0648\u06cc\u0631\u0627\u06cc\u0634 \u06a9\u0646\u06cc\u062f","wc_comment_not_updated":"\u0645\u062a\u0627\u0633\u0641\u0645\u060c \u0646\u0638\u0631\u0627\u062a \u0622\u067e\u0644\u0648\u062f\u0646\u0634\u062f\u0647 \u0627\u0646\u062f.","wc_comment_not_edited":"\u0634\u0645\u0627 \u0647\u06cc\u0686 \u062a\u063a\u06cc\u06cc\u0631 \u0627\u06cc\u062c\u0627\u062f \u0646\u06a9\u0631\u062f\u0647 \u0627\u06cc\u062f","wc_msg_input_min_length":"\u0648\u0631\u0648\u062f\u06cc \u0628\u0633\u06cc\u0627\u0631 \u06a9\u0648\u062a\u0627\u0647 \u0627\u0633\u062a","wc_msg_input_max_length":"\u0648\u0631\u0648\u062f\u06cc \u062e\u06cc\u0644\u06cc \u0637\u0648\u0644\u0627\u0646\u06cc \u0627\u0633\u062a","wc_spoiler_title":"\u0639\u0646\u0648\u0627\u0646 spoiler","wc_cannot_rate_again":"\u0634\u0645\u0627 \u0646\u0645\u06cc\u200c\u062a\u0648\u0627\u0646\u06cc\u062f \u062f\u0648\u0628\u0627\u0631\u0647 \u0627\u0645\u062a\u06cc\u0627\u0632 \u062f\u0647\u06cc\u062f","wc_not_allowed_to_rate":"\u0634\u0645\u0627 \u0645\u062c\u0627\u0632 \u0628\u0647 \u0631\u0623\u06cc \u062f\u0627\u062f\u0646 \u062f\u0631 \u0627\u06cc\u0646\u062c\u0627 \u0646\u06cc\u0633\u062a\u06cc\u062f","wc_confirm_rate_edit":"\u0622\u06cc\u0627 \u0645\u0637\u0645\u0626\u0646 \u0647\u0633\u062a\u06cc\u062f \u06a9\u0647 \u0645\u06cc\u200c\u062e\u0648\u0627\u0647\u06cc\u062f \u0646\u0631\u062e \u062e\u0648\u062f \u0631\u0627 \u0648\u06cc\u0631\u0627\u06cc\u0634 \u06a9\u0646\u06cc\u062f\u061f","wc_follow_user":"\u0627\u06cc\u0646 \u06a9\u0627\u0631\u0628\u0631 \u0631\u0627 \u062f\u0646\u0628\u0627\u0644 \u06a9\u0646\u06cc\u062f","wc_unfollow_user":"\u062f\u0646\u0628\u0627\u0644 \u0646\u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646 \u06a9\u0627\u0631\u0628\u0631","wc_follow_success":"\u0634\u0645\u0627 \u0646\u0648\u06cc\u0633\u0646\u062f\u0647 \u0627\u06cc\u0646 \u0646\u0638\u0631 \u0631\u0627 \u062f\u0646\u0628\u0627\u0644 \u0645\u06cc \u06a9\u0646\u06cc\u062f.","wc_follow_canceled":"\u0634\u0645\u0627 \u0646\u0648\u06cc\u0633\u0646\u062f\u0647 \u0627\u06cc\u0646 \u0646\u0638\u0631 \u0631\u0627 \u062f\u0646\u0628\u0627\u0644 \u0646\u0645\u06cc \u06a9\u0646\u06cc\u062f.","wc_follow_email_confirm":"\u0644\u0637\u0641\u0627 \u0627\u06cc\u0645\u06cc\u0644 \u062e\u0648\u062f \u0631\u0627 \u0686\u06a9 \u06a9\u0631\u062f\u0647 \u0648 \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062f\u0646\u0628\u0627\u0644 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646 \u06a9\u0627\u0631\u0628\u0631 \u0631\u0627 \u062a\u0623\u06cc\u06cc\u062f \u06a9\u0646\u06cc\u062f.","wc_follow_email_confirm_fail":"\u0645\u062a\u0623\u0633\u0641\u06cc\u0645\u060c \u0645\u0627 \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u06cc\u0645 \u0627\u06cc\u0645\u06cc\u0644 \u062a\u0623\u06cc\u06cc\u062f\u06cc\u0647 \u0631\u0627 \u0627\u0631\u0633\u0627\u0644 \u06a9\u0646\u06cc\u0645.","wc_follow_login_to_follow":"\u0644\u0637\u0641\u0627 \u062c\u0647\u062a \u062f\u0646\u0628\u0627\u0644 \u06a9\u0631\u062f\u0646 \u0627\u06cc\u0646 \u06a9\u0627\u0631\u0628\u0631\u0627\u0646 \u0648\u0627\u0631\u062f \u062d\u0633\u0627\u0628 \u06a9\u0627\u0631\u0628\u0631\u06cc \u062e\u0648\u062f \u0634\u0648\u06cc\u062f.","wc_follow_impossible":"\u0645\u062a\u0623\u0633\u0641\u06cc\u0645\u060c \u0627\u0645\u0627 \u0634\u0645\u0627 \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u06cc\u062f \u0627\u06cc\u0646 \u06a9\u0627\u0631\u0628\u0631 \u0631\u0627 \u062f\u0646\u0628\u0627\u0644 \u06a9\u0646\u06cc\u062f.","wc_follow_not_added":"\u062f\u0646\u0628\u0627\u0644 \u06a9\u0631\u062f\u0646 \u0646\u0627\u0645\u0648\u0641\u0642 \u0628\u0648\u062f. \u0644\u0637\u0641\u0627 \u0628\u0639\u062f\u0627 \u062f\u0648\u0628\u0627\u0631\u0647 \u062a\u0644\u0627\u0634 \u06a9\u0646\u06cc\u062f.","wc_inline_feedbacks":"\u0628\u0627\u0632\u062e\u0648\u0631\u062f (Feedback) \u0647\u0627\u06cc \u0627\u06cc\u0646\u0644\u0627\u06cc\u0646","wc_inline_comments_view_all":"\u0645\u0634\u0627\u0647\u062f\u0647 \u0647\u0645\u0647 \u062f\u06cc\u062f\u06af\u0627\u0647 \u0647\u0627","is_user_logged_in":"","commentListLoadType":"0","commentListUpdateType":"0","commentListUpdateTimer":"60","liveUpdateGuests":"0","wordpressThreadCommentsDepth":"3","wordpressIsPaginate":"","commentTextMaxLength":"0","replyTextMaxLength":"0","commentTextMinLength":"1","replyTextMinLength":"1","storeCommenterData":"100000","socialLoginAgreementCheckbox":"0","enableFbLogin":"0","fbUseOAuth2":"0","enableFbShare":"0","facebookAppID":"","facebookUseOAuth2":"0","enableGoogleLogin":"0","googleClientID":"","googleClientSecret":"","cookiehash":"d7290271d3e1e9c1dd0540c635b5b3b0","isLoadOnlyParentComments":"0","scrollToComment":"1","commentFormView":"expanded","enableDropAnimation":"1","isNativeAjaxEnabled":"1","userInteractionCheck":"1","enableBubble":"0","bubbleLiveUpdate":"0","bubbleHintTimeout":"45","bubbleHintHideTimeout":"10","cookieHideBubbleHint":"wpdiscuz_hide_bubble_hint","bubbleHintShowOnce":"1","bubbleHintCookieExpires":"7","bubbleShowNewCommentMessage":"1","bubbleLocation":"content_left","firstLoadWithAjax":"0","wc_copied_to_clipboard":"\u06a9\u067e\u06cc \u06a9\u0631\u062f\u0646 \u062f\u0631 \u062d\u0627\u0641\u0638\u0647 \u0645\u0648\u0642\u062a","inlineFeedbackAttractionType":"blink","loadRichEditor":"1","wpDiscuzReCaptchaSK":"","wpDiscuzReCaptchaTheme":"light","wpDiscuzReCaptchaVersion":"2.0","wc_captcha_show_for_guest":"0","wc_captcha_show_for_members":"0","wpDiscuzIsShowOnSubscribeForm":"0","wmuEnabled":"0","wmuInput":"wmu_files","wmuMaxFileCount":"1","wmuMaxFileSize":"2097152","wmuPostMaxSize":"67108864","wmuIsLightbox":"0","wmuMimeTypes":{"jpg":"image/jpeg","jpeg":"image/jpeg","jpe":"image/jpeg","gif":"image/gif","png":"image/png","bmp":"image/bmp","tiff":"image/tiff","tif":"image/tiff","ico":"image/x-icon"},"wmuPhraseConfirmDelete":"\u0622\u06cc\u0627 \u0645\u0637\u0645\u0626\u0646 \u0647\u0633\u062a\u06cc\u062f \u06a9\u0647 \u0645\u06cc \u062e\u0648\u0627\u0647\u06cc\u062f \u0627\u06cc\u0646 \u067e\u06cc\u0648\u0633\u062a \u0631\u0627 \u062d\u0630\u0641 \u06a9\u0646\u06cc\u062f\u061f","wmuPhraseNotAllowedFile":"\u0646\u0648\u0639 \u067e\u0631\u0648\u0646\u062f\u0647 \u0645\u062c\u0627\u0632 \u0646\u06cc\u0633\u062a","wmuPhraseMaxFileCount":"\u062d\u062f\u0627\u06a9\u062b\u0631 \u062a\u0639\u062f\u0627\u062f \u067e\u0631\u0648\u0646\u062f\u0647 \u0647\u0627\u06cc \u0622\u067e\u0644\u0648\u062f\u0634\u062f\u0647 \u0647\u0633\u062a 1","wmuPhraseMaxFileSize":"\u062d\u062f\u0627\u06a9\u062b\u0631 \u062d\u062c\u0645 \u067e\u0631\u0648\u0646\u062f\u0647 \u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u0634\u062f\u0647 2MB","wmuPhrasePostMaxSize":"\u062d\u062f\u0627\u06a9\u062b\u0631 \u0627\u0646\u062f\u0627\u0632\u0647 \u067e\u0633\u062a \u0647\u0633\u062a 64MB","wmuPhraseDoingUpload":"\u0628\u0627\u0631\u06af\u0630\u0627\u0631\u06cc \u062f\u0631 \u062d\u0627\u0644 \u0627\u0646\u062c\u0627\u0645 \u0627\u0633\u062a! \u0644\u0637\u0641\u0627 \u0635\u0628\u0631 \u06a9\u0646\u06cc\u062f.","msgEmptyFile":"File is empty. Please upload something more substantial. This error could also be caused by uploads being disabled in your php.ini or by post_max_size being defined as smaller than upload_max_filesize in php.ini.","msgPostIdNotExists":"\u0634\u0646\u0627\u0633\u0647 \u067e\u0633\u062a \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f.","msgUploadingNotAllowed":"\u0645\u062a\u0623\u0633\u0641\u06cc\u0645\u060c \u0622\u067e\u0644\u0648\u062f\u06a9\u0631\u062f\u0646 \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u067e\u0633\u062a \u0645\u062c\u0627\u0632 \u0646\u06cc\u0633\u062a.","msgPermissionDenied":"\u0634\u0645\u0627 \u0645\u062c\u0648\u0632 \u06a9\u0627\u0641\u06cc \u0628\u0631\u0627\u06cc \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f","wmuKeyImages":"images","wmuSingleImageWidth":"auto","wmuSingleImageHeight":"200","wmuIconVideo":"https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/img/file-icons/video-audio-type.png","wmuIconFile":"https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/img/file-icons/file-type.png","previewTemplate":"\u003Cdiv class=\"wmu-preview [PREVIEW_TYPE_CLASS]\" title=\"[PREVIEW_TITLE]\" data-wmu-type=\"[PREVIEW_TYPE]\" data-wmu-attachment=\"[PREVIEW_ID]\" data-wmu-index=\"[PREVIEW_INDEX]\"\u003E\r\n    \u003Cdiv class=\"wmu-preview-remove\"\u003E\r\n        \u003Cimg class=\"wmu-preview-img\" src=\"[PREVIEW_ICON]\"\u003E\r\n        \u003Cdiv class=\"wmu-file-name\"\u003E[PREVIEW_FILENAME]\u003C/div\u003E\r\n        \u003Cdiv class=\"wmu-preview-delete\" title=\"Delete\"\u003E\u2715\u003C/div\u003E\r\n        \u003Clabel class=\"wmu-preview-replace\" title=\"Replace\"\u003E\u21bb\u003Cinput type=\"file\" style=\"display:none\" class=\"wmu-replace-input\"\u003E\u003C/label\u003E\r\n    \u003C/div\u003E\r\n\u003C/div\u003E\r\n","isUserRated":"0","version":"7.6.64","wc_post_id":"157906","wc_blog_id":"1","isCookiesEnabled":"","loadLastCommentId":"0","dataFilterCallbacks":[],"phraseFilters":[],"scrollSize":"32","url":"https://mag.cafebazaar.ir/wp-admin/admin-ajax.php","customAjaxUrl":"https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/utils/ajax/wpdiscuz-ajax.php","bubbleUpdateUrl":"https://mag.cafebazaar.ir/wp-json/wpdiscuz/v1/update","restNonce":"6014efb8c7","is_rate_editable":"0","menu_icon":"https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/img/plugin-icon/wpdiscuz-svg.svg","menu_icon_hover":"https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/img/plugin-icon/wpdiscuz-svg_hover.svg","nonceName":"wpdiscuz_nonce","postAttachmentsAsGallery":"","wmuPhraseNotAllowedFileType":"File type is not allowed","is_email_field_required":"1"};
+var wpdiscuzUCObj = {"msgConfirmDeleteComment":"\u0627\u06cc\u0627 \u0645\u0637\u0645\u0626\u0646 \u0647\u0633\u062a\u06cc\u062f \u06a9\u0647 \u0645\u06cc \u062e\u0648\u0627\u0647\u06cc\u062f \u0627\u06cc\u0646 \u0646\u0638\u0631 \u0631\u0627 \u062d\u0630\u0641 \u06a9\u0646\u06cc\u062f\u061f","msgConfirmCancelSubscription":"\u0627\u06cc\u0627 \u0645\u0637\u0645\u0626\u0646 \u0647\u0633\u062a\u06cc\u062f \u06a9\u0647 \u0645\u06cc \u062e\u0648\u0627\u0647\u06cc\u062f \u0627\u06cc\u0646 \u0639\u0636\u0648\u06cc\u062a \u0631\u0627 \u062d\u0630\u0641 \u06a9\u0646\u06cc\u062f\u061f","msgConfirmCancelFollow":"\u0622\u06cc\u0627 \u0645\u0637\u0645\u0626\u0646\u06cc\u062f \u06a9\u0647 \u0645\u06cc \u062e\u0648\u0627\u0647\u06cc\u062f \u0627\u06cc\u0646 \u062f\u0646\u0628\u0627\u0644 \u06a9\u0631\u062f\u0646 \u0631\u0627 \u0644\u063a\u0648 \u06a9\u0646\u06cc\u062f\u061f","additionalTab":"0"};
+//# sourceURL=wpdiscuz-combo-js-js-extra
+</script>
+<script id="wpdiscuz-combo-js-js-before">
+var wpdiscuzEditorOptions = {
+        modules: {
+        toolbar: "",
+        counter: {
+        uniqueID: "",
+        commentmaxcount : 0,
+        replymaxcount : 0,
+        commentmincount : 1,
+        replymincount : 1,
+        },
+                },
+        wc_be_the_first_text: "\u0627\u0648\u0644\u06cc\u0646 \u0646\u0641\u0631\u06cc \u0628\u0627\u0634\u06cc\u062f \u06a9\u0647 \u0646\u0638\u0631 \u0645\u06cc \u062f\u0647\u06cc\u062f!",
+        wc_comment_join_text: "\u0646\u0638\u0631\u062a \u0631\u0648 \u0628\u0646\u0648\u06cc\u0633 ...",
+        theme: "snow",
+        debug: "error"
+        };
+        
+//# sourceURL=wpdiscuz-combo-js-js-before
+</script>
+<script id="wpdiscuz-combo-js-js" src="https://mag.cafebazaar.ir/wp-content/plugins/wpdiscuz/assets/js/wpdiscuz-combo.min.js"></script>
+<script type="application/ld+json">
+
+		{
+
+		  "@context": "http://schema.org",
+
+		  "@type": "Article",
+
+		  "mainEntityOfPage": {
+
+			"@type": "WebPage",
+
+			"@id": "https://mag.cafebazaar.ir/the-most-popular-iranian-motorbike-games-on-cafe-bazzar/"
+
+		  },
+
+		  "headline": "معرفی محبوب‌ترین بازی‌های موتورسواری ایرانی در  بازار",
+
+		  "image": ["https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-main-pic-1024x576.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2026/02/4-warden-in-minecraft.png","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-1.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-2.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-3.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2025/12/04-Titanic-min.png","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-4.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/Iranian-motorbike-games-small-5.jpg","https://mag.cafebazaar.ir/wp-content/uploads/2026/04/you-tube-secrets-5.jpg"],"description": "در این مقاله می‌خواهیم به سراغ محبوب‌ترین بازی‌های موتورسواری ایرانی در بازار رفته و با آن‌ها بیشتر آشنا شویم. با مجله بازار همراه باشید. به قسمت ششم محبوب‌ترین بازی‌های بازار رسیده‌ایم و اینبار قرار است نگاهی به عناوین موتورسواری ایرانی داشته باشیم. اگرچه موتورسواری به اندازه اتومبیلرانی در میان کودکان و نوجوانان محبوب است، در [&hellip;]",
+
+		  "datePublished": "2026-04-20T14:36:12+03:30",
+
+		  "dateModified": "2026-04-26T07:11:22+03:30",
+
+		  "author": {
+
+			"@type": "Person",
+
+			"name": "مجله بازار"
+
+		  },
+
+		  "publisher": {
+
+			"@type": "Organization",
+
+			"name": "مجله بازار",
+
+			"sameAs": "https://mag.cafebazaar.ir",
+
+			"logo": {
+
+			  "@type": "ImageObject",
+
+			  "url": "https://mag.cafebazaar.ir/wp-content/uploads/2024/02/bazaar-logo-2-.png"
+
+			}
+
+		  }}</script><script>var rocket_beacon_data = {"ajax_url":"https:\/\/mag.cafebazaar.ir\/wp-admin\/admin-ajax.php","nonce":"55e96113db","url":"https:\/\/mag.cafebazaar.ir\/the-most-popular-iranian-motorbike-games-on-cafe-bazzar","is_mobile":false,"width_threshold":1600,"height_threshold":700,"delay":500,"debug":null,"status":{"atf":true,"lrc":true,"preconnect_external_domain":true},"elements":"img, video, picture, p, main, div, li, svg, section, header, span","lrc_threshold":1800,"preconnect_external_domain_elements":["link","script","iframe"],"preconnect_external_domain_exclusions":["static.cloudflareinsights.com","rel=\"profile\"","rel=\"preconnect\"","rel=\"dns-prefetch\"","rel=\"icon\""]}</script><script data-name="wpr-wpr-beacon" src='https://mag.cafebazaar.ir/wp-content/plugins/wp-rocket/assets/js/wpr-beacon.min.js' async></script></body>
+</html>
+
+<!-- This website is like a Rocket, isn't it? Performance optimized by WP Rocket. Learn more: https://wp-rocket.me -->

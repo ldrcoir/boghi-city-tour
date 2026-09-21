@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjrftkmal451y"
-path="res://.godot/imported/sharare_side.png-672e07752646ff99b3ddf85d415e425d.ctex"
+uid="uid://bak736deateu2"
+path="res://.godot/imported/samand_side.png-a074bb108eeab19f465e741ca8b9bfc7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/sharare_side.png"
-dest_files=["res://.godot/imported/sharare_side.png-672e07752646ff99b3ddf85d415e425d.ctex"]
+source_file="res://assets/sprites/samand_side.png"
+dest_files=["res://.godot/imported/samand_side.png-a074bb108eeab19f465e741ca8b9bfc7.ctex"]
 
 [params]
 

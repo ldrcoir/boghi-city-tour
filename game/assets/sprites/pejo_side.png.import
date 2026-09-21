@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j1mvcteq8wtm"
-path="res://.godot/imported/zabib_side.png-618c7c9326d4571fe4556e0197b461f2.ctex"
+uid="uid://ba4heo5okel6i"
+path="res://.godot/imported/pejo_side.png-8df40c3667f8efd95cbe1170d0c4d216.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/zabib_side.png"
-dest_files=["res://.godot/imported/zabib_side.png-618c7c9326d4571fe4556e0197b461f2.ctex"]
+source_file="res://assets/sprites/pejo_side.png"
+dest_files=["res://.godot/imported/pejo_side.png-8df40c3667f8efd95cbe1170d0c4d216.ctex"]
 
 [params]
 
