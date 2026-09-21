@@ -48,6 +48,10 @@ var mission_label: Label
 var extra_label: Label
 var progress: ProgressBar
 var boost_btn: Button
+var nitro_bar: ProgressBar
+var flame: CPUParticles2D
+var dust: CPUParticles2D
+var lines: Control
 var end_panel: PanelContainer
 var end_title: Label
 var end_stars: Label
@@ -87,9 +91,9 @@ func _build_world() -> void:
         backdrop.z_index = -14
         add_child(backdrop)
 
-        # painterly parallax: far city (opaque) -> hills -> road
+        # painterly parallax: far city (opaque) -> buildings band -> road
         _add_layer("res://assets/sprites/bg_far.png", -12, GROUND_Y + 50.0, 1.286, 0.18)
-        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.40)
+        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.75)
         _add_layer("res://assets/sprites/road_strip.png", -4, VIEW_H, 1.286, 1.0, 0.54)
 
         world = Node2D.new()
@@ -155,7 +159,56 @@ func _build_car(stats: Dictionary) -> void:
         plate_label.set_anchors_preset(Control.PRESET_FULL_RECT)
         plate.add_child(plate_label)
         car.add_child(plate)
+        _attach_car_fx()
         add_child(car)
+
+func _attach_car_fx() -> void:
+        # نیترو: شعلهٔ آتشین پشت اگزوز
+        flame = CPUParticles2D.new()
+        flame.position = Vector2(-125, -32)
+        flame.emitting = false
+        flame.amount = 80
+        flame.lifetime = 0.32
+        flame.direction = Vector2(-1, 0)
+        flame.spread = 14.0
+        flame.gravity = Vector2(-280, -50)
+        flame.initial_velocity_min = 380.0
+        flame.initial_velocity_max = 660.0
+        flame.scale_amount_min = 9.0
+        flame.scale_amount_max = 16.0
+        var curve := Curve.new()
+        curve.add_point(Vector2(0, 1.0))
+        curve.add_point(Vector2(1, 0.1))
+        flame.scale_amount_curve = curve
+        var grad := Gradient.new()
+        grad.offsets = PackedFloat32Array([0.0, 0.3, 1.0])
+        grad.colors = PackedColorArray([Color(1.0, 0.97, 0.55, 0.95),
+                Color(1.0, 0.55, 0.08, 0.85), Color(0.85, 0.12, 0.02, 0.0)])
+        flame.color_ramp = grad
+        var mat := CanvasItemMaterial.new()
+        mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+        flame.material = mat
+        flame.z_index = -1
+        car.add_child(flame)
+        # گردوخاک چرخ‌ها روی جاده
+        dust = CPUParticles2D.new()
+        dust.position = Vector2(-100, -10)
+        dust.emitting = false
+        dust.amount = 26
+        dust.lifetime = 0.7
+        dust.direction = Vector2(-1, 0)
+        dust.spread = 30.0
+        dust.gravity = Vector2(0, -40)
+        dust.initial_velocity_min = 60.0
+        dust.initial_velocity_max = 150.0
+        dust.scale_amount_min = 4.0
+        dust.scale_amount_max = 8.0
+        var dg := Gradient.new()
+        dg.offsets = PackedFloat32Array([0.0, 1.0])
+        dg.colors = PackedColorArray([Color(0.62, 0.5, 0.36, 0.5), Color(0.62, 0.5, 0.36, 0.0)])
+        dust.color_ramp = dg
+        dust.z_index = -1
+        car.add_child(dust)
 
 func _build_hud() -> void:
         hud = CanvasLayer.new()
@@ -202,7 +255,7 @@ func _build_hud() -> void:
         hud.add_child(jump_btn)
 
         boost_btn = Button.new()
-        boost_btn.text = Globals.L("boost")
+        boost_btn.text = Globals.L("nitro")
         boost_btn.add_theme_font_override("font", font)
         boost_btn.add_theme_font_size_override("font_size", 30)
         boost_btn.position = Vector2(850, VIEW_H - 130)
@@ -210,6 +263,28 @@ func _build_hud() -> void:
         boost_btn.pressed.connect(_on_boost)
         _style_btn(boost_btn, true)
         hud.add_child(boost_btn)
+
+        # گیج نیترو بالای دکمه
+        nitro_bar = ProgressBar.new()
+        nitro_bar.min_value = 0
+        nitro_bar.max_value = 100
+        nitro_bar.value = 100
+        nitro_bar.show_percentage = false
+        nitro_bar.position = Vector2(850, VIEW_H - 154)
+        nitro_bar.size = Vector2(190, 16)
+        var nbg := _sb(Color(0.12, 0.1, 0.14), Color(0.29, 0.216, 0.157), 8, 2, false)
+        var nfill := _sb(Color(1.0, 0.55, 0.08), Color(0.9, 0.3, 0.05), 8, 0, false)
+        nitro_bar.add_theme_stylebox_override("background", nbg)
+        nitro_bar.add_theme_stylebox_override("fill", nfill)
+        hud.add_child(nitro_bar)
+
+        # خطوط سرعت هنگام نیترو
+        lines = SpeedLines.new()
+        lines.position = Vector2.ZERO
+        lines.size = Vector2(VIEW_W, VIEW_H)
+        lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        lines.visible = false
+        hud.add_child(lines)
 
 func _hud_label(font: FontFile, size: int, pos: Vector2, col: Color) -> Label:
         var l := Label.new()
@@ -301,7 +376,7 @@ func _process(delta: float) -> void:
         turbo_meter = min(1.0, turbo_meter + delta * 0.22)
         var target_mult := 1.0
         if boosting:
-                target_mult = 1.6
+                target_mult = 1.85
         if elapsed < slow_until:
                 target_mult = 0.38
         speed_mult = lerp(speed_mult, target_mult, delta * 4.0)
@@ -351,6 +426,16 @@ func _process(delta: float) -> void:
         progress.value = 100.0 * world_x / finish_px
         if target_passengers > 0:
                 extra_label.text = "🚕 " + str(passengers) + " / " + str(target_passengers)
+        # جلوه‌های نیترو و زندگی صحنه
+        flame.emitting = boosting
+        dust.emitting = on_ground and spd > 70.0
+        lines.visible = boosting
+        nitro_bar.value = turbo_meter * 100.0
+        var zoom_target := Vector2(0.92, 0.92) if boosting else Vector2.ONE
+        cam.zoom = cam.zoom.lerp(zoom_target, delta * 3.0)
+        if on_ground:
+                car_sprite.position.y = 12.0 - car_sprite.texture.get_height() * car_sprite.scale.y * 0.5 + sin(elapsed * 28.0) * 1.6
+
         boost_btn.modulate = Color(1, 1, 1) if turbo_meter >= 0.99 else Color(0.6, 0.6, 0.6)
         AudioMgr.set_engine(true, clamp((spd / 300.0) * speed_mult, 0.0, 1.0))
 
@@ -555,3 +640,22 @@ func _make_shadow_tex() -> ImageTexture:
             var a: float = clamp(1.0 - d, 0.0, 1.0)
             img.set_pixel(x, y, Color(0.03, 0.02, 0.05, a * a * 0.9))
     return ImageTexture.create_from_image(img)
+
+
+## خطوط سرعتِ هنگام نیترو — رسم سبک هر فریم
+class SpeedLines extends Control:
+    var t := 0.0
+
+    func _process(delta: float) -> void:
+        t += delta
+        if visible:
+            queue_redraw()
+
+    func _draw() -> void:
+        var rng := RandomNumberGenerator.new()
+        rng.seed = int(t * 24.0)
+        for i in 20:
+            var y := rng.randf_range(70.0, 640.0)
+            var x := rng.randf_range(-60.0, 1020.0)
+            var ln := rng.randf_range(120.0, 320.0)
+            draw_line(Vector2(x, y), Vector2(x + ln, y), Color(1.0, 0.95, 0.8, 0.12), 3.0)
