@@ -3,16 +3,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const APK_PATH = "/apk/BoghiCityTour_v0.1_test.apk";
+const APK_PATH = "/apk/BoghiCityTour_v0.2_test.apk";
 
 const SCREENSHOTS = [
+  { src: "/apk/shot_menu_v4.png", alt: "منوی حرفه‌ای جدید با بوقی قرمز و پراید مسابقه‌ای روی جاده غروب تهران" },
+  { src: "/apk/shot_garage_v4a.png", alt: "کارگاه استاد فنر — جرقه‌ها هنگام تعمیر بوقی قرمز" },
+  { src: "/apk/shot_garage_v4b.png", alt: "استاد فنر سیبیل‌دار وسط ضربه آچار — انیمیشن کار" },
   { src: "/apk/shot_game_v3.png", alt: "گیم‌پلی: بوقی قرمز در خیابان‌های غروب تهران" },
-  { src: "/apk/shot_garage_v3.png", alt: "کارگاه استاد فنر با ۹ ماشین" },
-  { src: "/apk/shot_menu_v3.png", alt: "منوی اصلی با تخته اسم بچه‌ها" },
 ];
 
 const STEPS = [
-  { n: "۱", t: "دانلود", d: "دکمه بزرگ نارنجی را بزن تا فایل APK (۶۸ مگابایت) دانلود شود." },
+  { n: "۱", t: "دانلود", d: "دکمه بزرگ نارنجی را بزن تا فایل APK (۶۹ مگابایت) دانلود شود." },
   { n: "۲", t: "اجازه نصب", d: "روی فایل دانلودشده بزن؛ اگر پرسید، «اجازه نصب از منابع ناشناس» را برای مرورگرت فعال کن." },
   { n: "۳", t: "بازی!", d: "نصب که تمام شد آیکون بوقی قرمز را از منوی گوشی باز کن و اسم بچه را بنویس — سفر شروع می‌شود!" },
 ];
@@ -48,7 +49,7 @@ export default function Home() {
           </h1>
           <p className="mt-2 text-amber-100/85 text-sm sm:text-base leading-7 max-w-md mx-auto">
             فصل ۱ تهران — ۵۰ مأموریت با بوقی قرمز، نیترو، کارگاه استاد فنر و
-            ۹ ماشین ایرانی
+            ۱۱ ماشین ایرانی
           </p>
         </header>
 
@@ -59,10 +60,10 @@ export default function Home() {
         >
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-amber-200/90 mb-5">
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
-              نسخه ۰.۱.۰ (تست خانوادگی)
+              نسخه ۰.۲.۰ (تست خانوادگی)
             </span>
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
-              ۶۸ مگابایت
+              ۶۹ مگابایت
             </span>
             <span className="rounded-full bg-amber-500/15 border border-amber-400/30 px-3 py-1">
               اندروید ۷ به بالا
@@ -109,6 +110,16 @@ export default function Home() {
           </ol>
         </section>
 
+        {/* چه چیزهایی تازه است */}
+        <section aria-label="امکانات جدید این نسخه" className="mt-6 rounded-2xl border border-amber-400/25 bg-black/25 p-5 text-sm text-amber-100/85 leading-7">
+          <p className="font-display-fa text-lg text-amber-300 mb-2">تازه‌های نسخه ۰.۲ 🏁</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>ماشین‌های مسابقه‌ای قرمز جدید: پژو ۲۰۶ مسابقه‌ای و دنا مسابقه‌ای با استریک سفید</li>
+            <li>منوی حرفه‌ای و بزرگ‌تر — با بوقی و پراید پارک‌شده روی جاده</li>
+            <li>استاد فنر فقط سیبیل! + انیمیشن واقعی کار با آچار، جرقه و صدای فلز</li>
+          </ul>
+        </section>
+
         {/* اسکرین‌شات‌ها */}
         <section aria-label="تصاویر بازی" className="mt-8">
           <h2 className="font-display-fa text-2xl text-amber-300 mb-3 text-center">
@@ -138,7 +149,7 @@ export default function Home() {
       </div>
 
       <footer className="mt-auto w-full border-t border-amber-400/15 bg-black/30 py-4 text-center text-xs text-amber-200/60">
-        بوقی: تور شهرها · نسخه تست ۰.۱.۰ · ساخته‌شده با ❤ برای بچه‌ها
+        بوقی: تور شهرها · نسخه تست ۰.۲.۰ · ساخته‌شده با ❤ برای بچه‌ها
       </footer>
     </main>
   );

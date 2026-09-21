@@ -57,6 +57,12 @@ const CARS := [
                 "jump": 0.8, "accel": 0.85, "tough": 1.5, "price": 2200
         },
         {
+                "id": "pejo_race", "name": "پژو ۲۰۶ مسابقه‌ای", "en": "206 Racing",
+                "desc": "قرمز آتشین با استریک سفید — عاشق پیست است!",
+                "tex": "res://assets/sprites/pejo_race_side.png",
+                "jump": 1.05, "accel": 1.22, "tough": 0.9, "price": 2400
+        },
+        {
                 "id": "shahin", "name": "شاهین", "en": "Shahin",
                 "desc": "مشکی اسپرت با خط طلایی — شاه شب‌های تهران",
                 "tex": "res://assets/sprites/shahin_side.png",
@@ -67,6 +73,12 @@ const CARS := [
                 "desc": "نارنجی جیغ جوان — پرش‌های بلند هوایی",
                 "tex": "res://assets/sprites/quick_side.png",
                 "jump": 1.25, "accel": 1.05, "tough": 0.75, "price": 3400
+        },
+        {
+                "id": "dena_race", "name": "دنا مسابقه‌ای", "en": "Dena Racing",
+                "desc": "سدان ملی با لباس استریک قرمز — غرور پیست!",
+                "tex": "res://assets/sprites/dena_race_side.png",
+                "jump": 1.0, "accel": 1.3, "tough": 1.05, "price": 4200
         },
 ]
 
