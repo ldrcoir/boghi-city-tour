@@ -16,9 +16,15 @@ var season = null      # parsed season json
 const CARS := [
         {
                 "id": "boghi", "name": "بوقی", "en": "Boghi",
-                "desc": "پراید فیروزه‌ای معروف محله — ستاره روی جلوپنجره!",
+                "desc": "پراید قرمز معروف محله — چشم‌های آبی، لبخند همیشگی!",
                 "tex": "res://assets/sprites/boghi_side.png",
                 "jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
+        },
+        {
+                "id": "boghi_yellow", "name": "بوقی زرد", "en": "Boghi Sun",
+                "desc": "داداش آفتابی بوقی — همان لبخند به رنگ خورشید!",
+                "tex": "res://assets/sprites/boghi_yellow_side.png",
+                "jump": 1.05, "accel": 1.08, "tough": 0.92, "price": 800
         },
         {
                 "id": "tiba", "name": "تیبا", "en": "Tiba",
