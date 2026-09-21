@@ -9,3 +9,4 @@ tools/dl/*.tpz
 tools/dl/*.log
 download/*.apk
 download/*.idsig
+download/*.bundle
