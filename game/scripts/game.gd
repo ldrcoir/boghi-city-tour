@@ -140,8 +140,8 @@ func _build_car(stats: Dictionary) -> void:
         plate.size = Vector2(160, 44)
         plate_label = Label.new()
         plate_label.text = Globals.plate_name
-        plate_label.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
-        plate_label.add_theme_font_size_override("font_size", 22)
+        plate_label.add_theme_font_override("font", load("res://assets/fonts/Lalezar-Regular.ttf"))
+        plate_label.add_theme_font_size_override("font_size", 24)
         plate_label.add_theme_color_override("font_color", Color(0.25, 0.16, 0.09))
         plate_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         plate_label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -153,12 +153,12 @@ func _build_hud() -> void:
         hud = CanvasLayer.new()
         hud.process_mode = Node.PROCESS_MODE_ALWAYS
         add_child(hud)
-        var font: FontFile = load("res://assets/fonts/Vazirmatn-Bold.ttf")
+        var font: FontFile = load("res://assets/fonts/Lalezar-Regular.ttf") # فانتزی برای HUD
 
-        coin_label = _hud_label(font, 30, Vector2(1040, 16), Color(0.95, 0.75, 0.1))
-        time_label = _hud_label(font, 30, Vector2(24, 16), Color(0.95, 0.35, 0.25))
-        extra_label = _hud_label(font, 26, Vector2(24, 60), Color(0.98, 0.98, 0.98))
-        mission_label = _hud_label(font, 30, Vector2(0, 16), Color(0.98, 0.98, 0.98))
+        coin_label = _hud_label(font, 34, Vector2(1040, 16), Color(0.95, 0.75, 0.1))
+        time_label = _hud_label(font, 34, Vector2(24, 16), Color(0.95, 0.35, 0.25))
+        extra_label = _hud_label(font, 28, Vector2(24, 60), Color(0.98, 0.98, 0.98))
+        mission_label = _hud_label(font, 34, Vector2(0, 16), Color(0.98, 0.98, 0.98))
         mission_label.custom_minimum_size = Vector2(VIEW_W, 0)
         mission_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -186,7 +186,7 @@ func _build_hud() -> void:
         var jump_btn := Button.new()
         jump_btn.text = Globals.L("jump")
         jump_btn.add_theme_font_override("font", font)
-        jump_btn.add_theme_font_size_override("font_size", 30)
+        jump_btn.add_theme_font_size_override("font_size", 34)
         jump_btn.position = Vector2(1060, VIEW_H - 130)
         jump_btn.size = Vector2(190, 100)
         jump_btn.pressed.connect(do_jump)
@@ -196,7 +196,7 @@ func _build_hud() -> void:
         boost_btn = Button.new()
         boost_btn.text = Globals.L("boost")
         boost_btn.add_theme_font_override("font", font)
-        boost_btn.add_theme_font_size_override("font_size", 26)
+        boost_btn.add_theme_font_size_override("font_size", 30)
         boost_btn.position = Vector2(850, VIEW_H - 130)
         boost_btn.size = Vector2(190, 100)
         boost_btn.pressed.connect(_on_boost)
