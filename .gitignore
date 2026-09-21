@@ -4,3 +4,8 @@ node_modules/
 *.pyc
 game/.godot/
 scripts/shot_*.png
+tools/dl/*.zip
+tools/dl/*.tpz
+tools/dl/*.log
+download/*.apk
+download/*.idsig
