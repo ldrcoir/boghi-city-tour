@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 const APK_PATH = "/apk/BoghiCityTour_v0.2_test.apk";
 
 const SCREENSHOTS = [
-  { src: "/apk/shot_menu_v4.png", alt: "منوی حرفه‌ای جدید با بوقی قرمز و پراید مسابقه‌ای روی جاده غروب تهران" },
-  { src: "/apk/shot_garage_v4a.png", alt: "کارگاه استاد فنر — جرقه‌ها هنگام تعمیر بوقی قرمز" },
-  { src: "/apk/shot_garage_v4b.png", alt: "استاد فنر سیبیل‌دار وسط ضربه آچار — انیمیشن کار" },
-  { src: "/apk/shot_game_v3.png", alt: "گیم‌پلی: بوقی قرمز در خیابان‌های غروب تهران" },
+  { src: "/apk/shot_menu_v5.png", alt: "منوی حرفه‌ای با بوقی قرمز خندون و چشم‌های آبی روی جاده غروب تهران" },
+  { src: "/apk/shot_garage_v5a.png", alt: "کارگاه استاد فنر — جرقه‌ها هنگام تعمیر بوقی قرمز با لبخند بزرگ" },
+  { src: "/apk/shot_garage_v5b.png", alt: "استاد فنر سیبیل‌دار وسط ضربه آچار — انیمیشن کار" },
+  { src: "/apk/shot_game_v5.png", alt: "گیم‌پلی: بوقی قرمز با چشم‌های خوشگل و دکمه نیترو در تهران" },
 ];
 
 const STEPS = [
@@ -49,7 +49,7 @@ export default function Home() {
           </h1>
           <p className="mt-2 text-amber-100/85 text-sm sm:text-base leading-7 max-w-md mx-auto">
             فصل ۱ تهران — ۵۰ مأموریت با بوقی قرمز، نیترو، کارگاه استاد فنر و
-            ۱۱ ماشین ایرانی
+            ۱۲ ماشین ایرانی
           </p>
         </header>
 
@@ -114,9 +114,12 @@ export default function Home() {
         <section aria-label="امکانات جدید این نسخه" className="mt-6 rounded-2xl border border-amber-400/25 bg-black/25 p-5 text-sm text-amber-100/85 leading-7">
           <p className="font-display-fa text-lg text-amber-300 mb-2">تازه‌های نسخه ۰.۲ 🏁</p>
           <ul className="list-disc list-inside space-y-1">
-            <li>ماشین‌های مسابقه‌ای قرمز جدید: پژو ۲۰۶ مسابقه‌ای و دنا مسابقه‌ای با استریک سفید</li>
+            <li>چشم‌های خوشگل و لبخند بزرگ برگشت! بوقی قرمز حالا مثل کانسپت اصلی زنده و خندونه 😍</li>
+            <li>بوقی زرد جدید — داداش آفتابی بوقی، فقط ۸۰۰ سکه!</li>
+            <li>ماشین‌های مسابقه‌ای قرمز: پژو ۲۰۶ مسابقه‌ای و دنا مسابقه‌ای با استریک سفید</li>
             <li>منوی حرفه‌ای و بزرگ‌تر — با بوقی و پراید پارک‌شده روی جاده</li>
             <li>استاد فنر فقط سیبیل! + انیمیشن واقعی کار با آچار، جرقه و صدای فلز</li>
+            <li>نیترو با شعله آتشین، گیج و دکمه مخصوص 🔥</li>
           </ul>
         </section>
 
