@@ -134,7 +134,7 @@ func _build_car(stats: Dictionary) -> void:
         car.area_entered.connect(_on_hit)
         car_sprite = Sprite2D.new()
         car_sprite.texture = load(Globals.CARS[Globals.selected_car]["tex"])
-        var sc := 0.68 # نسل ۲: ماشین واقعی و درشت در محیط (درخواست کاربر)
+        var sc := 214.0 / float(car_sprite.texture.get_height()) # ارتفاع ثابت ~۲۱۴px برای هر ابعاد اسپرایت
         car_sprite.scale = Vector2(sc, sc)
         var th := car_sprite.texture.get_height() * sc
         car_sprite.position = Vector2(0, 12.0 - th * 0.5) # چرخ‌ها روی جاده
