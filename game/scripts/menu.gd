@@ -9,9 +9,12 @@ var panel_home: PanelContainer
 var panel_levels: PanelContainer
 var coin_label: Label
 var plate_edit: LineEdit
-var brain: CarBrain
+var brain = null
 var boghi_car: TextureRect
 var pride_car: TextureRect
+
+# بارگذاری مستقیم مغز — بدون وابستگی به class cache (رفع باگ منو اندروید)
+const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 
 const COL_GOLD := Color(0.96, 0.76, 0.25)
 const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
@@ -27,12 +30,12 @@ func _ready() -> void:
         _build_ui()
         _refresh()
         # مغز بوقی: ماشین‌های پارک‌شده زنده‌اند و حرف می‌زنند
-        brain = CarBrain.new()
+        brain = BRAIN_SCRIPT.new()
         add_child(brain)
         if boghi_car != null:
-                CarBrain.add_breathing(boghi_car, 4.0, 1.25)
+                BRAIN_SCRIPT.add_breathing(boghi_car, 4.0, 1.25)
         if pride_car != null:
-                CarBrain.add_breathing(pride_car, 3.0, 1.5)
+                BRAIN_SCRIPT.add_breathing(pride_car, 3.0, 1.5)
         brain.start_idle_chatter(
                 func(cid: String) -> Control:
                         return boghi_car if cid == "boghi" else pride_car,
@@ -218,7 +221,7 @@ func _build_title() -> void:
                 logo.size = Vector2(560, 130)
                 logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
                 add_child(logo)
-                CarBrain.add_breathing(logo, 2.5, 1.6)
+                BRAIN_SCRIPT.add_breathing(logo, 2.5, 1.6)
                 return
         var title := _mk_label("بوقی: تور شهرها", 58, false, true, COL_GOLD)
         title.add_theme_color_override("font_outline_color", Color(0.10, 0.06, 0.03))
@@ -342,7 +345,7 @@ func _build_levels_panel() -> void:
         add_child(center)
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۳ — ماشین‌های زبان‌باز", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۰٫۴ — موتور جدید + موسیقی زنده", 15, true, false, Color(1, 1, 1, 0.6))
         v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         v.position = Vector2(1000, 692)
         v.custom_minimum_size = Vector2(256, 0)

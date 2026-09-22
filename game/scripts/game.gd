@@ -33,7 +33,10 @@ var next_passenger_idx := 0
 var shake := 0.0
 var _auto_timer := 0.0
 var _shot_taken := false
-var brain: CarBrain
+var brain = null
+
+# بارگذاری مستقیم مغز — بدون وابستگی به class cache
+const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 var car_anchor: Control
 var _hit_chat_until := 0.0
 var _boost_in := 0.0
@@ -84,7 +87,7 @@ func _ready() -> void:
         _build_hud()
         AudioMgr.play_music()
         # مغز بوقی: ماشینِ تو همین اول مسابقه گاز می‌زند!
-        brain = CarBrain.new()
+        brain = BRAIN_SCRIPT.new()
         add_child(brain)
         car_anchor = Control.new()
         car_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE

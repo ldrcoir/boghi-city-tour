@@ -22,7 +22,10 @@ var up_buttons := {}      # uid -> Button
 var up_dots := {}         # uid -> Label
 var _working := false
 var _demo_timer: Timer
-var brain: CarBrain
+var brain = null
+
+# بارگذاری مستقیم مغز — بدون وابستگی به class cache
+const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 
 func _ready() -> void:
         font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
@@ -32,9 +35,9 @@ func _ready() -> void:
         _refresh()
         AudioMgr.play_music()
         # مغز بوقی در کارگاه: ماشین‌ها و استاد فنر حرف می‌زنند
-        brain = CarBrain.new()
+        brain = BRAIN_SCRIPT.new()
         add_child(brain)
-        CarBrain.add_breathing(car_pic, 3.0, 1.4)
+        BRAIN_SCRIPT.add_breathing(car_pic, 3.0, 1.4)
         brain.start_idle_chatter(
                 func(cid: String) -> Control:
                         return ustad if cid == "ustad" else car_pic,
