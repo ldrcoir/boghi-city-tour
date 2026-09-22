@@ -1,0 +1,40 @@
+# Godot
+game/.godot/
+*.tmp
+
+# Android build outputs
+*.apk.idsig
+
+# Local deliverables & dev artifacts (never publish)
+download/
+upload/
+tools/
+db/
+.env
+*.log
+worklog.md
+
+# Web dev workspace (not part of the game repo)
+.next/
+node_modules/
+src/
+public/
+examples/
+mini-services/
+prisma/
+tests/
+.zscripts/
+skills/
+Caddyfile
+bun.lock
+components.json
+eslint.config.mjs
+package.json
+package-lock.json
+postcss.config.mjs
+tailwind.config.ts
+tsconfig.json
+next.config.ts
+next-env.d.ts
+server.log
+dev.log
