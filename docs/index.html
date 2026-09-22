@@ -14,6 +14,9 @@
   .card{background:rgba(0,0,0,.35);border:1px solid rgba(251,191,36,.3);border-radius:20px;padding:24px;max-width:720px;width:100%;text-align:center}
   .btn{display:inline-block;background:linear-gradient(180deg,#f87171,#dc2626);color:#fff;text-decoration:none;font-size:1.5rem;padding:14px 42px;border-radius:16px;border:2px solid #fca5a5;box-shadow:0 6px 0 #7f1d1d;margin:12px 0}
   .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #7f1d1d}
+  .btn.ghost{background:transparent;color:var(--amber);border:2px solid rgba(251,191,36,.5);box-shadow:none;font-size:1.1rem;padding:10px 28px}
+  .logo{width:320px;max-width:80%;margin:4px 0 10px;border-radius:18px}
+  .logo-card{background:linear-gradient(180deg,#f59e0b22,#dc262622);border:1px solid rgba(251,191,36,.4);border-radius:22px;padding:14px;margin-bottom:18px}
   .shots{display:flex;gap:10px;overflow-x:auto;padding:10px 0;margin-top:8px}
   .shots img{width:250px;border-radius:14px;border:2px solid rgba(251,191,36,.35)}
   ul{list-style:none;margin-top:14px;line-height:2;font-size:.95rem}
@@ -22,17 +25,22 @@
 </style>
 </head>
 <body>
+<div class="logo-card">
+  <img class="logo" src="screenshots/logo.png" alt="ایماروید — بوقی: تور شهرها">
+</div>
 <h1>🚗 بوقی: تور شهرها</h1>
 <p class="sub">فصل ۱ تهران — ۵۰ مأموریت · ماشین‌های زبان‌باز با شخصیت 🗯️ · نیترو 🔥 · کارگاه استاد فنر</p>
 <div class="card">
-  <a class="btn" href="https://github.com/ldrcoir/boghi-city-tour/releases/latest" target="_blank" rel="noopener">⬇ دانلود APK نسخه تست</a>
+  <a class="btn" href="https://github.com/ldrcoir/boghi-city-tour/releases/download/v0.3/BoghiCityTour_v0.3_test.apk" target="_blank" rel="noopener">⬇ دانلود مستقیم APK نسخه تست</a>
+  <a class="btn ghost" href="https://github.com/ldrcoir/boghi-city-tour/releases/latest" target="_blank" rel="noopener">صفحه Releases</a>
   <p style="font-size:.9rem;color:#fde68a">۷۰ مگابایت · اندروید ۷ به بالا · بدون نیاز به اینترنت</p>
   <div class="shots">
-    <img src="https://raw.githubusercontent.com/ldrcoir/boghi-city-tour/main/public/apk/shot_menu_v5.png" alt="منو">
-    <img src="https://raw.githubusercontent.com/ldrcoir/boghi-city-tour/main/public/apk/shot_garage_v5a.png" alt="کارگاه استاد فنر">
-    <img src="https://raw.githubusercontent.com/ldrcoir/boghi-city-tour/main/public/apk/shot_game_v5.png" alt="گیم‌پلی">
+    <img src="screenshots/shot_menu_v6.png" alt="منو">
+    <img src="screenshots/shot_garage_v6a.png" alt="کارگاه استاد فنر">
+    <img src="screenshots/shot_game_v5.png" alt="گیم‌پلی">
   </div>
   <ul>
+    <li>هر ماشین شخصیت و صدای خودش را دارد — بوقی می‌گوید «منو انتخاب کن!»</li>
     <li>چشم‌های خوشگل و لبخند بزرگ روی بوقی قرمز و بوقی زرد</li>
     <li>پلاک ماشین اسم خودت می‌شه!</li>
     <li>سکه جمع کن، ماشین نو بخر، استاد فنر تیونش کنه</li>
