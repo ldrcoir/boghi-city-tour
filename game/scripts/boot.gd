@@ -32,7 +32,7 @@ func _ready() -> void:
         status_label.offset_right = 300
         add_child(status_label)
 
-        detail_label = _mk_label("", 18)
+        detail_label = _mk_label("", 15)
         detail_label.set_anchors_preset(Control.PRESET_CENTER)
         detail_label.anchor_top = 0.62
         detail_label.anchor_bottom = 0.95
@@ -44,15 +44,15 @@ func _ready() -> void:
         var model := OS.get_model_name()
         var ver := Engine.get_version_info()
         var ver_str := "%d.%d.%d" % [ver["major"], ver["minor"], ver["patch"]]
-        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str
+        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر زیرِ این صفحه «v0.6.0» نوشته نشد، یعنی لینک قدیمی را باز کرده‌ای"
         # برچسب نسخه — همیشه دیده می‌شود تا مشخص باشد کدام بیلد روی گوشی اجراست
-        var ver_label := _mk_label("بوقی v0.5.0 (build 6)", 15)
+        var ver_label := _mk_label("بوقی v0.6.0 (build 7)", 22)
         ver_label.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
         ver_label.anchor_top = 0.95
         ver_label.anchor_bottom = 1.0
         ver_label.offset_left = 16
         ver_label.offset_right = -16
-        ver_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.35))
+        ver_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.75))
         add_child(ver_label)
         _go_menu()
 
@@ -82,11 +82,46 @@ func _go_menu() -> void:
         await get_tree().create_timer(1.0).timeout
         if not is_instance_valid(self):
                 return
+        # چک سلامت: پنل اصلی منو باید ساخته شده باشد؛ وگرنه دلیلش را نشان بده
+        if inst.get("panel_home") == null:
+                _fail("منو نیمه‌کاره ماند (پنل اصلی ساخته نشد — جزئیات از لاگ پایین صفحه)")
+                return
+        detail_label.text = "منو آماده شد"
         var tw := create_tween()
         tw.tween_property(self, "modulate:a", 0.0, 0.35)
         tw.tween_callback(queue_free)
 
 func _fail(msg: String) -> void:
         status_label.text = "خطای راه‌اندازی"
-        detail_label.text += "\n\n" + msg + "\n\nلطفاً از این صفحه عکس بگیر و برایم بفرست"
+        var tail := _log_tail()
+        detail_label.text += "\n\n" + msg
+        if tail != "":
+                detail_label.text += "\n\n— آخرِ لاگ —\n" + tail
+        detail_label.text += "\nلطفاً از این صفحه عکس بگیر و برایم بفرست"
         detail_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.4))
+
+func _log_tail() -> String:
+        # لاگ گودوت (file_logging فعال است) — خطاهای اسکریپت روی صفحه نشان داده می‌شوند
+        for p in ["user://logs/godot.log", "user://logs/godot.log.1"]:
+                if not FileAccess.file_exists(p):
+                        continue
+                var f := FileAccess.open(p, FileAccess.READ)
+                if f == null:
+                        continue
+                var lines: Array[String] = []
+                while not f.eof_reached():
+                        var l := f.get_line()
+                        if l.strip_edges() != "":
+                                lines.append(l)
+                f.close()
+                var errs: Array[String] = []
+                for l in lines:
+                        if l.contains("ERROR") or l.contains("Failed") or l.contains("error"):
+                                errs.append(l)
+                var pick: Array[String] = errs if not errs.is_empty() else lines
+                var out := ""
+                for i in range(max(0, pick.size() - 7), pick.size()):
+                        out += pick[i].substr(0, 110) + "\n"
+                if out != "":
+                        return out
+        return ""

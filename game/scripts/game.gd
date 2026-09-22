@@ -457,11 +457,11 @@ func _process(delta: float) -> void:
                         obj.queue_free()
 
         # hud
-        coin_label.text = "🪙 " + str(coins_got) + (" / " + str(target_coins) if target_coins > 0 else "")
-        time_label.text = "⏱ " + str(int(ceil(time_left)))
+        coin_label.text = "سکه " + str(coins_got) + (" / " + str(target_coins) if target_coins > 0 else "")
+        time_label.text = "زمان " + str(int(ceil(time_left)))
         progress.value = 100.0 * world_x / finish_px
         if target_passengers > 0:
-                extra_label.text = "🚕 " + str(passengers) + " / " + str(target_passengers)
+                extra_label.text = "مسافر " + str(passengers) + " / " + str(target_passengers)
         # جلوه‌های نیترو و زندگی صحنه
         flame.emitting = boosting
         dust.emitting = on_ground and spd > 70.0
@@ -626,13 +626,13 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         end_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         vb.add_child(end_title)
         end_stars = Label.new()
-        end_stars.text = "★★★".substr(0, stars) + "···".substr(0, 3 - stars) if stars > 0 else "---"
+        end_stars.text = "٭٭٭".substr(0, stars) + "···".substr(0, 3 - stars) if stars > 0 else "---"
         end_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         end_stars.add_theme_font_size_override("font_size", 44)
         end_stars.add_theme_color_override("font_color", Color(0.72, 0.52, 0.1))
         vb.add_child(end_stars)
         end_reward = Label.new()
-        end_reward.text = Globals.L("reward") + ": " + str(reward) + " 🪙"
+        end_reward.text = Globals.L("reward") + ": " + str(reward) + " سکه"
         end_reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         end_reward.add_theme_font_size_override("font_size", 28)
         end_reward.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))

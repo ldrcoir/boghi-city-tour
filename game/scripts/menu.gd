@@ -324,14 +324,28 @@ func _build_home_panel() -> void:
         hb.alignment = BoxContainer.ALIGNMENT_CENTER
         mv.add_child(hb)
 
-        # چیپ سکه
+        # چیپ سکه — آیکون واقعی سکه؛ ایموجی در فونت‌های باندل‌شده گلیف ندارد
+        # و روی گوشی مربع توخالی می‌افتد، پس از texture استفاده می‌کنیم
         var chip := PanelContainer.new()
         chip.add_theme_stylebox_override("panel", _sb(Color(0.16, 0.17, 0.20, 0.97), COL_GOLD_DIM, 22, 1, false))
         chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-        coin_label = _mk_label("🪙 " + str(Globals.coins), 24, true, false, COL_GOLD)
-        coin_label.custom_minimum_size = Vector2(150, 44)
+        var chip_hb := HBoxContainer.new()
+        chip_hb.add_theme_constant_override("separation", 8)
+        chip.add_child(chip_hb)
+        var coin_tex := _safe_load("res://assets/sprites/coin.png")
+        if coin_tex != null:
+                var coin_icon := TextureRect.new()
+                coin_icon.texture = coin_tex
+                coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                coin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                coin_icon.custom_minimum_size = Vector2(32, 32)
+                coin_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+                chip_hb.add_child(coin_icon)
+        coin_label = _mk_label(str(Globals.coins), 24, true, false, COL_GOLD)
+        coin_label.custom_minimum_size = Vector2(100, 44)
         coin_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-        chip.add_child(coin_label)
+        coin_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+        chip_hb.add_child(coin_label)
         hb.add_child(chip)
 
         # پلاک اسم کودک
@@ -393,7 +407,7 @@ func _build_levels_panel() -> void:
                 var b := Button.new()
                 var txt := str(id)
                 for s in 3:
-                        txt += "★" if s < st else "·"
+                        txt += "٭" if s < st else "·"
                 b.text = txt
                 b.custom_minimum_size = Vector2(112, 74)
                 if font_display != null:
@@ -414,7 +428,7 @@ func _build_levels_panel() -> void:
         add_child(center)
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۴ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۰٫۶ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
         v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         v.position = Vector2(1000, 692)
         v.custom_minimum_size = Vector2(256, 0)
@@ -443,7 +457,7 @@ func _deco_brain() -> void:
 func _deco_version() -> void:
         # برچسب کوچک نسخه در گوشه — اگر این را دیدی یعنی بیلد جدید روی گوشی اجراست
         var l := Label.new()
-        l.text = "بوقی v0.5.0"
+        l.text = "بوقی v0.6.0 (build 7)"
         l.add_theme_font_size_override("font_size", 14)
         if font != null:
                 l.add_theme_font_override("font", font)
@@ -471,7 +485,7 @@ func _on_plate_changed() -> void:
 
 func _refresh() -> void:
         if coin_label:
-                coin_label.text = "🪙 " + str(Globals.coins)
+                coin_label.text = str(Globals.coins)
         if plate_edit:
                 plate_edit.text = Globals.plate_name
 

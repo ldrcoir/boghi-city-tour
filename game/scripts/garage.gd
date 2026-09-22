@@ -116,10 +116,20 @@ func _build() -> void:
         add_child(title)
 
         # سکه‌ها (بالا-چپ، کنار دکمه برگشت)
-        coin_label = _mk_label("🪙 " + str(Globals.coins), 30, true, false, Color(0.98, 0.85, 0.3))
+        # آیکون سکه + عدد — به‌جای ایموجی که در فونت گوشی نیست
+        if ResourceLoader.exists("res://assets/sprites/coin.png"):
+                var coin_icon := TextureRect.new()
+                coin_icon.texture = load("res://assets/sprites/coin.png")
+                coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                coin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                coin_icon.position = Vector2(118, 22)
+                coin_icon.size = Vector2(36, 36)
+                coin_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                add_child(coin_icon)
+        coin_label = _mk_label(str(Globals.coins), 30, true, false, Color(0.98, 0.85, 0.3))
         coin_label.add_theme_color_override("font_outline_color", Color(0.22, 0.12, 0.05))
         coin_label.add_theme_constant_override("outline_size", 8)
-        coin_label.position = Vector2(148, 28)
+        coin_label.position = Vector2(160, 28)
         add_child(coin_label)
 
         # سایه و ویترین ماشین (وسط-چپ)
@@ -322,7 +332,7 @@ func _on_car_button(i: int) -> void:
                 Globals.save_game()
                 AudioMgr.play_sfx("coin")
         elif not Globals.buy_car(i):
-                _show_toast("سکه کافی نداری! مأموریت برو 🪙")
+                _show_toast("سکه کافی نداری! مأموریت برو")
                 if brain != null:
                         brain.say(car_pic, str(Globals.CARS[Globals.selected_car]["id"]), "poor")
                 return
@@ -338,7 +348,7 @@ func _on_upgrade(uid: String) -> void:
         if not Globals.do_upgrade(uid):
                 var cost := Globals.upgrade_cost(uid)
                 if cost > 0:
-                        _show_toast("سکه کافی نداری! مأموریت برو 🪙")
+                        _show_toast("سکه کافی نداری! مأموریت برو")
                 return
         AudioMgr.play_sfx("clank")
         _refresh()
@@ -391,7 +401,7 @@ func _show_toast(msg: String) -> void:
         t.tween_property(toast, "modulate:a", 0.0, 0.6)
 
 func _refresh() -> void:
-        coin_label.text = "🪙 " + str(Globals.coins)
+        coin_label.text = str(Globals.coins)
         var c = Globals.CARS[Globals.selected_car]
         car_pic.texture = load(c["tex"])
         car_name_label.text = str(c["name"])
@@ -411,9 +421,9 @@ func _refresh() -> void:
                 var cost := Globals.upgrade_cost(uid)
                 var dots := ""
                 for k in 3:
-                        dots += "●" if k < lvl else "○"
+                        dots += "•" if k < lvl else "·"
                 up_dots[uid].text = dots
-                up_buttons[uid].text = Globals.L("max") if cost < 0 else str(cost) + " 🪙"
+                up_buttons[uid].text = Globals.L("max") if cost < 0 else str(cost) + " سکه"
                 up_buttons[uid].disabled = cost < 0
 
 func _make_shadow_tex() -> ImageTexture:
