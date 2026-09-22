@@ -38,6 +38,9 @@ func _safe_font(path: String) -> FontFile:
         return null
 
 func _ready() -> void:
+        # جهت چیدمان را LTR قفل می‌کنیم تا presetهای anchor در لوکیشن فارسی آینه نشوند
+        # (متن فارسی دست‌نخورده می‌ماند — فقط هندسه deterministic می‌شود)
+        set("layout_direction", 0)
         font = _safe_font("res://assets/fonts/Vazirmatn-Regular.ttf")
         font_bold = _safe_font("res://assets/fonts/Vazirmatn-Bold.ttf")
         font_display = _safe_font("res://assets/fonts/Lalezar-Regular.ttf")
@@ -54,6 +57,7 @@ func _ready() -> void:
         call_deferred("_deco_logo")
         call_deferred("_deco_brain")
         call_deferred("_deco_version")
+        call_deferred("_layout_watchdog")
         var uargs := OS.get_cmdline_user_args()
         if uargs.has("--garage"):
                 get_tree().change_scene_to_file("res://scenes/garage.tscn")
@@ -201,64 +205,80 @@ func _add_gradient(top: bool) -> void:
         tr.texture = gt
         tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         tr.stretch_mode = TextureRect.STRETCH_SCALE
-        if top:
-                tr.position = Vector2(0, 0)
-                tr.size = Vector2(1280, 170)
-        else:
-                tr.position = Vector2(0, 500)
-                tr.size = Vector2(1280, 220)
         tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        # چیدمان anchor-محور (position ثابت روی برخی گوشی‌ها رندر نمی‌شود)
+        tr.anchor_left = 0.0
+        tr.anchor_right = 1.0
+        if top:
+                tr.anchor_top = 0.0
+                tr.anchor_bottom = 0.236
+        else:
+                tr.anchor_top = 0.694
+                tr.anchor_bottom = 1.0
         add_child(tr)
 
 func _deco_cars() -> void:
         # بوقی قرمز و پراید مسابقه‌ای پارک شده روی جاده خیس — قهرمان‌های محله
-        var sh1 := Sprite2D.new()
+        # همه با anchor (نه position ثابت) تا روی هر گوشی/هر RTL رندر شود
+        var sh1 := TextureRect.new()
         sh1.texture = _make_shadow_tex()
-        sh1.position = Vector2(230, 678)
-        sh1.scale = Vector2(2.05, 0.75)
-        sh1.z_index = -1
+        sh1.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        sh1.anchor_left = 0.0
+        sh1.anchor_right = 0.372
+        sh1.anchor_top = 0.908
+        sh1.anchor_bottom = 0.975
+        sh1.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(sh1)
         var c1 := TextureRect.new()
         c1.texture = _safe_load("res://assets/sprites/boghi_side.png")
         c1.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         c1.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        c1.position = Vector2(48, 512)
-        c1.size = Vector2(360, 190)
-        c1.pivot_offset = Vector2(180, 190)
+        c1.anchor_left = 0.0375
+        c1.anchor_right = 0.3188
+        c1.anchor_top = 0.7111
+        c1.anchor_bottom = 0.975
         c1.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(c1)
         boghi_car = c1
         # لمسِ بوقی: بوقی با صدای شیطون می‌گوید «منو انتخاب کن!»
         var tap1 := Button.new()
         tap1.flat = true
-        tap1.position = Vector2(48, 512)
-        tap1.size = Vector2(360, 190)
         tap1.modulate.a = 0.0
+        tap1.anchor_left = 0.0375
+        tap1.anchor_right = 0.3188
+        tap1.anchor_top = 0.7111
+        tap1.anchor_bottom = 0.975
         tap1.pressed.connect(func():
                 if brain != null and is_instance_valid(boghi_car):
                         brain.say(boghi_car, "boghi", "idle"))
         add_child(tap1)
-        var sh2 := Sprite2D.new()
+        var sh2 := TextureRect.new()
         sh2.texture = _make_shadow_tex()
-        sh2.position = Vector2(628, 686)
-        sh2.scale = Vector2(1.8, 0.7)
-        sh2.z_index = -1
+        sh2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        sh2.anchor_left = 0.3219
+        sh2.anchor_right = 0.6594
+        sh2.anchor_top = 0.9222
+        sh2.anchor_bottom = 0.9833
+        sh2.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(sh2)
         var c2 := TextureRect.new()
         c2.texture = _safe_load("res://assets/sprites/pride_side.png")
         c2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         c2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        c2.position = Vector2(468, 538)
-        c2.size = Vector2(320, 162)
-        c2.pivot_offset = Vector2(160, 162)
+        c2.anchor_left = 0.3656
+        c2.anchor_right = 0.6156
+        c2.anchor_top = 0.7472
+        c2.anchor_bottom = 0.9722
         c2.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(c2)
         pride_car = c2
         var tap2 := Button.new()
         tap2.flat = true
-        tap2.position = Vector2(468, 538)
-        tap2.size = Vector2(320, 162)
         tap2.modulate.a = 0.0
+        tap2.anchor_left = 0.3656
+        tap2.anchor_right = 0.6156
+        tap2.anchor_top = 0.7472
+        tap2.anchor_bottom = 0.9722
         tap2.pressed.connect(func():
                 if brain != null and is_instance_valid(pride_car):
                         brain.say(pride_car, "pride", "idle"))
@@ -269,21 +289,34 @@ func _build_title() -> void:
         var title := _mk_label("بوقی: تور شهرها", 58, false, true, COL_GOLD)
         title.add_theme_color_override("font_outline_color", Color(0.10, 0.06, 0.03))
         title.add_theme_constant_override("outline_size", 14)
-        title.position = Vector2(540, 24)
-        title.custom_minimum_size = Vector2(716, 0)
+        title.anchor_left = 0.0
+        title.anchor_right = 1.0
+        title.anchor_top = 0.0
+        title.offset_top = 24.0
+        title.offset_bottom = 106.0
+        title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(title)
         title_nodes.append(title)
         var bar := Panel.new()
         bar.add_theme_stylebox_override("panel", _sb(COL_RED, Color(0, 0, 0, 0), 3))
-        bar.position = Vector2(798, 110)
-        bar.size = Vector2(200, 7)
+        bar.anchor_left = 0.5
+        bar.anchor_right = 0.5
+        bar.anchor_top = 0.0
+        bar.offset_left = -100.0
+        bar.offset_right = 100.0
+        bar.offset_top = 110.0
+        bar.offset_bottom = 117.0
         add_child(bar)
         title_nodes.append(bar)
         var sub := _mk_label("فصل ۱ — تهران  •  ۵۰ مأموریت محله", 21, true, false, Color(1, 1, 1, 0.88))
         sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
         sub.add_theme_constant_override("outline_size", 6)
-        sub.position = Vector2(540, 124)
-        sub.custom_minimum_size = Vector2(716, 0)
+        sub.anchor_left = 0.0
+        sub.anchor_right = 1.0
+        sub.anchor_top = 0.0
+        sub.offset_top = 124.0
+        sub.offset_bottom = 162.0
+        sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(sub)
         title_nodes.append(sub)
 
@@ -299,8 +332,10 @@ func _deco_logo() -> void:
         logo.texture = logo_tex
         logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        logo.position = Vector2(520, 8)
-        logo.size = Vector2(560, 130)
+        logo.anchor_left = 0.406
+        logo.anchor_right = 0.844
+        logo.anchor_top = 0.011
+        logo.anchor_bottom = 0.192
         logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(logo)
         BRAIN_SCRIPT.add_breathing(logo, 2.5, 1.6)
@@ -308,8 +343,13 @@ func _deco_logo() -> void:
 func _build_home_panel() -> void:
         panel_home = PanelContainer.new()
         panel_home.add_theme_stylebox_override("panel", _sb(COL_GLASS, Color(0.85, 0.68, 0.28, 0.45), 22, 2))
-        panel_home.position = Vector2(856, 176)
-        panel_home.size = Vector2(388, 466)
+        # چیدمان anchor-محور — نسبت به قاب ۱۲۸۰×۷۲۰؛ روی هر گوشی/RTL همان جا می‌ماند
+        panel_home.anchor_left = 0.669
+        panel_home.anchor_right = 0.972
+        panel_home.anchor_top = 0.244
+        panel_home.anchor_bottom = 0.892
+        panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
+        panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
         add_child(panel_home)
 
         var mv := MarginContainer.new()
@@ -428,10 +468,16 @@ func _build_levels_panel() -> void:
         add_child(center)
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۶ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
-        v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-        v.position = Vector2(1000, 692)
-        v.custom_minimum_size = Vector2(256, 0)
+        var v := _mk_label("نسخه ۰٫۸ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
+        v.anchor_left = 0.0
+        v.anchor_right = 1.0
+        v.anchor_top = 1.0
+        v.anchor_bottom = 1.0
+        v.offset_left = 16.0
+        v.offset_right = -280.0
+        v.offset_top = -34.0
+        v.offset_bottom = -10.0
+        v.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
         add_child(v)
 
 func _build_ui() -> void:
@@ -455,20 +501,55 @@ func _deco_brain() -> void:
                 func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
 
 func _deco_version() -> void:
-        # برچسب کوچک نسخه در گوشه — اگر این را دیدی یعنی بیلد جدید روی گوشی اجراست
+        # برچسب نسخه — تمام‌عرض پایین با تراز راست؛ در RTL آینه هم نمی‌شود (full-wide متقارن است)
         var l := Label.new()
-        l.text = "بوقی v0.7 (build 8)"
+        l.text = "بوقی v0.8 (build 9)"
         l.add_theme_font_size_override("font_size", 14)
         if font != null:
                 l.add_theme_font_override("font", font)
         l.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
-        l.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-        l.offset_left = 14.0
+        l.anchor_left = 0.0
+        l.anchor_right = 1.0
+        l.anchor_top = 1.0
+        l.anchor_bottom = 1.0
+        l.offset_left = 16.0
+        l.offset_right = -16.0
         l.offset_top = -30.0
-        l.offset_right = 140.0
         l.offset_bottom = -8.0
+        l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         l.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(l)
+
+func _layout_watchdog() -> void:
+        # نگهبان چیدمان: اگر پنل منو روی دید نیست، هندسه‌ی واقعی را روی صفحه نشان بده
+        # تا کاربر عکس بگیرد و ما مقادیر واقعی گوشی را ببینیم
+        await get_tree().create_timer(1.6).timeout
+        if not is_instance_valid(panel_home):
+                return
+        var vp := get_viewport_rect().size
+        var gr: Rect2 = panel_home.get_global_rect()
+        var on_screen: bool = panel_home.visible and gr.size.x > 60.0 and gr.size.y > 60.0 \
+                and gr.position.x < vp.x - 60.0 and gr.position.y < vp.y - 60.0 \
+                and gr.end.x > 60.0 and gr.end.y > 60.0
+        if on_screen:
+                print("[boghi][watchdog] panel OK rect=", gr, " viewport=", vp)
+                return
+        var msg := "خطای چیدمان — لطفاً از این صفحه عکس بگیر و بفرست\n"
+        msg += "viewport=%s window=%s\n" % [vp, get_window().size]
+        msg += "root=%s\npanel_global=%s visible=%s\n" % [Rect2(Vector2.ZERO, size), gr, panel_home.visible]
+        msg += "locale=%s scale=%s\n" % [OS.get_locale(), get_viewport().content_scale_factor]
+        print("[boghi][watchdog] ", msg.replace("\n", " | "))
+        var box := PanelContainer.new()
+        var sbf := StyleBoxFlat.new()
+        sbf.bg_color = Color(0.25, 0.05, 0.05, 0.94)
+        sbf.set_corner_radius_all(12)
+        box.add_theme_stylebox_override("panel", sbf)
+        box.set_anchors_preset(Control.PRESET_FULL_RECT)
+        box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        var lbl := _mk_label(msg, 22, true, false, Color(1, 0.9, 0.85))
+        lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        box.add_child(lbl)
+        add_child(box)
 
 func _show(p: PanelContainer) -> void:
         if panel_home == null or panel_levels == null:
