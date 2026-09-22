@@ -44,15 +44,15 @@ func _ready() -> void:
         var model := OS.get_model_name()
         var ver := Engine.get_version_info()
         var ver_str := "%d.%d.%d" % [ver["major"], ver["minor"], ver["patch"]]
-        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر زیرِ این صفحه «v0.6.0» نوشته نشد، یعنی لینک قدیمی را باز کرده‌ای"
-        # برچسب نسخه — همیشه دیده می‌شود تا مشخص باشد کدام بیلد روی گوشی اجراست
-        var ver_label := _mk_label("بوقی v0.6.0 (build 7)", 22)
-        ver_label.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-        ver_label.anchor_top = 0.95
-        ver_label.anchor_bottom = 1.0
+        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر بالای صفحه «v0.7» طلایی نمی‌بینی، یعنی فایل قدیمی نصب شده"
+        # پلاک نسخه — بزرگ و طلایی، بالای صفحه؛ انگشت‌نگاری بیلد v0.7
+        var ver_label := _mk_label("بوقی v0.7 — بیلد ۸", 34)
+        ver_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+        ver_label.anchor_top = 0.02
+        ver_label.anchor_bottom = 0.11
         ver_label.offset_left = 16
         ver_label.offset_right = -16
-        ver_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.75))
+        ver_label.add_theme_color_override("font_color", Color(0.96, 0.76, 0.25))
         add_child(ver_label)
         _go_menu()
 
@@ -86,7 +86,7 @@ func _go_menu() -> void:
         if inst.get("panel_home") == null:
                 _fail("منو نیمه‌کاره ماند (پنل اصلی ساخته نشد — جزئیات از لاگ پایین صفحه)")
                 return
-        detail_label.text = "منو آماده شد"
+        detail_label.text = "منو آماده شد — نسخه درست نصب شده"
         var tw := create_tween()
         tw.tween_property(self, "modulate:a", 0.0, 0.35)
         tw.tween_callback(queue_free)

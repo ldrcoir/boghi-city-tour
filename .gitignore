@@ -40,3 +40,4 @@ next.config.ts
 next-env.d.ts
 server.log
 dev.log
+.secrets.env

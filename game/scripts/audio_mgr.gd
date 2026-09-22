@@ -16,9 +16,13 @@ func _ready() -> void:
                 music_player.stream = load(mpath)
                 if music_player.stream is AudioStreamOggVorbis:
                         music_player.stream.loop = true
-        music_player.volume_db = -9.0
+        music_player.volume_db = -6.0
         music_player.finished.connect(func(): music_player.play())
         add_child(music_player)
+        # آهنگ بلافاصله از لحظه‌ی بوت شروع می‌شود — حتی قبل از منو
+        # (اثر انگشت شنیداری v0.7: اگر این آهنگ شنیده شد یعنی بیلد درست نصب است)
+        if music_player.stream != null:
+                music_player.play()
         engine_player = AudioStreamPlayer.new()
         engine_player.stream = load("res://assets/audio/engine.wav")
         engine_player.volume_db = -60.0

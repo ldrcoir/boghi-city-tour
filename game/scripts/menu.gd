@@ -457,7 +457,7 @@ func _deco_brain() -> void:
 func _deco_version() -> void:
         # برچسب کوچک نسخه در گوشه — اگر این را دیدی یعنی بیلد جدید روی گوشی اجراست
         var l := Label.new()
-        l.text = "بوقی v0.6.0 (build 7)"
+        l.text = "بوقی v0.7 (build 8)"
         l.add_theme_font_size_override("font_size", 14)
         if font != null:
                 l.add_theme_font_override("font", font)

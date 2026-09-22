@@ -28,7 +28,7 @@
 **https://github.com/ldrcoir/boghi-city-tour/releases/latest/download/BoghiCityTour.apk**
 
 یا از صفحه [Releases](https://github.com/ldrcoir/boghi-city-tour/releases/latest) آخرین نسخه را بگیرید.
-بعد از نصب، روی صفحه بوت باید «بوقی v0.6.0» نوشته شود — این یعنی نسخه درست اجرا شده.
+بعد از نصب، بالای صفحه بوت باید «بوقی v0.7 — بیلد ۸» طلایی دیده شود و آهنگ جدید پخش شود — این یعنی نسخه درست اجرا شده. لینک‌های قدیمی هم اکنون فایل v0.7 می‌دهند.
 
 ## تصاویر بازی
 | گیم‌پلی | کارگاه استاد فنر |
