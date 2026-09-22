@@ -6,17 +6,21 @@ config_version=5
 config/name="Boghi City Tour"
 run/main_scene="res://scenes/boot.tscn"
 config/features=PackedStringArray("4.7")
-boot_splash/bg_color=Color(0.075, 0.06, 0.075, 1)
+boot_splash/bg_color=Color(0.117647, 0.0705882, 0.0392157, 1)
 boot_splash/show_image=true
-boot_splash/image="res://assets/sprites/logo.png"
+boot_splash/image="res://assets/sprites/splash.png"
 boot_splash/fullsize=false
-boot_splash/use_filter=true
 config/icon="res://icon.png"
 
 [autoload]
 
 Globals="*res://scripts/globals.gd"
 AudioMgr="*res://scripts/audio_mgr.gd"
+
+[debug]
+
+file_logging/enable_file_logging=true
+file_logging/enable_file_logging.pc=true
 
 [display]
 

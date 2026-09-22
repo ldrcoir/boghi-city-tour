@@ -291,8 +291,9 @@ func _show_bubble(anchor: Control, text: String) -> void:
         var b := Bubble.new()
         b.brain = self
         b.set_text(text)
-        var font: FontFile = load("res://assets/fonts/Lalezar-Regular.ttf")
-        b.add_theme_font_override("font", font)
+        var bfont: Resource = load("res://assets/fonts/Lalezar-Regular.ttf")
+        if bfont is FontFile:
+                b.add_theme_font_override("font", bfont)
         var top := anchor.global_position
         var w := maxf(190.0, minf(400.0, text.length() * 13.0 + 70.0))
         b.size = Vector2(w, 0)
