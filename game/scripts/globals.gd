@@ -86,6 +86,30 @@ const CARS := [
                 "tex": "res://assets/sprites/dena_race_side.png",
                 "jump": 1.0, "accel": 1.3, "tough": 1.05, "price": 4200
         },
+        {
+                "id": "pride_blue", "name": "پراید آبی مسابقه‌ای", "en": "Pride Blue RS",
+                "desc": "موج آبی پیست — استریک سفید و بال بزرگ!",
+                "tex": "res://assets/sprites/pride_blue_side.png",
+                "jump": 0.95, "accel": 1.28, "tough": 0.9, "price": 4800
+        },
+        {
+                "id": "pejo_green", "name": "پژو سبز مسابقه‌ای", "en": "206 Emerald",
+                "desc": "زمرد پرشور پیست — استریک مشکی، شتاب وحشی!",
+                "tex": "res://assets/sprites/pejo_green_side.png",
+                "jump": 1.05, "accel": 1.32, "tough": 0.9, "price": 5400
+        },
+        {
+                "id": "shahin_white", "name": "شاهین سفید", "en": "Shahin Pearl",
+                "desc": "قهرمان سفید شب‌های تهران — خط طلایی، نفس طلایی!",
+                "tex": "res://assets/sprites/shahin_white_side.png",
+                "jump": 0.95, "accel": 1.38, "tough": 1.0, "price": 6000
+        },
+        {
+                "id": "dena_red", "name": "دنا سرخ کاپیتان", "en": "Dena Red Captain",
+                "desc": "کاپیتان سرخ مأموریت‌ها — سخت‌کوش و سریع!",
+                "tex": "res://assets/sprites/dena_red_side.png",
+                "jump": 1.0, "accel": 1.42, "tough": 1.1, "price": 6800
+        },
 ]
 
 const UPGRADES := [

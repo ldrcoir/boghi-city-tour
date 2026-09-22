@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gtpaq2iuary"
-path="res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"
+uid="uid://c037asgdrf1uo"
+path="res://.godot/imported/pejo_green_side.png-25024dd24a7774ff8e5ef6876860682d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/splash.png"
-dest_files=["res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"]
+source_file="res://assets/sprites/pejo_green_side.png"
+dest_files=["res://.godot/imported/pejo_green_side.png-25024dd24a7774ff8e5ef6876860682d.ctex"]
 
 [params]
 

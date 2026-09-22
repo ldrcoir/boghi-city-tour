@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gtpaq2iuary"
-path="res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"
+uid="uid://dpimyuxyhonyu"
+path="res://.godot/imported/shahin_white_side.png-107f293f1ad9549366ee600e954c7c16.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/splash.png"
-dest_files=["res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"]
+source_file="res://assets/sprites/shahin_white_side.png"
+dest_files=["res://.godot/imported/shahin_white_side.png-107f293f1ad9549366ee600e954c7c16.ctex"]
 
 [params]
 

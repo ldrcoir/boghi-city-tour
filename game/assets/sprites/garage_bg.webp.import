@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3513pv5l4ucp"
-path="res://.godot/imported/garage_bg.png-a9563b334abc1babd76370a14e606e48.ctex"
+uid="uid://cmpf3gfwfdc8o"
+path="res://.godot/imported/garage_bg.webp-df9ab745dfd3cd6f7f413c87349b50e0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/garage_bg.png"
-dest_files=["res://.godot/imported/garage_bg.png-a9563b334abc1babd76370a14e606e48.ctex"]
+source_file="res://assets/sprites/garage_bg.webp"
+dest_files=["res://.godot/imported/garage_bg.webp-df9ab745dfd3cd6f7f413c87349b50e0.ctex"]
 
 [params]
 

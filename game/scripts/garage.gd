@@ -89,7 +89,7 @@ func _mk_label(txt: String, size: int, bold := false, display := false, col := C
 func _build() -> void:
         # پس‌زمینه کارگاه گرم و پرنور
         var bg := TextureRect.new()
-        bg.texture = load("res://assets/sprites/garage_bg.png")
+        bg.texture = load("res://assets/sprites/garage_bg.webp")
         bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
         bg.set_anchors_preset(Control.PRESET_FULL_RECT)

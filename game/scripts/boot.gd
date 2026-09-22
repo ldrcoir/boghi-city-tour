@@ -44,9 +44,9 @@ func _ready() -> void:
         var model := OS.get_model_name()
         var ver := Engine.get_version_info()
         var ver_str := "%d.%d.%d" % [ver["major"], ver["minor"], ver["patch"]]
-        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر بالای صفحه «v0.8» طلایی نمی‌بینی، یعنی فایل قدیمی نصب شده"
+        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر بالای صفحه «v0.9» طلایی نمی‌بینی، یعنی فایل قدیمی نصب شده"
         # پلاک نسخه — بزرگ و طلایی، بالای صفحه؛ انگشت‌نگاری بیلد v0.7
-        var ver_label := _mk_label("بوقی v0.8 — بیلد ۹", 34)
+        var ver_label := _mk_label("بوقی v0.9 — بیلد ۱۰", 34)
         ver_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
         ver_label.anchor_top = 0.02
         ver_label.anchor_bottom = 0.11

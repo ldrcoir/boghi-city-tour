@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gtpaq2iuary"
-path="res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"
+uid="uid://df0qprpoauf0h"
+path="res://.godot/imported/dena_red_side.png-c66f2b8782b17bc5358395388a8465cd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/splash.png"
-dest_files=["res://.godot/imported/splash.png-9ffdfe26897c9006e0a009263e94d08a.ctex"]
+source_file="res://assets/sprites/dena_red_side.png"
+dest_files=["res://.godot/imported/dena_red_side.png-c66f2b8782b17bc5358395388a8465cd.ctex"]
 
 [params]
 

@@ -9,9 +9,13 @@ var font_bold: FontFile
 var font_display: FontFile
 var panel_home: PanelContainer
 var panel_levels: PanelContainer
+var levels_center: CenterContainer
+var play_btn: Button
 var coin_label: Label
 var plate_edit: LineEdit
 var brain = null
+var deco_cars: Array = []
+var back_btn: Button
 # بارگذاری مستقیم مغز — بدون وابستگی به class cache
 const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 var boghi_car: TextureRect
@@ -67,15 +71,61 @@ func _ready() -> void:
                 _autotest()
 
 func _autotest() -> void:
-        await get_tree().create_timer(1.5).timeout
+        await get_tree().create_timer(1.2).timeout
         var img := get_viewport().get_texture().get_image()
         if img != null:
                 img.save_png("/home/z/my-project/scripts/shot_menu.png")
+        # تست تپ واقعی: رویداد از پایپ‌لاین ورودی می‌گذرد (مثل انگشت روی گوشی)
+        if play_btn != null and is_instance_valid(play_btn):
+                var pos: Vector2 = play_btn.get_global_rect().get_center()
+                var ev := InputEventMouseButton.new()
+                ev.button_index = MOUSE_BUTTON_LEFT
+                ev.pressed = true
+                ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+                ev.position = pos
+                ev.global_position = pos
+                Input.parse_input_event(ev)
+                await get_tree().create_timer(0.12).timeout
+                var ev2 := InputEventMouseButton.new()
+                ev2.button_index = MOUSE_BUTTON_LEFT
+                ev2.pressed = false
+                ev2.position = pos
+                ev2.global_position = pos
+                Input.parse_input_event(ev2)
+                await get_tree().create_timer(0.7).timeout
+                var ok := panel_levels != null and panel_levels.visible
+                print("[boghi][autotest] TAP-PLAY ", "OK" if ok else "FAIL",
+                        " levels=", panel_levels.visible if panel_levels != null else false,
+                        " home=", panel_home.visible if panel_home != null else false)
+                var img2 := get_viewport().get_texture().get_image()
+                if img2 != null:
+                        img2.save_png("/home/z/my-project/scripts/shot_levels.png")
+                # تست برگشت: تپ واقعی روی دکمه‌ی برگشت
+                if back_btn != null and is_instance_valid(back_btn):
+                        var pos2: Vector2 = back_btn.get_global_rect().get_center()
+                        var ev3 := InputEventMouseButton.new()
+                        ev3.button_index = MOUSE_BUTTON_LEFT
+                        ev3.pressed = true
+                        ev3.button_mask = MOUSE_BUTTON_MASK_LEFT
+                        ev3.position = pos2
+                        ev3.global_position = pos2
+                        Input.parse_input_event(ev3)
+                        await get_tree().create_timer(0.12).timeout
+                        var ev4 := InputEventMouseButton.new()
+                        ev4.button_index = MOUSE_BUTTON_LEFT
+                        ev4.pressed = false
+                        ev4.position = pos2
+                        ev4.global_position = pos2
+                        Input.parse_input_event(ev4)
+                        await get_tree().create_timer(0.5).timeout
+                        var ok2 := panel_home.visible
+                        print("[boghi][autotest] TAP-BACK ", "OK" if ok2 else "FAIL",
+                                " home=", panel_home.visible, " levels=", panel_levels.visible)
         get_tree().quit()
 
 func _build_background() -> void:
         # اگر پس‌زمینه به هر دلیل لود نشد، گرادیان گرم آسفالت جایش را می‌گیرد
-        var tex := _safe_load("res://assets/sprites/menu_bg.png")
+        var tex := _safe_load("res://assets/sprites/menu_bg.webp")
         if tex != null:
                 var bg := TextureRect.new()
                 bg.texture = tex
@@ -252,6 +302,9 @@ func _deco_cars() -> void:
                 if brain != null and is_instance_valid(boghi_car):
                         brain.say(boghi_car, "boghi", "idle"))
         add_child(tap1)
+        deco_cars.append(sh1)
+        deco_cars.append(c1)
+        deco_cars.append(tap1)
         var sh2 := TextureRect.new()
         sh2.texture = _make_shadow_tex()
         sh2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -283,6 +336,9 @@ func _deco_cars() -> void:
                 if brain != null and is_instance_valid(pride_car):
                         brain.say(pride_car, "pride", "idle"))
         add_child(tap2)
+        deco_cars.append(sh2)
+        deco_cars.append(c2)
+        deco_cars.append(tap2)
 
 ## تیتر متنی — همیشه ساخته می‌شود (پشتیبان مطمئن)
 func _build_title() -> void:
@@ -423,6 +479,7 @@ func _build_home_panel() -> void:
 
         var b_play := _mk_button(Globals.L("levels"), 30, "red", 72)
         b_play.pressed.connect(func(): _show(panel_levels))
+        play_btn = b_play
         hb.add_child(b_play)
 
         var b_garage := _mk_button(Globals.L("workshop"), 25, "dark", 58)
@@ -461,14 +518,19 @@ func _build_levels_panel() -> void:
         lv.add_child(scroll)
         var b_back1 := _mk_button(Globals.L("back"), 24, "dark", 58)
         b_back1.pressed.connect(func(): _show(panel_home))
+        back_btn = b_back1
         lv.add_child(b_back1)
         var center := CenterContainer.new()
         center.set_anchors_preset(Control.PRESET_FULL_RECT)
+        # ⛔ حیاتی: کانتینر تمام‌صفحه نباید ورودی بخرد وگرنه همه‌ی دکمه‌های
+        # زیرش روی گوشی مرده می‌شوند (باگ «دکمه‌ها کار نمی‌کنند» v0.8)
+        center.mouse_filter = Control.MOUSE_FILTER_IGNORE
         center.add_child(panel_levels)
         add_child(center)
+        levels_center = center
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۸ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۰٫۹ — ماشین‌های زنده", 15, true, false, Color(1, 1, 1, 0.6))
         v.anchor_left = 0.0
         v.anchor_right = 1.0
         v.anchor_top = 1.0
@@ -503,7 +565,7 @@ func _deco_brain() -> void:
 func _deco_version() -> void:
         # برچسب نسخه — تمام‌عرض پایین با تراز راست؛ در RTL آینه هم نمی‌شود (full-wide متقارن است)
         var l := Label.new()
-        l.text = "بوقی v0.8 (build 9)"
+        l.text = "بوقی v0.9 (build 10)"
         l.add_theme_font_size_override("font_size", 14)
         if font != null:
                 l.add_theme_font_override("font", font)
@@ -525,6 +587,9 @@ func _layout_watchdog() -> void:
         # تا کاربر عکس بگیرد و ما مقادیر واقعی گوشی را ببینیم
         await get_tree().create_timer(1.6).timeout
         if not is_instance_valid(panel_home):
+                return
+        # اگر کاربر به پنل دیگری رفته، نظارت فقط مال صفحه‌ی خانه است
+        if not panel_home.visible:
                 return
         var vp := get_viewport_rect().size
         var gr: Rect2 = panel_home.get_global_rect()
@@ -556,6 +621,15 @@ func _show(p: PanelContainer) -> void:
                 return
         panel_home.visible = p == panel_home
         panel_levels.visible = p == panel_levels
+        # کانتینر مأموریت‌ها هم وقتی پنل مخفی است باید مخفی شود
+        # (دو لایه محافظت: mouse_filter=IGNORE + مخفی‌سازی کامل)
+        # ماشین‌های تزئینی و دکمه‌های تپ فقط مال صفحه‌ی خانه‌اند؛
+        # وگرنه روی پنل مأموریت‌ها می‌افتند و تپِ دکمه‌ها را می‌دزدند
+        for n in deco_cars:
+                if is_instance_valid(n):
+                        n.visible = p == panel_home
+        if levels_center != null:
+                levels_center.visible = p == panel_levels
         _refresh()
 
 func _on_plate_changed() -> void:
