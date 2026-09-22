@@ -11,7 +11,11 @@ func _ready() -> void:
                 if ResourceLoader.exists(path):
                         sfx[n] = load(path)
         music_player = AudioStreamPlayer.new()
-        music_player.stream = load("res://assets/audio/music_loop.wav")
+        var mpath := "res://assets/audio/music_loop.ogg"
+        if ResourceLoader.exists(mpath):
+                music_player.stream = load(mpath)
+                if music_player.stream is AudioStreamOggVorbis:
+                        music_player.stream.loop = true
         music_player.volume_db = -9.0
         music_player.finished.connect(func(): music_player.play())
         add_child(music_player)
