@@ -9,6 +9,8 @@ game/.godot/
 download/
 upload/
 tools/
+dl/
+build/
 db/
 .env
 *.log
