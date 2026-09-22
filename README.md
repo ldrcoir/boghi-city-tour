@@ -23,11 +23,12 @@
 - فونت‌های فارسی: Lalezar + Vazirmatn
 
 ## دانلود APK
-لینک مستقیم نسخه فعلی (اندروید ۷ به بالا):
+**لینک همیشگی** — همیشه آخرین نسخه (اندروید ۷ به بالا). ذخیره‌اش کن:
 
-**https://github.com/ldrcoir/boghi-city-tour/releases/download/v0.4/BoghiCityTour_v0.4_test.apk**
+**https://github.com/ldrcoir/boghi-city-tour/releases/latest/download/BoghiCityTour.apk**
 
 یا از صفحه [Releases](https://github.com/ldrcoir/boghi-city-tour/releases/latest) آخرین نسخه را بگیرید.
+بعد از نصب، روی صفحه بوت باید «بوقی v0.6.0» نوشته شود — این یعنی نسخه درست اجرا شده.
 
 ## تصاویر بازی
 | گیم‌پلی | کارگاه استاد فنر |
