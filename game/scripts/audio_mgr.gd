@@ -11,7 +11,7 @@ func _ready() -> void:
                 if ResourceLoader.exists(path):
                         sfx[n] = load(path)
         music_player = AudioStreamPlayer.new()
-        music_player.stream = load("res://assets/audio/music_loop.wav")
+        music_player.stream = load("res://assets/audio/music_loop.ogg")
         music_player.volume_db = -9.0
         music_player.finished.connect(func(): music_player.play())
         add_child(music_player)

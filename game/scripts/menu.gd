@@ -1,6 +1,8 @@
 extends Control
 ## منوی اصلی — نسل حرفه‌ای: شیشه آسفالت تیره + طلایی + قرمز آتشین
-## بزرگ‌ترها هم دوستش دارند، بچه‌ها هم بازی می‌کنند
+## معماری ضربه‌گیر: اول منوی ضروری (دکمه‌ها و پنل‌ها) ساخته می‌شود و بعد
+## تزئینات زنده در فراخوان‌های جداگانه deferred اضافه می‌شوند؛ اگر هر تزئین
+## روی هر دستگاهی خطا بدهد، منوی کامل و قابل‌بازی سر جایش می‌ماند.
 
 var font: FontFile
 var font_bold: FontFile
@@ -12,6 +14,7 @@ var plate_edit: LineEdit
 var brain: CarBrain
 var boghi_car: TextureRect
 var pride_car: TextureRect
+var title_nodes: Array = []
 
 const COL_GOLD := Color(0.96, 0.76, 0.25)
 const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
@@ -20,38 +23,81 @@ const COL_RED_DARK := Color(0.45, 0.08, 0.06)
 const COL_GLASS := Color(0.10, 0.11, 0.13, 0.90)
 const COL_CREAM := Color(0.95, 0.93, 0.88)
 
+func _safe_load(path: String) -> Resource:
+        # بارگذاری امن: منبع نبودن یا خرابی هرگز منو را نمی‌شکند
+        if path == null or not ResourceLoader.exists(path):
+                return null
+        return load(path)
+
+func _safe_font(path: String) -> FontFile:
+        var r := _safe_load(path)
+        if r is FontFile:
+                return r
+        return null
+
 func _ready() -> void:
-        font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
-        font_bold = load("res://assets/fonts/Vazirmatn-Bold.ttf")
-        font_display = load("res://assets/fonts/Lalezar-Regular.ttf")
+        font = _safe_font("res://assets/fonts/Vazirmatn-Regular.ttf")
+        font_bold = _safe_font("res://assets/fonts/Vazirmatn-Bold.ttf")
+        font_display = _safe_font("res://assets/fonts/Lalezar-Regular.ttf")
+        _build_background()
         _build_ui()
         _refresh()
-        # مغز بوقی: ماشین‌های پارک‌شده زنده‌اند و حرف می‌زنند
-        brain = CarBrain.new()
-        add_child(brain)
-        if boghi_car != null:
-                CarBrain.add_breathing(boghi_car, 4.0, 1.25)
-        if pride_car != null:
-                CarBrain.add_breathing(pride_car, 3.0, 1.5)
-        brain.start_idle_chatter(
-                func(cid: String) -> Control:
-                        return boghi_car if cid == "boghi" else pride_car,
-                func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
-        if OS.get_cmdline_user_args().has("--garage"):
+        # آهنگ از همان اول منو پخش می‌شود
+        if has_node("/root/AudioMgr"):
+                get_node("/root/AudioMgr").play_music()
+        # تزئینات زنده — هر کدام در فراخوان جداگانه deferred تا خرابیِ
+        # هر بخش فقط خودش را از کار بیندازد، نه کل منو را
+        call_deferred("_deco_gradients")
+        call_deferred("_deco_cars")
+        call_deferred("_deco_logo")
+        call_deferred("_deco_brain")
+        var uargs := OS.get_cmdline_user_args()
+        if uargs.has("--garage"):
                 get_tree().change_scene_to_file("res://scenes/garage.tscn")
-        if OS.get_cmdline_user_args().has("--levels"):
+        if uargs.has("--levels"):
                 _show(panel_levels)
-        if OS.get_cmdline_user_args().has("--autotest"):
-                if brain != null and boghi_car != null:
-                        brain.say(boghi_car, "boghi", "select")
-                await get_tree().create_timer(1.5).timeout
-                get_viewport().get_texture().get_image().save_png("/home/z/my-project/scripts/shot_menu.png")
-                get_tree().quit()
+        if uargs.has("--autotest"):
+                _autotest()
+
+func _autotest() -> void:
+        await get_tree().create_timer(1.5).timeout
+        var img := get_viewport().get_texture().get_image()
+        if img != null:
+                img.save_png("/home/z/my-project/scripts/shot_menu.png")
+        get_tree().quit()
+
+func _build_background() -> void:
+        # اگر پس‌زمینه به هر دلیل لود نشد، گرادیان گرم آسفالت جایش را می‌گیرد
+        var tex := _safe_load("res://assets/sprites/menu_bg.png")
+        if tex != null:
+                var bg := TextureRect.new()
+                bg.texture = tex
+                bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+                bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+                bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                add_child(bg)
+        else:
+                var gt := GradientTexture2D.new()
+                var g := Gradient.new()
+                g.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
+                g.colors = PackedColorArray([Color(0.30, 0.16, 0.10), Color(0.14, 0.09, 0.07), Color(0.06, 0.04, 0.04)])
+                gt.gradient = g
+                gt.fill_from = Vector2(0.3, 0.0)
+                gt.fill_to = Vector2(0.7, 1.0)
+                var bg := TextureRect.new()
+                bg.texture = gt
+                bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+                bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                add_child(bg)
 
 func _mk_label(txt: String, size: int, bold := false, display := false, col := COL_CREAM) -> Label:
         var l := Label.new()
         l.text = txt
-        l.add_theme_font_override("font", font_display if display else (font_bold if bold else font))
+        var f := font_display if display else (font_bold if bold else font)
+        if f != null:
+                l.add_theme_font_override("font", f)
         l.add_theme_font_size_override("font_size", size)
         l.add_theme_color_override("font_color", col)
         l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -109,23 +155,30 @@ func _style_btn(b: Button, kind := "red") -> void:
 func _mk_button(txt: String, size := 26, kind := "red", h := 74) -> Button:
         var b := Button.new()
         b.text = txt
-        b.add_theme_font_override("font", font_display)
+        if font_display != null:
+                b.add_theme_font_override("font", font_display)
         b.add_theme_font_size_override("font_size", size)
         b.custom_minimum_size = Vector2(320, h)
         _style_btn(b, kind)
         return b
 
-func _make_shadow_tex() -> ImageTexture:
-        var sz := Vector2i(240, 64)
-        var img := Image.create(sz.x, sz.y, false, Image.FORMAT_RGBA8)
-        var cx := sz.x / 2.0
-        var cy := sz.y / 2.0
-        for y in sz.y:
-                for x in sz.x:
-                        var d := Vector2((x - cx) / (cx - 6.0), (y - cy) / (cy - 4.0)).length()
-                        var a: float = clamp(1.0 - d, 0.0, 1.0)
-                        img.set_pixel(x, y, Color(0.02, 0.02, 0.03, a * a * 0.8))
-        return ImageTexture.create_from_image(img)
+## سایهٔ نرم زیر ماشین‌ها — رادیال خالص موتور، بدون حلقهٔ پیکسلی
+func _make_shadow_tex() -> Texture2D:
+        var gt := GradientTexture2D.new()
+        gt.fill = GradientTexture2D.FILL_RADIAL
+        gt.width = 240
+        gt.height = 64
+        gt.fill_from = Vector2(0.5, 0.5)
+        gt.fill_to = Vector2(0.5, 0.0)
+        var g := Gradient.new()
+        g.offsets = PackedFloat32Array([0.0, 0.65, 1.0])
+        g.colors = PackedColorArray([Color(0.02, 0.02, 0.03, 0.8), Color(0.02, 0.02, 0.03, 0.22), Color(0, 0, 0, 0)])
+        gt.gradient = g
+        return gt
+
+func _deco_gradients() -> void:
+        _add_gradient(true)
+        _add_gradient(false)
 
 func _add_gradient(top: bool) -> void:
         var gt := GradientTexture2D.new()
@@ -154,15 +207,16 @@ func _add_gradient(top: bool) -> void:
         tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
         add_child(tr)
 
-func _add_parked_cars() -> void:
+func _deco_cars() -> void:
         # بوقی قرمز و پراید مسابقه‌ای پارک شده روی جاده خیس — قهرمان‌های محله
         var sh1 := Sprite2D.new()
         sh1.texture = _make_shadow_tex()
         sh1.position = Vector2(230, 678)
         sh1.scale = Vector2(2.05, 0.75)
+        sh1.z_index = -1
         add_child(sh1)
         var c1 := TextureRect.new()
-        c1.texture = load("res://assets/sprites/boghi_side.png")
+        c1.texture = _safe_load("res://assets/sprites/boghi_side.png")
         c1.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         c1.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         c1.position = Vector2(48, 512)
@@ -178,16 +232,17 @@ func _add_parked_cars() -> void:
         tap1.size = Vector2(360, 190)
         tap1.modulate.a = 0.0
         tap1.pressed.connect(func():
-                if brain != null and boghi_car != null:
+                if brain != null and is_instance_valid(boghi_car):
                         brain.say(boghi_car, "boghi", "idle"))
         add_child(tap1)
         var sh2 := Sprite2D.new()
         sh2.texture = _make_shadow_tex()
         sh2.position = Vector2(628, 686)
         sh2.scale = Vector2(1.8, 0.7)
+        sh2.z_index = -1
         add_child(sh2)
         var c2 := TextureRect.new()
-        c2.texture = load("res://assets/sprites/pride_side.png")
+        c2.texture = _safe_load("res://assets/sprites/pride_side.png")
         c2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         c2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         c2.position = Vector2(468, 538)
@@ -202,41 +257,50 @@ func _add_parked_cars() -> void:
         tap2.size = Vector2(320, 162)
         tap2.modulate.a = 0.0
         tap2.pressed.connect(func():
-                if brain != null and pride_car != null:
+                if brain != null and is_instance_valid(pride_car):
                         brain.say(pride_car, "pride", "idle"))
         add_child(tap2)
 
+## تیتر متنی — همیشه ساخته می‌شود (پشتیبان مطمئن)
 func _build_title() -> void:
-        # لوگوی رسمی بازی — اگر نبود، تیتر متنی می‌ماند
-        var logo_path := "res://assets/sprites/logo.png"
-        if ResourceLoader.exists(logo_path):
-                var logo := TextureRect.new()
-                logo.texture = load(logo_path)
-                logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-                logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-                logo.position = Vector2(520, 8)
-                logo.size = Vector2(560, 130)
-                logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
-                add_child(logo)
-                CarBrain.add_breathing(logo, 2.5, 1.6)
-                return
         var title := _mk_label("بوقی: تور شهرها", 58, false, true, COL_GOLD)
         title.add_theme_color_override("font_outline_color", Color(0.10, 0.06, 0.03))
         title.add_theme_constant_override("outline_size", 14)
         title.position = Vector2(540, 24)
         title.custom_minimum_size = Vector2(716, 0)
         add_child(title)
+        title_nodes.append(title)
         var bar := Panel.new()
         bar.add_theme_stylebox_override("panel", _sb(COL_RED, Color(0, 0, 0, 0), 3))
         bar.position = Vector2(798, 110)
         bar.size = Vector2(200, 7)
         add_child(bar)
+        title_nodes.append(bar)
         var sub := _mk_label("فصل ۱ — تهران  •  ۵۰ مأموریت محله", 21, true, false, Color(1, 1, 1, 0.88))
         sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
         sub.add_theme_constant_override("outline_size", 6)
         sub.position = Vector2(540, 124)
         sub.custom_minimum_size = Vector2(716, 0)
         add_child(sub)
+        title_nodes.append(sub)
+
+## لوگوی رسمی — تزئین جداگانه؛ اگر لود شد تیتر متنی زیرش مخفی می‌شود
+func _deco_logo() -> void:
+        var logo_tex := _safe_load("res://assets/sprites/logo.png")
+        if logo_tex == null:
+                return
+        for n in title_nodes:
+                if is_instance_valid(n):
+                        n.visible = false
+        var logo := TextureRect.new()
+        logo.texture = logo_tex
+        logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        logo.position = Vector2(520, 8)
+        logo.size = Vector2(560, 130)
+        logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        add_child(logo)
+        CarBrain.add_breathing(logo, 2.5, 1.6)
 
 func _build_home_panel() -> void:
         panel_home = PanelContainer.new()
@@ -270,16 +334,20 @@ func _build_home_panel() -> void:
         # پلاک اسم کودک
         var plate_box := Control.new()
         plate_box.custom_minimum_size = Vector2(300, 210)
-        var board := TextureRect.new()
-        board.texture = load("res://assets/sprites/plate_empty.png")
-        board.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        board.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        board.set_anchors_preset(Control.PRESET_FULL_RECT)
-        plate_box.add_child(board)
+        var board_tex := _safe_load("res://assets/sprites/plate_empty.png")
+        if board_tex != null:
+                var board := TextureRect.new()
+                board.texture = board_tex
+                board.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                board.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                board.set_anchors_preset(Control.PRESET_FULL_RECT)
+                board.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                plate_box.add_child(board)
         plate_edit = LineEdit.new()
         plate_edit.text = Globals.plate_name
         plate_edit.max_length = 12
-        plate_edit.add_theme_font_override("font", font_bold)
+        if font_bold != null:
+                plate_edit.add_theme_font_override("font", font_bold)
         plate_edit.add_theme_font_size_override("font_size", 30)
         plate_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
         plate_edit.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
@@ -325,7 +393,8 @@ func _build_levels_panel() -> void:
                         txt += "★" if s < st else "·"
                 b.text = txt
                 b.custom_minimum_size = Vector2(112, 74)
-                b.add_theme_font_override("font", font_display)
+                if font_display != null:
+                        b.add_theme_font_override("font", font_display)
                 b.add_theme_font_size_override("font_size", 21)
                 b.disabled = not Globals.level_unlocked(id)
                 _style_btn(b, "tile")
@@ -342,29 +411,35 @@ func _build_levels_panel() -> void:
         add_child(center)
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۳ — ماشین‌های زبان‌باز", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۰٫۴ — ریتمِ محله", 15, true, false, Color(1, 1, 1, 0.6))
         v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
         v.position = Vector2(1000, 692)
         v.custom_minimum_size = Vector2(256, 0)
         add_child(v)
 
 func _build_ui() -> void:
-        var bg := TextureRect.new()
-        bg.texture = load("res://assets/sprites/menu_bg.png")
-        bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-        bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-        add_child(bg)
-        _add_gradient(true)
-        _add_gradient(false)
-        _add_parked_cars()
         _build_title()
         _build_home_panel()
         _build_levels_panel()
         _build_version()
         _show(panel_home)
 
+## مغز بوقی — آخرین و ضربه‌گیرترین تزئین
+func _deco_brain() -> void:
+        brain = CarBrain.new()
+        add_child(brain)
+        if boghi_car != null and is_instance_valid(boghi_car):
+                CarBrain.add_breathing(boghi_car, 4.0, 1.25)
+        if pride_car != null and is_instance_valid(pride_car):
+                CarBrain.add_breathing(pride_car, 3.0, 1.5)
+        brain.start_idle_chatter(
+                func(cid: String) -> Control:
+                        return boghi_car if cid == "boghi" else pride_car,
+                func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
+
 func _show(p: PanelContainer) -> void:
+        if panel_home == null or panel_levels == null:
+                return
         panel_home.visible = p == panel_home
         panel_levels.visible = p == panel_levels
         _refresh()

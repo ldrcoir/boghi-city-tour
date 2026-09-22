@@ -25,7 +25,7 @@
 ## دانلود APK
 لینک مستقیم نسخه فعلی (اندروید ۷ به بالا):
 
-**https://github.com/ldrcoir/boghi-city-tour/releases/download/v0.3/BoghiCityTour_v0.3_test.apk**
+**https://github.com/ldrcoir/boghi-city-tour/releases/download/v0.4/BoghiCityTour_v0.4_test.apk**
 
 یا از صفحه [Releases](https://github.com/ldrcoir/boghi-city-tour/releases/latest) آخرین نسخه را بگیرید.
 
