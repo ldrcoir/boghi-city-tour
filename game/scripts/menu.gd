@@ -53,6 +53,7 @@ func _ready() -> void:
         call_deferred("_deco_cars")
         call_deferred("_deco_logo")
         call_deferred("_deco_brain")
+        call_deferred("_deco_version")
         var uargs := OS.get_cmdline_user_args()
         if uargs.has("--garage"):
                 get_tree().change_scene_to_file("res://scenes/garage.tscn")
@@ -438,6 +439,22 @@ func _deco_brain() -> void:
                 func(cid: String) -> Control:
                         return boghi_car if cid == "boghi" else pride_car,
                 func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
+
+func _deco_version() -> void:
+        # برچسب کوچک نسخه در گوشه — اگر این را دیدی یعنی بیلد جدید روی گوشی اجراست
+        var l := Label.new()
+        l.text = "بوقی v0.5.0"
+        l.add_theme_font_size_override("font_size", 14)
+        if font != null:
+                l.add_theme_font_override("font", font)
+        l.add_theme_color_override("font_color", Color(1, 1, 1, 0.4))
+        l.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+        l.offset_left = 14.0
+        l.offset_top = -30.0
+        l.offset_right = 140.0
+        l.offset_bottom = -8.0
+        l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        add_child(l)
 
 func _show(p: PanelContainer) -> void:
         if panel_home == null or panel_levels == null:

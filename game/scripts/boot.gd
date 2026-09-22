@@ -45,6 +45,15 @@ func _ready() -> void:
         var ver := Engine.get_version_info()
         var ver_str := "%d.%d.%d" % [ver["major"], ver["minor"], ver["patch"]]
         detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str
+        # برچسب نسخه — همیشه دیده می‌شود تا مشخص باشد کدام بیلد روی گوشی اجراست
+        var ver_label := _mk_label("بوقی v0.5.0 (build 6)", 15)
+        ver_label.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+        ver_label.anchor_top = 0.95
+        ver_label.anchor_bottom = 1.0
+        ver_label.offset_left = 16
+        ver_label.offset_right = -16
+        ver_label.add_theme_color_override("font_color", Color(1, 1, 1, 0.35))
+        add_child(ver_label)
         _go_menu()
 
 func _mk_label(txt: String, size: int) -> Label:
