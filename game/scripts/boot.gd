@@ -70,9 +70,14 @@ func _mk_label(txt: String, size: int) -> Label:
 func _go_menu() -> void:
         await get_tree().process_frame
         await get_tree().process_frame
-        var packed: PackedScene = load("res://scenes/menu.tscn")
+        # مسیر مستقیم برای تست/دمو: --story یا --storytest → هاب زندگی محله
+        var uargs := OS.get_cmdline_user_args()
+        var scene_path := "res://scenes/menu.tscn"
+        if uargs.has("--story") or uargs.has("--storytest"):
+                scene_path = "res://scenes/story.tscn"
+        var packed: PackedScene = load(scene_path)
         if packed == null:
-                _fail("منو پیدا نشد: res://scenes/menu.tscn")
+                _fail("صحنه پیدا نشد: " + scene_path)
                 return
         var inst := packed.instantiate()
         if inst == null:
@@ -85,7 +90,7 @@ func _go_menu() -> void:
         if not is_instance_valid(self):
                 return
         # چک سلامت: پنل اصلی منو باید ساخته شده باشد؛ وگرنه دلیلش را نشان بده
-        if inst.get("panel_home") == null:
+        if scene_path.ends_with("menu.tscn") and inst.get("panel_home") == null:
                 _fail("منو نیمه‌کاره ماند (پنل اصلی ساخته نشد — جزئیات از لاگ پایین صفحه)")
                 return
         # ⛔ حیاتی (باگ «وارد بازی نشدن» v0.9): منو را باید به‌عنوان صحنه‌ی

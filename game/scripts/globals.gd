@@ -10,6 +10,10 @@ var upgrades := {"engine": 0, "tire": 0, "nitro": 0}
 var unlocked_car: Array = []
 var level_stars := {}  # id -> stars
 var season = null      # parsed season json
+# داستان: اپیزودهای دیده‌شده + دلِ محله + مدت صبر آنلاین (ثانیه)
+var story_seen := {}
+var hearts: int = 0
+var online_wait: float = 15.0
 
 # رشته ماشین‌ها: نام‌های واقعی و آشنای خیابان‌های ایران (درخواست کاربر)
 # ترتیب = نردبان قیمت؛ پراید/تیبا/پژو/سمند/دنا/نیسان/شاهین/کوییک
@@ -221,6 +225,9 @@ func save_game() -> void:
                 "upgrades": upgrades,
                 "unlocked_car": unlocked_car,
                 "level_stars": level_stars,
+                "story_seen": story_seen,
+                "hearts": hearts,
+                "online_wait": online_wait,
         }
         var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
         if f:
@@ -250,6 +257,12 @@ func load_save() -> void:
         level_stars.clear()
         for k in ls:
                 level_stars[int(k)] = int(ls[k])
+        var ss = data.get("story_seen", {})
+        story_seen = {}
+        for k in ss:
+                story_seen[str(k)] = bool(ss[k])
+        hearts = int(data.get("hearts", 0))
+        online_wait = float(data.get("online_wait", 15.0))
         f.close()
 
 func car_stats() -> Dictionary:

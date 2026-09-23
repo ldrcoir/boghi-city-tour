@@ -67,7 +67,12 @@ var end_reward: Label
 func _ready() -> void:
         autotest = OS.get_cmdline_user_args().has("--autotest")
         var lid: int = Globals.get_meta("start_level", 1)
-        lv = Globals.get_level(lid)
+        # مرحله‌ی سفارشی داستان (مثلاً «سیب‌زمینی و سنگک») اولویت دارد
+        if Globals.has_meta("custom_level"):
+                lv = Globals.get_meta("custom_level")
+                Globals.remove_meta("custom_level")
+        else:
+                lv = Globals.get_level(lid)
         if lv.is_empty():
                 lv = {"id": 1, "type": "race", "name": "تست", "speed": 14.0, "distance": 500,
                         "time": 90, "obstacle_rate": 0.4, "coin_rate": 0.8, "ramp_rate": 0.3, "reward": 50}

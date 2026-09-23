@@ -395,6 +395,7 @@ static var _srg := RandomNumberGenerator.new()
 
 var bubble: Control = null
 var voice_player: AudioStreamPlayer = null
+var voice_enabled := false # صدای لاله‌زبان خاموش (بازخورد کاربر: «صدا زشته») — حباب متنی کافی است
 var _rng := RandomNumberGenerator.new()
 var _car_idx := 0
 
@@ -481,6 +482,8 @@ func _show_bubble(anchor: Control, text: String) -> void:
 
 ## صدای لاله‌زبان — یک جمله‌ی بی‌کلامِ آهنگین که شخصیتِ ماشین را می‌سازد
 func _speak(text: String, car_id: String, mood: String) -> void:
+        if not voice_enabled:
+                return # پیش‌فرض سکوت — ریتم طنز از متن می‌آید نه از بوق سینوسی
         var v: Dictionary = PERSONAS[car_id]["voice"] if PERSONAS.has(car_id) else {"pitch": 300.0, "tone": 0.5, "rate": 10.0, "jit": 0.15}
         var pitch := float(v["pitch"])
         var tone := float(v["tone"])

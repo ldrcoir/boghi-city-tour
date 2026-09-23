@@ -29,6 +29,7 @@ var _expect_scene_change := false
 
 # بارگذاری مستقیم مغز — بدون وابستگی به class cache
 const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
+const ONLINE_SCRIPT := preload("res://scripts/online_race.gd")
 
 const COL_GOLD := Color(0.96, 0.76, 0.25)
 const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
@@ -389,9 +390,9 @@ func _build_home_panel() -> void:
         panel_home = PanelContainer.new()
         panel_home.add_theme_stylebox_override("panel", _sb(COL_GLASS, Color(0.85, 0.68, 0.28, 0.45), 22, 2))
         # اندازه ثابت + وسط‌چین مطلق — ضدآینه و ضدعرض‌های مختلف
-        panel_home.custom_minimum_size = Vector2(360, 434)
+        panel_home.custom_minimum_size = Vector2(360, 512)
         panel_home.set_anchors_preset(Control.PRESET_CENTER)
-        panel_home.offset_top = 20.0 # کمی پایین‌تر از مرکز — دور از تیتر (زیرتیتر تا y=160)
+        panel_home.offset_top = 40.0 # پایین‌تر از تیتر (تیتر تا y=160)
         panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
         panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
         add_child(panel_home)
@@ -464,21 +465,51 @@ func _build_home_panel() -> void:
         plate_box.add_child(plate_edit)
         hb.add_child(plate_box)
 
-        var b_play := _mk_button(Globals.L("levels"), 30, "red", 64)
+        # سه‌بخشی: مسابقه (قرمز اصلی) / مأموریت‌ها / زندگی محله
+        var b_race := _mk_button("مسابقه", 30, "red", 64)
+        b_race.pressed.connect(_start_quick_race)
+        hb.add_child(b_race)
+
+        var b_play := _mk_button(Globals.L("levels"), 24, "dark", 54)
         b_play.pressed.connect(func(): _show(panel_levels))
         play_btn = b_play
         hb.add_child(b_play)
 
-        var b_garage := _mk_button(Globals.L("workshop"), 24, "dark", 54)
+        var b_life := _mk_button("زندگی محله", 24, "dark", 54)
+        b_life.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/story.tscn"))
+        hb.add_child(b_life)
+
+        var b_garage := _mk_button(Globals.L("workshop"), 22, "dark", 48)
         b_garage.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/garage.tscn"))
         hb.add_child(b_garage)
 
-        # چند نفره آنلاین — نقشه راه؛ اکبر تیکه می‌اندازد که نسخه بعد می‌آید
-        var b_online := _mk_button("آنلاین چند نفره — به‌زودی!", 19, "dark", 46)
-        b_online.pressed.connect(func():
-                if brain != null and deco_cars.size() > 1 and is_instance_valid(deco_cars[1]):
-                        brain.say(deco_cars[1], "akbar", "online"))
+        # چند نفره آنلاین — جست‌وجوی حریف؛ پیدا نشد → اکبر AI پشت فرمون
+        var b_online := _mk_button("آنلاین چند نفره", 20, "dark", 46)
+        b_online.pressed.connect(_open_online)
         hb.add_child(b_online)
+
+func _start_quick_race() -> void:
+        # مسابقه سریع با حریف AI (قاب: حلقه‌ی مسابقه‌ی محله)
+        Globals.set_meta("custom_level", {
+                "id": 901, "type": "race", "name": "حلقه‌ی مسابقه‌ی محله", "district": "محله",
+                "speed": 13.2, "distance": 460, "time": 70,
+                "obstacle_rate": 0.5, "coin_rate": 0.85, "ramp_rate": 0.3, "reward": 70,
+        })
+        Globals.set_meta("start_level", 901)
+        get_tree().change_scene_to_file("res://scenes/game.tscn")
+
+func _open_online() -> void:
+        # جست‌وجوی حریف آنلاین؛ اگر تا پایان صبر پیدا نشد → اکبر AI
+        var ov: Control = ONLINE_SCRIPT.new()
+        add_child(ov)
+        ov.ai_takeover.connect(func():
+                Globals.set_meta("custom_level", {
+                        "id": 902, "type": "race", "name": "آنلاین — حریف: اکبر (AI)", "district": "محله",
+                        "speed": 13.6, "distance": 500, "time": 75,
+                        "obstacle_rate": 0.5, "coin_rate": 0.85, "ramp_rate": 0.3, "reward": 90,
+                })
+                Globals.set_meta("start_level", 902)
+                get_tree().change_scene_to_file("res://scenes/game.tscn"))
 
 func _build_levels_panel() -> void:
         panel_levels = PanelContainer.new()
