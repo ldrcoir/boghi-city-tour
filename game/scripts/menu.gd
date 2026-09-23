@@ -20,6 +20,8 @@ var back_btn: Button
 const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 var boghi_car: TextureRect
 var pride_car: TextureRect
+var akbar_rect: TextureRect
+var akbar_line_label: Label
 var title_nodes: Array = []
 
 const COL_GOLD := Color(0.96, 0.76, 0.25)
@@ -486,12 +488,41 @@ func _build_home_panel() -> void:
         b_garage.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/garage.tscn"))
         hb.add_child(b_garage)
 
+        # چند نفره آنلاین — نقشه راه؛ اکبر تیکه می‌اندازد که نسخه بعد می‌آید
+        var b_online := _mk_button("آنلاین چند نفره — به‌زودی", 20, "dark", 50)
+        b_online.pressed.connect(func():
+                if brain != null and boghi_car != null and is_instance_valid(boghi_car):
+                        brain.say(boghi_car, "akbar", "online"))
+        hb.add_child(b_online)
+
 func _build_levels_panel() -> void:
         panel_levels = PanelContainer.new()
         panel_levels.add_theme_stylebox_override("panel", _sb(Color(0.115, 0.125, 0.145, 0.97), Color(0.85, 0.68, 0.28, 0.55), 24, 3))
         var lv := VBoxContainer.new()
         lv.add_theme_constant_override("separation", 10)
         panel_levels.add_child(lv)
+        # اکبر سیبیلو — معرفی‌کننده مأموریت‌ها؛ هر بار یک تیکه تازه
+        var hdr := HBoxContainer.new()
+        hdr.add_theme_constant_override("separation", 14)
+        akbar_rect = TextureRect.new()
+        akbar_rect.texture = _safe_load("res://assets/sprites/akbar.png")
+        if akbar_rect.texture != null:
+                akbar_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                akbar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+                akbar_rect.custom_minimum_size = Vector2(96, 116)
+                hdr.add_child(akbar_rect)
+        var ak := VBoxContainer.new()
+        ak.add_theme_constant_override("separation", 2)
+        var ak_name := _mk_label("اکبر سیبیلو — رئیس مأموریت‌ها", 26, false, true, COL_GOLD)
+        ak_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+        ak.add_child(ak_name)
+        akbar_line_label = _mk_label("", 21, true, false, COL_CREAM)
+        akbar_line_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+        akbar_line_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
+        akbar_line_label.add_theme_constant_override("outline_size", 5)
+        ak.add_child(akbar_line_label)
+        hdr.add_child(ak)
+        lv.add_child(hdr)
         lv.add_child(_mk_label(Globals.L("levels") + " — " + "تهران", 38, false, true, COL_GOLD))
         var scroll := ScrollContainer.new()
         scroll.custom_minimum_size = Vector2(980, 460)
@@ -530,7 +561,7 @@ func _build_levels_panel() -> void:
         levels_center = center
 
 func _build_version() -> void:
-        var v := _mk_label("نسخه ۰٫۹ — ماشین‌های زنده", 15, true, false, Color(1, 1, 1, 0.6))
+        var v := _mk_label("نسخه ۱٫۰ — فرمولی‌ها رسیدن", 15, true, false, Color(1, 1, 1, 0.6))
         v.anchor_left = 0.0
         v.anchor_right = 1.0
         v.anchor_top = 1.0
@@ -565,7 +596,7 @@ func _deco_brain() -> void:
 func _deco_version() -> void:
         # برچسب نسخه — تمام‌عرض پایین با تراز راست؛ در RTL آینه هم نمی‌شود (full-wide متقارن است)
         var l := Label.new()
-        l.text = "بوقی v0.9 (build 10)"
+        l.text = "بوقی v1.0 (build 11)"
         l.add_theme_font_size_override("font_size", 14)
         if font != null:
                 l.add_theme_font_override("font", font)
@@ -621,6 +652,14 @@ func _show(p: PanelContainer) -> void:
                 return
         panel_home.visible = p == panel_home
         panel_levels.visible = p == panel_levels
+        # هر باز شدن مأموریت‌ها: تیکه تازه‌ی اکبر + صدای لاله‌زبانش
+        if p == panel_levels and akbar_line_label != null:
+                var line := CarBrain.pick_line("akbar", "idle")
+                if line.is_empty():
+                        line = "امروز جاده مال ماست!"
+                akbar_line_label.text = line
+                if brain != null and akbar_rect != null and is_instance_valid(akbar_rect) and akbar_rect.texture != null:
+                        brain.say(akbar_rect, "akbar", "idle")
         # کانتینر مأموریت‌ها هم وقتی پنل مخفی است باید مخفی شود
         # (دو لایه محافظت: mouse_filter=IGNORE + مخفی‌سازی کامل)
         # ماشین‌های تزئینی و دکمه‌های تپ فقط مال صفحه‌ی خانه‌اند؛

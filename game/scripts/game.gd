@@ -151,7 +151,10 @@ func _build_car(stats: Dictionary) -> void:
         car.add_child(shape)
         car.area_entered.connect(_on_hit)
         car_sprite = Sprite2D.new()
-        car_sprite.texture = load(Globals.CARS[Globals.selected_car]["tex"])
+        # در مسابقه چهره جدی (بدون چشم، شیشه دودی) — طبق بریف نوجوان‌پسند کاربر
+        var cdef: Dictionary = Globals.CARS[Globals.selected_car]
+        var race_path: String = "res://assets/sprites/" + str(cdef["id"]) + "_race.png"
+        car_sprite.texture = load(race_path) if ResourceLoader.exists(race_path) else load(str(cdef["tex"]))
         var sc := 214.0 / float(car_sprite.texture.get_height()) # ارتفاع ثابت ~۲۱۴px برای هر ابعاد اسپرایت
         car_sprite.scale = Vector2(sc, sc)
         var th := car_sprite.texture.get_height() * sc
@@ -608,9 +611,95 @@ func _finish(win: bool) -> void:
                 AudioMgr.play_sfx("win")
         else:
                 AudioMgr.play_sfx("fail")
+        # جشن بعد خط پایان: ماشین زنده می‌شود، می‌رقصد، رقیب‌ها رد می‌شوند و کری می‌خوانند
+        _celebrate(win)
+        var stars_c := stars
+        var reward_c := reward
+        get_tree().create_timer(3.4 if win else 1.4).timeout.connect(func():
+                _show_end(win, stars_c, reward_c))
+
+## جشنِ خط پایان — نسخه چشم‌دار زنده می‌شود + کانفتی + رقیب‌ها تیکه می‌اندازند
+func _celebrate(win: bool) -> void:
+        if car_sprite == null:
+                return
+        # ۱) تعویض به چهره زنده (چشم + لبخند) — روحِ ماشین برمی‌گردد
+        var cute_path: String = str(Globals.CARS[Globals.selected_car]["tex"])
+        if ResourceLoader.exists(cute_path):
+                car_sprite.texture = load(cute_path)
+                var th := car_sprite.texture.get_height() * car_sprite.scale.y
+                car_sprite.position.y = 12.0 - th * 0.5
+        # ۲) جست‌وخیز — فنری و خوشحال
+        var base_y := car_sprite.position.y
+        var tw := create_tween().set_loops(6)
+        tw.tween_property(car_sprite, "position:y", base_y - 26.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+        tw.parallel().tween_property(car_sprite, "scale", car_sprite.scale * Vector2(0.92, 1.12), 0.16)
+        tw.tween_property(car_sprite, "position:y", base_y, 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+        tw.parallel().tween_property(car_sprite, "scale", car_sprite.scale, 0.2)
+        # ۳) کانفتی — باران شادی روی جاده
+        for i in 3:
+                var c := CPUParticles2D.new()
+                c.position = Vector2(240 + i * 300.0, 60.0)
+                c.emitting = false
+                c.amount = 42
+                c.lifetime = 3.2
+                c.direction = Vector2(0, 1)
+                c.spread = 45.0
+                c.gravity = Vector2(0, 240)
+                c.initial_velocity_min = 60.0
+                c.initial_velocity_max = 160.0
+                c.scale_amount_min = 5.0
+                c.scale_amount_max = 9.0
+                var g := Gradient.new()
+                g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+                var cols: Array = [Color(1.0, 0.42, 0.16), Color(1.0, 0.85, 0.2), Color(0.25, 0.75, 0.95)]
+                g.colors = PackedColorArray([cols[i], cols[(i + 1) % 3], cols[(i + 2) % 3]])
+                c.color_ramp = g
+                c.z_index = 8
+                add_child(c)
+                c.emitting = win
+        # ۴) حباب‌ها و کری‌خوانی
+        var my_id := str(Globals.CARS[Globals.selected_car]["id"])
         if brain != null and car_anchor != null:
-                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "win" if win else "lose")
-        _show_end(win, stars, reward)
+                brain.say(car_anchor, my_id, "win" if win else "lose")
+        if win:
+                _rival_parade(my_id)
+
+## رقیب‌ها از جاده رد می‌شوند و کری می‌خوانند — «کری‌خوانیِ محله»
+func _rival_parade(my_id: String) -> void:
+        var ids: Array = []
+        for c in Globals.CARS:
+                if str(c["id"]) != my_id:
+                        ids.append(str(c["id"]))
+        if ids.is_empty():
+                return
+        for i in 2:
+                var rid: String = ids[randi_range(0, ids.size() - 1)]
+                var tex_path: String = "res://assets/sprites/" + rid + "_side.png"
+                if not ResourceLoader.exists(tex_path):
+                        continue
+                var rv := Sprite2D.new()
+                rv.texture = load(tex_path)
+                var sc := 214.0 / float(rv.texture.get_height())
+                rv.scale = Vector2(sc, sc)
+                rv.position = Vector2(1580.0, GROUND_Y - rv.texture.get_height() * sc * 0.5 + 12.0)
+                rv.z_index = 3
+                add_child(rv)
+                var stop_x := 720.0 + i * 240.0
+                var tw2 := create_tween()
+                tw2.tween_property(rv, "position:x", stop_x, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+                tw2.tween_callback(func():
+                        if brain == null or not is_instance_valid(rv):
+                                return
+                        var anchor := Control.new()
+                        anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                        anchor.size = Vector2(160, 60)
+                        var sp: Vector2 = rv.get_global_transform_with_canvas().origin
+                        anchor.position = sp + Vector2(-40.0, -150.0)
+                        hud.add_child(anchor)
+                        brain.say(anchor, rid, "taunt")
+                        var tw3 := create_tween()
+                        tw3.tween_property(rv, "position:x", -300.0, 1.6).set_delay(1.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+                        tw3.tween_callback(rv.queue_free))
 
 func _show_end(win: bool, stars: int, reward: int) -> void:
         end_panel = PanelContainer.new()

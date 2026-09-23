@@ -110,6 +110,30 @@ const CARS := [
                 "tex": "res://assets/sprites/dena_red_side.png",
                 "jump": 1.0, "accel": 1.42, "tough": 1.1, "price": 6800
         },
+        {
+                "id": "nissan_blue", "name": "نیسان آبی اکبر", "en": "Akbar's Blue Nissan",
+                "desc": "نیسان آبی اکبر سیبیلو — لونگ گردن، آسفالت زیر چرخ!",
+                "tex": "res://assets/sprites/nissan_blue_side.png",
+                "jump": 0.82, "accel": 0.9, "tough": 1.55, "price": 7600
+        },
+        {
+                "id": "formula_red", "name": "فرمول آتش", "en": "Formula Fire",
+                "desc": "فرمول‌یک سرخِ آتشین — بال جلو، بال عقب، جون نصف!",
+                "tex": "res://assets/sprites/formula_red_side.png",
+                "jump": 1.05, "accel": 1.5, "tough": 0.85, "price": 9500
+        },
+        {
+                "id": "formula_blue", "name": "فرمول موج", "en": "Formula Wave",
+                "desc": "فرمول‌یک آبیِ موج‌سوار — چابک‌ترین چرخ‌های پیست!",
+                "tex": "res://assets/sprites/formula_blue_side.png",
+                "jump": 1.18, "accel": 1.55, "tough": 0.78, "price": 12000
+        },
+        {
+                "id": "formula_black", "name": "فرمول شاهین", "en": "Formula Shahin",
+                "desc": "مشکی-طلایی شب‌های تهران — پادشاه بی‌رقیب سرعت!",
+                "tex": "res://assets/sprites/formula_black_side.png",
+                "jump": 1.0, "accel": 1.68, "tough": 0.9, "price": 16000
+        },
 ]
 
 const UPGRADES := [
