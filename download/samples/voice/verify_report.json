@@ -1,0 +1,98 @@
+[
+ {
+  "file": "01_boghi_greeting",
+  "actor": "boghi",
+  "ok": false,
+  "match": "38%",
+  "asr": "صبح خیر محله گوگلی آماده است برای این تور شهرها",
+  "size": 28224
+ },
+ {
+  "file": "02_boghi_tease",
+  "actor": "boghi",
+  "ok": false,
+  "match": "42%",
+  "asr": "اَكبر جُن رَوحِ خَبندی دوباره، دیشاب تا سُبح تو گاراج چرت زدی",
+  "size": 31104
+ },
+ {
+  "file": "03_boghi_proud",
+  "actor": "boghi",
+  "ok": false,
+  "match": "11%",
+  "asr": "من ماشین تو شهرم من کرنیش را با آش جذب می گیرم",
+  "size": 35424
+ },
+ {
+  "file": "04_nissan_greeting",
+  "actor": "nissan",
+  "ok": true,
+  "match": "60%",
+  "asr": "سوبرهات بخیر بغیجان دلم گرفته",
+  "size": 26784
+ },
+ {
+  "file": "05_nissan_funny",
+  "actor": "nissan",
+  "ok": false,
+  "match": "0%",
+  "asr": "",
+  "size": 37584
+ },
+ {
+  "file": "06_nissan_nostalgia",
+  "actor": "nissan",
+  "ok": true,
+  "match": "73%",
+  "asr": "یا بار تو جوونی من قابل امتی کامل بردم چه روزهای بود؟",
+  "size": 34560
+ },
+ {
+  "file": "07_wife_potato",
+  "actor": "wife",
+  "ok": true,
+  "match": "50%",
+  "asr": "اکبر وای استاتهای سر راه دو کیلو سیب زمینی بخر بیار دوتانون سنگه هم برگیر از پری خانه داغداغ",
+  "size": 54144
+ },
+ {
+  "file": "08_wife_angry",
+  "actor": "wife",
+  "ok": true,
+  "match": "75%",
+  "asr": "معمریت خفن تو خفتنت مال دو ساعت پیشه",
+  "size": 25056
+ },
+ {
+  "file": "09_wife_insist",
+  "actor": "wife",
+  "ok": false,
+  "match": "0%",
+  "asr": "",
+  "size": 19296
+ },
+ {
+  "file": "10_akbar_mission",
+  "actor": "nissan",
+  "ok": false,
+  "match": "0%",
+  "asr": "",
+  "size": 45936
+ },
+ {
+  "file": "11_sisbalu_humor",
+  "actor": "sisbalu",
+  "ok": false,
+  "match": "0%",
+  "asr": "",
+  "size": 47088
+ },
+ {
+  "file": "12_narrator_intro",
+  "actor": "narrator",
+  "ok": false,
+  "match": "0%",
+  "asr": "",
+  "size": 47664
+ }
+]

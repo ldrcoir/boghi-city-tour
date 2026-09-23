@@ -4,8 +4,10 @@
 *.secret
 *token*
 
-# خروجی‌های بیلد و دانلودی
-download/
+# خروجی‌های بیلد و دانلودی (نمونه‌های صدا/انیمیشن استثناست تا گم نشود)
+download/*
+!download/samples
+!download/samples/**
 tools/
 game/android/build/
 game/.godot/
