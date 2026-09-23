@@ -1,0 +1,29 @@
+[
+  {
+    "url": "https://docs.godotengine.org",
+    "name": "Exporting projects - Godot Docs",
+    "snippet": "There are two ways to install export templates. First, you can check the box for the platform and architecture you want to use, then click the Install Selected ...",
+    "host_name": "docs.godotengine.org",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://thegodotbarn.com",
+    "name": "GodotSteam Tutorials - Exporting And Shipping",
+    "snippet": "In this tutorial we will cover exporting from Godot and setting things up in Steamworks so you can use your builds from the Steam client. So let's get into it! Read more",
+    "host_name": "thegodotbarn.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://mreliptik.github.io",
+    "name": "Automatic Godot game export and upload to Steam and Itch",
+    "snippet": "Aug 22, 2023 — The goal was to export a build for each template I have (windows & linux, steam and itch) with an automatic build number, folder and archive ... Read more",
+    "host_name": "mreliptik.github.io",
+    "rank": 2,
+    "date": "Aug 22, 2023",
+    "favicon": ""
+  }
+]
