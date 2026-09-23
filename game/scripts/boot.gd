@@ -78,6 +78,8 @@ func _go_menu() -> void:
         if inst == null:
                 _fail("ساخت صحنه منو شکست خورد (instantiate = null)")
                 return
+        # قفل LTR برای این صحنه (مقابل آینه‌شدن RTL روی گوشی فارسی)
+        inst.set("layout_direction", Control.LAYOUT_DIRECTION_LTR)
         get_tree().root.add_child.call_deferred(inst)
         await get_tree().create_timer(1.0).timeout
         if not is_instance_valid(self):
@@ -86,6 +88,11 @@ func _go_menu() -> void:
         if inst.get("panel_home") == null:
                 _fail("منو نیمه‌کاره ماند (پنل اصلی ساخته نشد — جزئیات از لاگ پایین صفحه)")
                 return
+        # ⛔ حیاتی (باگ «وارد بازی نشدن» v0.9): منو را باید به‌عنوان صحنه‌ی
+        # رسمیِ درخت معرفی کنیم؛ وگرنه current_scene نال می‌ماند و همه‌ی
+        # change_scene_to_fileهای بعدی (ماموریت/کارگاه/برگشت) بی‌صدا شکست می‌خورند
+        get_tree().current_scene = inst
+        print("[boghi][boot] current_scene -> menu OK")
         detail_label.text = "منو آماده شد — نسخه درست نصب شده"
         var tw := create_tween()
         tw.tween_property(self, "modulate:a", 0.0, 0.35)

@@ -28,6 +28,8 @@ var brain = null
 const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
 
 func _ready() -> void:
+        # قفل LTR — ضدآینه‌شدن روی گوشی فارسی (درس v0.9)
+        layout_direction = Control.LAYOUT_DIRECTION_LTR
         font = load("res://assets/fonts/Vazirmatn-Regular.ttf")
         font_bold = load("res://assets/fonts/Vazirmatn-Bold.ttf")
         font_display = load("res://assets/fonts/Lalezar-Regular.ttf")
@@ -95,12 +97,12 @@ func _build() -> void:
         bg.set_anchors_preset(Control.PRESET_FULL_RECT)
         add_child(bg)
 
-        # دکمه برگشت (بالا-چپ)
+        # دکمه برگشت (بالا-چپ) — زیر خط امن استاتوس‌بار
         var b_back := Button.new()
         b_back.text = Globals.L("back")
         b_back.add_theme_font_override("font", font_display)
         b_back.add_theme_font_size_override("font_size", 26)
-        b_back.position = Vector2(14, 14)
+        b_back.position = Vector2(14, 54)
         b_back.size = Vector2(120, 54)
         _style_btn(b_back, false)
         b_back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/menu.tscn"))
@@ -110,7 +112,7 @@ func _build() -> void:
         var title := _mk_label(Globals.L("workshop"), 46, false, true, Color(0.95, 0.75, 0.14))
         title.add_theme_color_override("font_outline_color", Color(0.22, 0.12, 0.05))
         title.add_theme_constant_override("outline_size", 12)
-        title.position = Vector2(120, 14)
+        title.position = Vector2(120, 54)
         title.custom_minimum_size = Vector2(780, 0)
         title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(title)
@@ -122,14 +124,14 @@ func _build() -> void:
                 coin_icon.texture = load("res://assets/sprites/coin.png")
                 coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
                 coin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-                coin_icon.position = Vector2(118, 22)
+                coin_icon.position = Vector2(148, 62)
                 coin_icon.size = Vector2(36, 36)
                 coin_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
                 add_child(coin_icon)
         coin_label = _mk_label(str(Globals.coins), 30, true, false, Color(0.98, 0.85, 0.3))
         coin_label.add_theme_color_override("font_outline_color", Color(0.22, 0.12, 0.05))
         coin_label.add_theme_constant_override("outline_size", 8)
-        coin_label.position = Vector2(160, 28)
+        coin_label.position = Vector2(190, 68)
         add_child(coin_label)
 
         # سایه و ویترین ماشین (وسط-چپ)

@@ -97,7 +97,7 @@ func _ready() -> void:
         get_tree().create_timer(0.7).timeout.connect(func():
                 if brain != null and not ended and car_anchor != null:
                         brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "go"))
-        mission_label.text = Globals.L("mission") + " " + str(lv["id"]) + ": " + str(lv["name"]) + " — " + Globals.L("type_" + str(lv["type"]))
+        mission_label.text = Globals.L("mission") + " " + str(int(lv["id"])) + ": " + str(lv["name"]) + " — " + Globals.L("type_" + str(lv["type"]))
         if autotest:
                 time_left = 999
                 _auto_timer = 0.0
@@ -244,46 +244,46 @@ func _build_hud() -> void:
         mission_label.custom_minimum_size = Vector2(VIEW_W, 0)
         mission_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
+        # ⛔ HUD لنگر-محور — روی هر عرض صفحه (1280 دسکتاپ تا 1600 گوشی) سر جایش می‌ماند
+        # و همه‌چیز زیر خط امن استاتوس‌بار (۴۶px) شروع می‌شود (درس اسکرین‌شات v0.9)
+        _place(coin_label, 1.0, 0.0, 1.0, 0.0, -250, 46, -60, 92)
+        _place(time_label, 0.0, 0.0, 0.0, 0.0, 24, 46, 300, 92)
+        _place(extra_label, 0.0, 0.0, 0.0, 0.0, 24, 98, 760, 138)
+        _place(mission_label, 0.0, 0.0, 1.0, 0.0, 0, 46, 0, 94)
+
         progress = ProgressBar.new()
         progress.min_value = 0
         progress.max_value = 100
         progress.value = 0
         progress.show_percentage = false
-        progress.position = Vector2(390, 64)
-        progress.size = Vector2(500, 22)
         var pbg := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 3)
         var pfill := _sb(Color(0.957, 0.769, 0.188), Color(0.72, 0.52, 0.1), 8, 0, false)
         progress.add_theme_stylebox_override("background", pbg)
         progress.add_theme_stylebox_override("fill", pfill)
         hud.add_child(progress)
+        _place(progress, 0.5, 0.0, 0.5, 0.0, -250, 100, 250, 122)
 
         var pause_btn := Button.new()
         pause_btn.text = "II"
-        pause_btn.position = Vector2(1216, 12)
-        pause_btn.size = Vector2(52, 52)
-        pause_btn.pressed.connect(_toggle_pause)
         _style_btn(pause_btn, false)
         hud.add_child(pause_btn)
+        _place(pause_btn, 1.0, 0.0, 1.0, 0.0, -64, 46, -12, 98)
 
         var jump_btn := Button.new()
         jump_btn.text = Globals.L("jump")
         jump_btn.add_theme_font_override("font", font)
         jump_btn.add_theme_font_size_override("font_size", 34)
-        jump_btn.position = Vector2(1060, VIEW_H - 130)
-        jump_btn.size = Vector2(190, 100)
-        jump_btn.pressed.connect(do_jump)
         _style_btn(jump_btn, true)
         hud.add_child(jump_btn)
+        _place(jump_btn, 1.0, 1.0, 1.0, 1.0, -220, -130, -30, -30)
 
         boost_btn = Button.new()
         boost_btn.text = Globals.L("nitro")
         boost_btn.add_theme_font_override("font", font)
         boost_btn.add_theme_font_size_override("font_size", 30)
-        boost_btn.position = Vector2(850, VIEW_H - 130)
-        boost_btn.size = Vector2(190, 100)
-        boost_btn.pressed.connect(_on_boost)
         _style_btn(boost_btn, true)
         hud.add_child(boost_btn)
+        _place(boost_btn, 1.0, 1.0, 1.0, 1.0, -420, -130, -230, -30)
 
         # گیج نیترو بالای دکمه
         nitro_bar = ProgressBar.new()
@@ -291,13 +291,12 @@ func _build_hud() -> void:
         nitro_bar.max_value = 100
         nitro_bar.value = 100
         nitro_bar.show_percentage = false
-        nitro_bar.position = Vector2(850, VIEW_H - 154)
-        nitro_bar.size = Vector2(190, 16)
         var nbg := _sb(Color(0.12, 0.1, 0.14), Color(0.29, 0.216, 0.157), 8, 2, false)
         var nfill := _sb(Color(1.0, 0.55, 0.08), Color(0.9, 0.3, 0.05), 8, 0, false)
         nitro_bar.add_theme_stylebox_override("background", nbg)
         nitro_bar.add_theme_stylebox_override("fill", nfill)
         hud.add_child(nitro_bar)
+        _place(nitro_bar, 1.0, 1.0, 1.0, 1.0, -420, -154, -230, -138)
 
         # خطوط سرعت هنگام نیترو
         lines = SpeedLines.new()
@@ -318,6 +317,17 @@ func _hud_label(font: FontFile, size: int, pos: Vector2, col: Color) -> Label:
         l.text = ""
         hud.add_child(l)
         return l
+
+## لنگرگذاری دقیق یک Control (به‌جای position/size ثابت)
+func _place(c: Control, al: float, at: float, ar: float, ab: float, ol: float, ot: float, orr: float, ob: float) -> void:
+        c.anchor_left = al
+        c.anchor_top = at
+        c.anchor_right = ar
+        c.anchor_bottom = ab
+        c.offset_left = ol
+        c.offset_top = ot
+        c.offset_right = orr
+        c.offset_bottom = ob
 
 func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
         var sb := StyleBoxFlat.new()
@@ -751,9 +761,12 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         _style_btn(b_menu, false)
         hb.add_child(b_menu)
         vb.add_child(hb)
-        end_panel.position = Vector2(VIEW_W / 2 - 260, VIEW_H / 2 - 160)
-        end_panel.custom_minimum_size = Vector2(520, 300)
         hud.add_child(end_panel)
+        # وسط‌چین لنگری — روی هر عرضی مرکز صفحه
+        _place(end_panel, 0.5, 0.5, 0.5, 0.5, -260, -170, 260, 130)
+        end_panel.custom_minimum_size = Vector2(520, 300)
+        end_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+        end_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
 
 func _exit_tree() -> void:
         AudioMgr.set_engine(false)
