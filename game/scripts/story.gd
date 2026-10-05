@@ -121,11 +121,11 @@ func _build_ui() -> void:
         var fb := _font("res://assets/fonts/Vazirmatn-Bold.ttf")
         if fb != null:
                 back.add_theme_font_override("font", fb)
-        back.add_theme_font_size_override("font_size", 20)
-        back.custom_minimum_size = Vector2(200, 52)
+        back.add_theme_font_size_override("font_size", 24)
+        back.custom_minimum_size = Vector2(240, 76)
         back.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
         back.offset_left = 18
-        back.offset_top = -74
+        back.offset_top = -98
         back.offset_bottom = -22
         var sb := _sb(Color(0.16, 0.175, 0.20, 0.97), COL_GOLD, 14)
         back.add_theme_stylebox_override("normal", sb)
@@ -140,7 +140,7 @@ func _refresh() -> void:
         for i in cards.size():
                 var c: Dictionary = cards[i]
                 var b := Button.new()
-                b.custom_minimum_size = Vector2(196, 92)
+                b.custom_minimum_size = Vector2(220, 104)
                 var ready_ep: bool = bool(c.get("ready", false))
                 var seen: bool = bool(c.get("seen", false))
                 var unlocked: bool = STORY_MGR.unlocked(i)
@@ -153,7 +153,7 @@ func _refresh() -> void:
                 var fd := _font("res://assets/fonts/Lalezar-Regular.ttf")
                 if fd != null:
                         n.add_theme_font_override("font", fd)
-                n.add_theme_font_size_override("font_size", 30)
+                n.add_theme_font_size_override("font_size", 38)
                 n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 n.mouse_filter = Control.MOUSE_FILTER_IGNORE
                 vb.add_child(n)
@@ -162,13 +162,13 @@ func _refresh() -> void:
                 var fb := _font("res://assets/fonts/Vazirmatn-Bold.ttf")
                 if fb != null:
                         t.add_theme_font_override("font", fb)
-                t.add_theme_font_size_override("font_size", 15)
+                t.add_theme_font_size_override("font_size", 17)
                 t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 t.mouse_filter = Control.MOUSE_FILTER_IGNORE
                 vb.add_child(t)
                 var st := Label.new()
                 st.text = "انجام شد" if seen else ("بازی کن" if (ready_ep and unlocked) else ("قفل" if ready_ep else "به‌زودی"))
-                st.add_theme_font_size_override("font_size", 13)
+                st.add_theme_font_size_override("font_size", 15)
                 st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 st.mouse_filter = Control.MOUSE_FILTER_IGNORE
                 st.add_theme_color_override("font_color", Color(0.55, 0.85, 0.55) if seen else (COL_GOLD if (ready_ep and unlocked) else Color(0.5, 0.5, 0.5)))

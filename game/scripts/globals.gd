@@ -3,6 +3,10 @@ extends Node
 
 const SAVE_PATH := "user://boghi_save.json"
 
+# نسخه بازی — تنها منبع حقیقت؛ منو/لاگ از همین می‌خوانند (دست‌نویس ممنوع)
+const VERSION := "0.12"
+const BUILD := 14
+
 var coins: int = 0
 var plate_name: String = "بوقی"
 var selected_car: int = 0
@@ -165,6 +169,8 @@ const I18N := {
         "max": {"fa": "ماکزیمم", "en": "Max"},
         "jump": {"fa": "پرش", "en": "JUMP"},
         "boost": {"fa": "توربو", "en": "TURBO"},
+        "go": {"fa": "برو!", "en": "GO!"},
+        "pos": {"fa": "جایگاه", "en": "POS"},
         "paused": {"fa": "توقف", "en": "Paused"},
         "resume": {"fa": "ادامه", "en": "Resume"},
         "menu": {"fa": "منو", "en": "Menu"},

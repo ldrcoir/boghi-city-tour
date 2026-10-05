@@ -1,0 +1,897 @@
+     1→     1→extends Node2D
+     2→     2→## Boghi gameplay: side-view auto-runner with jobs, coins, ramps, turbo
+     3→     3→
+     4→     4→const VIEW_W := 1280.0
+     5→     5→const VIEW_H := 720.0
+     6→     6→const GROUND_Y := 600.0
+     7→     7→const CAR_X := 300.0
+     8→     8→const GRAVITY := 2300.0
+     9→     9→
+    10→    10→var lv: Dictionary
+    11→    11→var speed_base := 150.0
+    12→    12→var world_x := 0.0
+    13→    13→var finish_px := 6000.0
+    14→    14→var time_left := 60.0
+    15→    15→var coins_got := 0
+    16→    16→var target_coins := -1
+    17→    17→var passengers := 0
+    18→    18→var target_passengers := -1
+    19→    19→var car_y := 0.0
+    20→    20→var vy := 0.0
+    21→    21→var on_ground := true
+    22→    22→var speed_mult := 1.0
+    23→    23→var slow_until := 0.0
+    24→    24→var turbo_left := 0.0
+    25→    25→var turbo_meter := 1.0
+    26→    26→var invuln_until := 0.0
+    27→    27→var elapsed := 0.0
+    28→    28→var ended := false
+    29→    29→var autotest := false
+    30→    30→var next_obj_x := 900.0
+    31→    31→var passenger_spots: Array = []
+    32→    32→var next_passenger_idx := 0
+    33→    33→var shake := 0.0
+    34→    34→var _auto_timer := 0.0
+    35→    35→var _shot_taken := false
+    36→    36→var brain = null
+    37→    37→
+    38→    38→# بارگذاری مستقیم مغز — بدون وابستگی به class cache
+    39→    39→const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
+    40→    40→var car_anchor: Control
+    41→    41→var _hit_chat_until := 0.0
+    42→    42→var _boost_in := 0.0
+    43→    43→
+    44→    44→var world: Node2D
+    45→    45→var layers: Array = []  # painterly parallax: {s1, s2, w, f}
+    46→    46→var car: Area2D
+    47→    47→var car_sprite: Sprite2D
+    48→    48→var shadow: Sprite2D
+    49→    49→var plate_label: Label
+    50→    50→var cam: Camera2D
+    51→    51→var hud: CanvasLayer
+    52→    52→var coin_label: Label
+    53→    53→var time_label: Label
+    54→    54→var mission_label: Label
+    55→    55→var extra_label: Label
+    56→    56→var progress: ProgressBar
+    57→    57→var boost_btn: Button
+    58→    58→var nitro_bar: ProgressBar
+    59→    59→var flame: CPUParticles2D
+    60→    60→var dust: CPUParticles2D
+    61→    61→var lines: Control
+    62→    62→var end_panel: PanelContainer
+    63→    63→var end_title: Label
+    64→    64→var end_stars: Label
+    65→    65→var end_reward: Label
+    66→    66→var end_retry_btn: Button
+    67→    67→var end_menu_btn: Button
+    68→    68→var pause_btn: Button
+    69→    69→var pause_overlay: Control
+    70→    70→var autotest_full := false
+    71→    71→
+    72→    72→func _ready() -> void:
+    73→    73→        autotest = OS.get_cmdline_user_args().has("--autotest")
+    74→    74→        autotest_full = OS.get_cmdline_user_args().has("--autotest-full")
+    75→    75→        if autotest_full and Globals.has_meta("at_retry"):
+    76→    76→                print("[boghi][autotest] TAP-RETRY OK — بازی دوباره لود شد")
+    77→    77→        var lid: int = Globals.get_meta("start_level", 1)
+    78→    78→        # مرحله‌ی سفارشی داستان (مثلاً «سیب‌زمینی و سنگک») اولویت دارد
+    79→    79→        if Globals.has_meta("custom_level"):
+    80→    80→                lv = Globals.get_meta("custom_level")
+    81→    81→                Globals.remove_meta("custom_level")
+    82→    82→        else:
+    83→    83→                lv = Globals.get_level(lid)
+    84→    84→        if lv.is_empty():
+    85→    85→                lv = {"id": 1, "type": "race", "name": "تست", "speed": 14.0, "distance": 500,
+    86→    86→                        "time": 90, "obstacle_rate": 0.4, "coin_rate": 0.8, "ramp_rate": 0.3, "reward": 50}
+    87→    87→        var stats: Dictionary = Globals.car_stats()
+    88→    88→        speed_base = float(lv["speed"]) * 10.0 * float(stats["accel"])
+    89→    89→        finish_px = float(lv["distance"]) * 10.0
+    90→    90→        time_left = float(lv["time"])
+    91→    91→        if lv["type"] == "collect":
+    92→    92→                target_coins = int(lv.get("target_coins", 10))
+    93→    93→        if lv["type"] == "taxi":
+    94→    94→                target_passengers = int(lv.get("target_passengers", 3))
+    95→    95→                for i in target_passengers + 1:
+    96→    96→                        passenger_spots.append(finish_px * (0.18 + 0.68 * (float(i) / (target_passengers + 1.0))))
+    97→    97→        next_obj_x = 700.0
+    98→    98→        _build_world()
+    99→    99→        _build_car(stats)
+   100→   100→        _build_hud()
+   101→   101→        AudioMgr.play_music()
+   102→   102→        # مغز بوقی: ماشینِ تو همین اول مسابقه گاز می‌زند!
+   103→   103→        brain = BRAIN_SCRIPT.new()
+   104→   104→        add_child(brain)
+   105→   105→        car_anchor = Control.new()
+   106→   106→        car_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   107→   107→        car_anchor.size = Vector2(0, 0)
+   108→   108→        hud.add_child(car_anchor)
+   109→   109→        _boost_in = 13.0 + randf() * 6.0
+   110→   110→        get_tree().create_timer(0.7).timeout.connect(func():
+   111→   111→                if brain != null and not ended and car_anchor != null:
+   112→   112→                        brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "go"))
+   113→   113→        mission_label.text = Globals.L("mission") + " " + str(int(lv["id"])) + ": " + str(lv["name"]) + " — " + Globals.L("type_" + str(lv["type"]))
+   114→   114→        if autotest or autotest_full:
+   115→   115→                time_left = 999
+   116→   116→                _auto_timer = 0.0
+   117→   117→        if autotest_full:
+   118→   118→                _autotest_full()
+   119→   119→
+   120→   120→func _build_world() -> void:
+   121→   121→        var backdrop := ColorRect.new()
+   122→   122→        backdrop.color = Color(0.09, 0.07, 0.11) # پس‌زمینه تیره گرم — نسل ۲
+   123→   123→        backdrop.size = Vector2(VIEW_W, VIEW_H)
+   124→   124→        backdrop.z_index = -14
+   125→   125→        add_child(backdrop)
+   126→   126→
+   127→   127→        # painterly parallax: far city (opaque) -> buildings band -> road
+   128→   128→        _add_layer("res://assets/sprites/bg_far.png", -12, GROUND_Y + 50.0, 1.286, 0.18)
+   129→   129→        _add_layer("res://assets/sprites/bg_mid.png", -10, GROUND_Y + 30.0, 1.286, 0.45, 0.75)
+   130→   130→        _add_layer("res://assets/sprites/road_strip.png", -4, VIEW_H, 1.286, 1.0, 0.54)
+   131→   131→
+   132→   132→        world = Node2D.new()
+   133→   133→        world.z_index = 2
+   134→   134→        add_child(world)
+   135→   135→
+   136→   136→        cam = Camera2D.new()
+   137→   137→        cam.position = Vector2(VIEW_W / 2, VIEW_H / 2)
+   138→   138→        add_child(cam)
+   139→   139→        cam.make_current()
+   140→   140→
+   141→   141→func _add_layer(path: String, z: int, bottom_y: float, scale: float, factor: float, squash: float = 0.0) -> void:
+   142→   142→        var tex: Texture2D = load(path)
+   143→   143→        var sc := Vector2(scale, scale if squash <= 0.0 else squash)
+   144→   144→        var s1 := Sprite2D.new()
+   145→   145→        s1.texture = tex
+   146→   146→        s1.centered = false
+   147→   147→        s1.z_index = z
+   148→   148→        s1.scale = sc
+   149→   149→        s1.position = Vector2(0.0, bottom_y - tex.get_height() * sc.y)
+   150→   150→        add_child(s1)
+   151→   151→        var s2 := s1.duplicate() as Sprite2D
+   152→   152→        s2.flip_h = true
+   153→   153→        s2.position = s1.position + Vector2(tex.get_width() * scale, 0.0)
+   154→   154→        add_child(s2)
+   155→   155→        layers.append({"s1": s1, "s2": s2, "w": tex.get_width() * scale, "f": factor})
+   156→   156→
+   157→   157→func _build_car(stats: Dictionary) -> void:
+   158→   158→        car = Area2D.new()
+   159→   159→        car.position = Vector2(CAR_X, GROUND_Y)
+   160→   160→        car.monitoring = true
+   161→   161→        var shape := CollisionShape2D.new()
+   162→   162→        var rect := RectangleShape2D.new()
+   163→   163→        rect.size = Vector2(235, 160)
+   164→   164→        shape.shape = rect
+   165→   165→        shape.position = Vector2(0, -78)
+   166→   166→        car.add_child(shape)
+   167→   167→        car.area_entered.connect(_on_hit)
+   168→   168→        car_sprite = Sprite2D.new()
+   169→   169→        # در مسابقه چهره جدی (بدون چشم، شیشه دودی) — طبق بریف نوجوان‌پسند کاربر
+   170→   170→        var cdef: Dictionary = Globals.CARS[Globals.selected_car]
+   171→   171→        var race_path: String = "res://assets/sprites/" + str(cdef["id"]) + "_race.png"
+   172→   172→        car_sprite.texture = load(race_path) if ResourceLoader.exists(race_path) else load(str(cdef["tex"]))
+   173→   173→        var sc := 214.0 / float(car_sprite.texture.get_height()) # ارتفاع ثابت ~۲۱۴px برای هر ابعاد اسپرایت
+   174→   174→        car_sprite.scale = Vector2(sc, sc)
+   175→   175→        var th := car_sprite.texture.get_height() * sc
+   176→   176→        car_sprite.position = Vector2(0, 12.0 - th * 0.5) # چرخ‌ها روی جاده
+   177→   177→        shadow = Sprite2D.new()
+   178→   178→        shadow.texture = _make_shadow_tex()
+   179→   179→        shadow.position = Vector2(CAR_X, GROUND_Y - 6)
+   180→   180→        shadow.z_index = -2
+   181→   181→        add_child(shadow)
+   182→   182→        car.add_child(car_sprite)
+   183→   183→        var plate := Panel.new()
+   184→   184→        var sb := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 4)
+   185→   185→        plate.add_theme_stylebox_override("panel", sb)
+   186→   186→        plate.custom_minimum_size = Vector2(160, 44)
+   187→   187→        plate.position = Vector2(-80, -240)
+   188→   188→        plate.size = Vector2(160, 44)
+   189→   189→        plate_label = Label.new()
+   190→   190→        plate_label.text = Globals.plate_name
+   191→   191→        plate_label.add_theme_font_override("font", load("res://assets/fonts/Lalezar-Regular.ttf"))
+   192→   192→        plate_label.add_theme_font_size_override("font_size", 24)
+   193→   193→        plate_label.add_theme_color_override("font_color", Color(0.25, 0.16, 0.09))
+   194→   194→        plate_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   195→   195→        plate_label.set_anchors_preset(Control.PRESET_FULL_RECT)
+   196→   196→        plate.add_child(plate_label)
+   197→   197→        car.add_child(plate)
+   198→   198→        _attach_car_fx()
+   199→   199→        add_child(car)
+   200→   200→
+   201→   201→func _attach_car_fx() -> void:
+   202→   202→        # نیترو: شعلهٔ آتشین پشت اگزوز
+   203→   203→        flame = CPUParticles2D.new()
+   204→   204→        flame.position = Vector2(-125, -32)
+   205→   205→        flame.emitting = false
+   206→   206→        flame.amount = 80
+   207→   207→        flame.lifetime = 0.32
+   208→   208→        flame.direction = Vector2(-1, 0)
+   209→   209→        flame.spread = 14.0
+   210→   210→        flame.gravity = Vector2(-280, -50)
+   211→   211→        flame.initial_velocity_min = 380.0
+   212→   212→        flame.initial_velocity_max = 660.0
+   213→   213→        flame.scale_amount_min = 9.0
+   214→   214→        flame.scale_amount_max = 16.0
+   215→   215→        var curve := Curve.new()
+   216→   216→        curve.add_point(Vector2(0, 1.0))
+   217→   217→        curve.add_point(Vector2(1, 0.1))
+   218→   218→        flame.scale_amount_curve = curve
+   219→   219→        var grad := Gradient.new()
+   220→   220→        grad.offsets = PackedFloat32Array([0.0, 0.3, 1.0])
+   221→   221→        grad.colors = PackedColorArray([Color(1.0, 0.97, 0.55, 0.95),
+   222→   222→                Color(1.0, 0.55, 0.08, 0.85), Color(0.85, 0.12, 0.02, 0.0)])
+   223→   223→        flame.color_ramp = grad
+   224→   224→        var mat := CanvasItemMaterial.new()
+   225→   225→        mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+   226→   226→        flame.material = mat
+   227→   227→        flame.z_index = -1
+   228→   228→        car.add_child(flame)
+   229→   229→        # گردوخاک چرخ‌ها روی جاده
+   230→   230→        dust = CPUParticles2D.new()
+   231→   231→        dust.position = Vector2(-100, -10)
+   232→   232→        dust.emitting = false
+   233→   233→        dust.amount = 26
+   234→   234→        dust.lifetime = 0.7
+   235→   235→        dust.direction = Vector2(-1, 0)
+   236→   236→        dust.spread = 30.0
+   237→   237→        dust.gravity = Vector2(0, -40)
+   238→   238→        dust.initial_velocity_min = 60.0
+   239→   239→        dust.initial_velocity_max = 150.0
+   240→   240→        dust.scale_amount_min = 4.0
+   241→   241→        dust.scale_amount_max = 8.0
+   242→   242→        var dg := Gradient.new()
+   243→   243→        dg.offsets = PackedFloat32Array([0.0, 1.0])
+   244→   244→        dg.colors = PackedColorArray([Color(0.62, 0.5, 0.36, 0.5), Color(0.62, 0.5, 0.36, 0.0)])
+   245→   245→        dust.color_ramp = dg
+   246→   246→        dust.z_index = -1
+   247→   247→        car.add_child(dust)
+   248→   248→
+   249→   249→func _build_hud() -> void:
+   250→   250→        hud = CanvasLayer.new()
+   251→   251→        hud.process_mode = Node.PROCESS_MODE_ALWAYS
+   252→   252→        add_child(hud)
+   253→   253→        var font: FontFile = load("res://assets/fonts/Lalezar-Regular.ttf") # فانتزی برای HUD
+   254→   254→
+   255→   255→        coin_label = _hud_label(font, 34, Vector2(1040, 16), Color(0.95, 0.75, 0.1))
+   256→   256→        time_label = _hud_label(font, 34, Vector2(24, 16), Color(0.95, 0.35, 0.25))
+   257→   257→        extra_label = _hud_label(font, 28, Vector2(24, 60), Color(0.98, 0.98, 0.98))
+   258→   258→        mission_label = _hud_label(font, 34, Vector2(0, 16), Color(0.98, 0.98, 0.98))
+   259→   259→        mission_label.custom_minimum_size = Vector2(VIEW_W, 0)
+   260→   260→        mission_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   261→   261→
+   262→   262→        # ⛔ HUD لنگر-محور — روی هر عرض صفحه (1280 دسکتاپ تا 1600 گوشی) سر جایش می‌ماند
+   263→   263→        # و همه‌چیز زیر خط امن استاتوس‌بار (۴۶px) شروع می‌شود (درس اسکرین‌شات v0.9)
+   264→   264→        _place(coin_label, 1.0, 0.0, 1.0, 0.0, -250, 46, -60, 92)
+   265→   265→        _place(time_label, 0.0, 0.0, 0.0, 0.0, 24, 46, 300, 92)
+   266→   266→        _place(extra_label, 0.0, 0.0, 0.0, 0.0, 24, 98, 760, 138)
+   267→   267→        _place(mission_label, 0.0, 0.0, 1.0, 0.0, 0, 46, 0, 94)
+   268→   268→
+   269→   269→        progress = ProgressBar.new()
+   270→   270→        progress.min_value = 0
+   271→   271→        progress.max_value = 100
+   272→   272→        progress.value = 0
+   273→   273→        progress.show_percentage = false
+   274→   274→        var pbg := _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 10, 3)
+   275→   275→        var pfill := _sb(Color(0.957, 0.769, 0.188), Color(0.72, 0.52, 0.1), 8, 0, false)
+   276→   276→        progress.add_theme_stylebox_override("background", pbg)
+   277→   277→        progress.add_theme_stylebox_override("fill", pfill)
+   278→   278→        hud.add_child(progress)
+   279→   279→        _place(progress, 0.5, 0.0, 0.5, 0.0, -250, 100, 250, 122)
+   280→   280→
+   281→   281→        pause_btn = Button.new()
+   282→   282→        pause_btn.text = "II"
+   283→   283→        _style_btn(pause_btn, false)
+   284→   284→        hud.add_child(pause_btn)
+   285→   285→        _place(pause_btn, 1.0, 0.0, 1.0, 0.0, -64, 46, -12, 98)
+   286→   286→        pause_btn.pressed.connect(_toggle_pause)
+   287→   287→
+   288→   288→        # پرده توقف — صفحه نیمه‌تیره + برچسب فارسی (فونت‌امن، بدون ایموجی)
+   289→   289→        pause_overlay = Control.new()
+   290→   290→        pause_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+   291→   291→        pause_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   292→   292→        pause_overlay.visible = false
+   293→   293→        var pv := ColorRect.new()
+   294→   294→        pv.color = Color(0, 0, 0, 0.55)
+   295→   295→        pv.set_anchors_preset(Control.PRESET_FULL_RECT)
+   296→   296→        pv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   297→   297→        pause_overlay.add_child(pv)
+   298→   298→        var pl := Label.new()
+   299→   299→        pl.text = Globals.L("paused")
+   300→   300→        pl.add_theme_font_override("font", font)
+   301→   301→        pl.add_theme_font_size_override("font_size", 44)
+   302→   302→        pl.add_theme_color_override("font_color", Color(0.98, 0.93, 0.8))
+   303→   303→        pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   304→   304→        pl.set_anchors_preset(Control.PRESET_CENTER)
+   305→   305→        pl.anchor_left = 0.0
+   306→   306→        pl.anchor_right = 1.0
+   307→   307→        pl.offset_top = -60
+   308→   308→        pl.offset_bottom = 60
+   309→   309→        pl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   310→   310→        pause_overlay.add_child(pl)
+   311→   311→        hud.add_child(pause_overlay)
+   312→   312→
+   313→   313→        var jump_btn := Button.new()
+   314→   314→        jump_btn.text = Globals.L("jump")
+   315→   315→        jump_btn.add_theme_font_override("font", font)
+   316→   316→        jump_btn.add_theme_font_size_override("font_size", 34)
+   317→   317→        _style_btn(jump_btn, true)
+   318→   318→        hud.add_child(jump_btn)
+   319→   319→        _place(jump_btn, 1.0, 1.0, 1.0, 1.0, -220, -130, -30, -30)
+   320→   320→
+   321→   321→        boost_btn = Button.new()
+   322→   322→        boost_btn.text = Globals.L("nitro")
+   323→   323→        boost_btn.add_theme_font_override("font", font)
+   324→   324→        boost_btn.add_theme_font_size_override("font_size", 30)
+   325→   325→        _style_btn(boost_btn, true)
+   326→   326→        hud.add_child(boost_btn)
+   327→   327→        _place(boost_btn, 1.0, 1.0, 1.0, 1.0, -420, -130, -230, -30)
+   328→   328→
+   329→   329→        # گیج نیترو بالای دکمه
+   330→   330→        nitro_bar = ProgressBar.new()
+   331→   331→        nitro_bar.min_value = 0
+   332→   332→        nitro_bar.max_value = 100
+   333→   333→        nitro_bar.value = 100
+   334→   334→        nitro_bar.show_percentage = false
+   335→   335→        var nbg := _sb(Color(0.12, 0.1, 0.14), Color(0.29, 0.216, 0.157), 8, 2, false)
+   336→   336→        var nfill := _sb(Color(1.0, 0.55, 0.08), Color(0.9, 0.3, 0.05), 8, 0, false)
+   337→   337→        nitro_bar.add_theme_stylebox_override("background", nbg)
+   338→   338→        nitro_bar.add_theme_stylebox_override("fill", nfill)
+   339→   339→        hud.add_child(nitro_bar)
+   340→   340→        _place(nitro_bar, 1.0, 1.0, 1.0, 1.0, -420, -154, -230, -138)
+   341→   341→
+   342→   342→        # خطوط سرعت هنگام نیترو
+   343→   343→        lines = SpeedLines.new()
+   344→   344→        lines.position = Vector2.ZERO
+   345→   345→        lines.size = Vector2(VIEW_W, VIEW_H)
+   346→   346→        lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   347→   347→        lines.visible = false
+   348→   348→        hud.add_child(lines)
+   349→   349→
+   350→   350→func _hud_label(font: FontFile, size: int, pos: Vector2, col: Color) -> Label:
+   351→   351→        var l := Label.new()
+   352→   352→        l.add_theme_font_override("font", font)
+   353→   353→        l.add_theme_font_size_override("font_size", size)
+   354→   354→        l.add_theme_color_override("font_color", col)
+   355→   355→        l.add_theme_color_override("font_outline_color", Color(0.25, 0.16, 0.09))
+   356→   356→        l.add_theme_constant_override("outline_size", 10)
+   357→   357→        l.position = pos
+   358→   358→        l.text = ""
+   359→   359→        hud.add_child(l)
+   360→   360→        return l
+   361→   361→
+   362→   362→## لنگرگذاری دقیق یک Control (به‌جای position/size ثابت)
+   363→   363→func _place(c: Control, al: float, at: float, ar: float, ab: float, ol: float, ot: float, orr: float, ob: float) -> void:
+   364→   364→        c.anchor_left = al
+   365→   365→        c.anchor_top = at
+   366→   366→        c.anchor_right = ar
+   367→   367→        c.anchor_bottom = ab
+   368→   368→        c.offset_left = ol
+   369→   369→        c.offset_top = ot
+   370→   370→        c.offset_right = orr
+   371→   371→        c.offset_bottom = ob
+   372→   372→
+   373→   373→func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
+   374→   374→        var sb := StyleBoxFlat.new()
+   375→   375→        sb.bg_color = bg
+   376→   376→        sb.set_corner_radius_all(radius)
+   377→   377→        sb.border_color = border
+   378→   378→        sb.border_width_left = bw
+   379→   379→        sb.border_width_right = bw
+   380→   380→        sb.border_width_top = bw
+   381→   381→        sb.border_width_bottom = bw + (4 if bw > 0 else 0)
+   382→   382→        if shadow:
+   383→   383→                sb.shadow_color = Color(0.25, 0.16, 0.09, 0.28)
+   384→   384→                sb.shadow_size = 6
+   385→   385→        return sb
+   386→   386→
+   387→   387→func _style_btn(b: Button, primary := true) -> void:
+   388→   388→        var base := Color(0.165, 0.616, 0.561) if primary else Color(0.965, 0.886, 0.737)
+   389→   389→        var dark := Color(0.11, 0.42, 0.385) if primary else Color(0.8, 0.66, 0.42)
+   390→   390→        b.add_theme_stylebox_override("normal", _sb(base, dark, 18, 3))
+   391→   391→        b.add_theme_stylebox_override("hover", _sb(base.lightened(0.07), dark, 18, 3))
+   392→   392→        b.add_theme_stylebox_override("pressed", _sb(dark, dark, 18, 3))
+   393→   393→        b.add_theme_stylebox_override("disabled", _sb(Color(0.87, 0.84, 0.78), Color(0.72, 0.66, 0.56), 18, 3))
+   394→   394→        var fg := Color(1, 1, 1) if primary else Color(0.29, 0.216, 0.157)
+   395→   395→        b.add_theme_color_override("font_color", fg)
+   396→   396→        b.add_theme_color_override("font_hover_color", fg)
+   397→   397→        b.add_theme_color_override("font_focus_color", fg)
+   398→   398→        b.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
+   399→   399→        b.add_theme_color_override("font_disabled_color", Color(0.55, 0.51, 0.46))
+   400→   400→
+   401→   401→func _unhandled_input(e: InputEvent) -> void:
+   402→   402→        if e is InputEventKey and e.pressed:
+   403→   403→                if e.keycode == KEY_SPACE or e.keycode == KEY_UP or e.keycode == KEY_W:
+   404→   404→                        do_jump()
+   405→   405→                elif e.keycode == KEY_X or e.keycode == KEY_SHIFT:
+   406→   406→                        _on_boost()
+   407→   407→
+   408→   408→func do_jump() -> void:
+   409→   409→        if ended or get_tree().paused:
+   410→   410→                return
+   411→   411→        if on_ground:
+   412→   412→                vy = -980.0 * float(Globals.car_stats()["jump"])
+   413→   413→                on_ground = false
+   414→   414→                AudioMgr.play_sfx("jump")
+   415→   415→
+   416→   416→func _on_boost() -> void:
+   417→   417→        if ended or get_tree().paused or turbo_meter < 0.99:
+   418→   418→                return
+   419→   419→        turbo_left = float(Globals.car_stats()["turbo"])
+   420→   420→        turbo_meter = 0.0
+   421→   421→        AudioMgr.play_sfx("boost")
+   422→   422→        if brain != null:
+   423→   423→                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "nitro")
+   424→   424→
+   425→   425→func _toggle_pause() -> void:
+   426→   426→        if ended:
+   427→   427→                return
+   428→   428→        var t := get_tree()
+   429→   429→        t.paused = not t.paused
+   430→   430→        if pause_overlay != null:
+   431→   431→                pause_overlay.visible = t.paused
+   432→   432→        if pause_btn != null:
+   433→   433→                pause_btn.text = "II" if not t.paused else "I>"
+   434→   434→
+   435→   435→func _process(delta: float) -> void:
+   436→   436→        if ended or get_tree().paused:
+   437→   437→                return
+   438→   438→        elapsed += delta
+   439→   439→        if autotest:
+   440→   440→                _auto_timer += delta
+   441→   441→                if _auto_timer > 1.1:
+   442→   442→                        _auto_timer = 0.0
+   443→   443→                        do_jump()
+   444→   444→                if elapsed > 3.2 and not _shot_taken:
+   445→   445→                        _shot_taken = true
+   446→   446→                        var img := get_viewport().get_texture().get_image()
+   447→   447→                        img.save_png("/home/z/my-project/scripts/shot_game.png")
+   448→   448→                if elapsed > 6.0:
+   449→   449→                        print("AUTOTEST OK world_x=", int(world_x), " coins=", coins_got, " objs=", world.get_child_count())
+   450→   450→                        get_tree().quit()
+   451→   451→        var boosting := turbo_left > 0.0
+   452→   452→        if boosting:
+   453→   453→                turbo_left -= delta
+   454→   454→        turbo_meter = min(1.0, turbo_meter + delta * 0.22)
+   455→   455→        var target_mult := 1.0
+   456→   456→        if boosting:
+   457→   457→                target_mult = 1.85
+   458→   458→        if elapsed < slow_until:
+   459→   459→                target_mult = 0.38
+   460→   460→        speed_mult = lerp(speed_mult, target_mult, delta * 4.0)
+   461→   461→        var spd := speed_base * speed_mult
+   462→   462→
+   463→   463→        world_x += spd * delta
+   464→   464→        time_left -= delta
+   465→   465→        if time_left <= 0.0:
+   466→   466→                _finish(false)
+   467→   467→                return
+   468→   468→
+   469→   469→        # scroll painterly parallax layers (mirror-tiled)
+   470→   470→        for L in layers:
+   471→   471→                var off := fmod(world_x * float(L["f"]), float(L["w"]))
+   472→   472→                (L["s1"] as Sprite2D).position.x = -off
+   473→   473→                (L["s2"] as Sprite2D).position.x = float(L["w"]) - off
+   474→   474→
+   475→   475→        # spawn
+   476→   476→        while world_x + VIEW_W > next_obj_x:
+   477→   477→                _spawn(next_obj_x)
+   478→   478→                next_obj_x += randf_range(260.0, 460.0) * (1.0 + float(lv["speed"]) / 70.0)
+   479→   479→
+   480→   480→        # car physics
+   481→   481→        vy += GRAVITY * delta
+   482→   482→        car_y += vy * delta
+   483→   483→        if car_y >= 0.0:
+   484→   484→                car_y = 0.0
+   485→   485→                vy = 0.0
+   486→   486→                if not on_ground:
+   487→   487→                        on_ground = true
+   488→   488→        car.position = Vector2(CAR_X, GROUND_Y + car_y)
+   489→   489→        car_sprite.rotation = clamp(vy * 0.00045, -0.3, 0.35)
+   490→   490→        var h: float = clamp(-car_y / 420.0, 0.0, 1.0)
+   491→   491→        shadow.position = Vector2(CAR_X, GROUND_Y - 6)
+   492→   492→        shadow.scale = Vector2(1.0 - 0.4 * h, 1.0 - 0.25 * h)
+   493→   493→        shadow.modulate = Color(1, 1, 1, 0.5 - 0.32 * h)
+   494→   494→
+   495→   495→        # لنگرِ حباب گفتار — بالای سر ماشین (مختصات صفحه)
+   496→   496→        if car_anchor != null:
+   497→   497→                var sp: Vector2 = car_sprite.get_global_transform_with_canvas().origin
+   498→   498→                car_anchor.position = sp + Vector2(0.0, -140.0)
+   499→   499→
+   500→   500→        # بوست مخفی بوقی — سیستم طرف بوقی است! هر چند ثانیه نیترویش را پر می‌کند
+   501→   501→        if brain != null and Globals.selected_car == 0 and not autotest:
+   502→   502→                _boost_in -= delta
+   503→   503→                if _boost_in <= 0.0 and turbo_meter < 0.62:
+   504→   504→                        _boost_in = 13.0 + randf() * 7.0
+   505→   505→                        turbo_meter = 1.0
+   506→   506→                        nitro_bar.modulate = Color(1.6, 1.4, 0.7)
+   507→   507→                        var tw := create_tween()
+   508→   508→                        tw.tween_property(nitro_bar, "modulate", Color(1, 1, 1), 0.8)
+   509→   509→                        brain.say(car_anchor, "boghi", "boost")
+   510→   510→
+   511→   511→        # move world objects
+   512→   512→        for obj in world.get_children():
+   513→   513→                obj.position.x -= spd * delta
+   514→   514→                if obj.position.x < -260:
+   515→   515→                        obj.queue_free()
+   516→   516→
+   517→   517→        # hud
+   518→   518→        coin_label.text = "سکه " + str(coins_got) + (" / " + str(target_coins) if target_coins > 0 else "")
+   519→   519→        time_label.text = "زمان " + str(int(ceil(time_left)))
+   520→   520→        progress.value = 100.0 * world_x / finish_px
+   521→   521→        if target_passengers > 0:
+   522→   522→                extra_label.text = "مسافر " + str(passengers) + " / " + str(target_passengers)
+   523→   523→        # جلوه‌های نیترو و زندگی صحنه
+   524→   524→        flame.emitting = boosting
+   525→   525→        dust.emitting = on_ground and spd > 70.0
+   526→   526→        lines.visible = boosting
+   527→   527→        nitro_bar.value = turbo_meter * 100.0
+   528→   528→        var zoom_target := Vector2(0.92, 0.92) if boosting else Vector2.ONE
+   529→   529→        cam.zoom = cam.zoom.lerp(zoom_target, delta * 3.0)
+   530→   530→        if on_ground:
+   531→   531→                car_sprite.position.y = 12.0 - car_sprite.texture.get_height() * car_sprite.scale.y * 0.5 + sin(elapsed * 28.0) * 1.6
+   532→   532→
+   533→   533→        boost_btn.modulate = Color(1, 1, 1) if turbo_meter >= 0.99 else Color(0.6, 0.6, 0.6)
+   534→   534→        AudioMgr.set_engine(true, clamp((spd / 300.0) * speed_mult, 0.0, 1.0))
+   535→   535→
+   536→   536→        # win conditions
+   537→   537→        var win := false
+   538→   538→        if lv["type"] == "collect" and target_coins > 0 and coins_got >= target_coins:
+   539→   539→                win = true
+   540→   540→        if lv["type"] == "taxi" and target_passengers > 0 and passengers >= target_passengers:
+   541→   541→                win = true
+   542→   542→        if world_x >= finish_px:
+   543→   543→                win = true
+   544→   544→        if win:
+   545→   545→                _finish(true)
+   546→   546→
+   547→   547→        # shake decay
+   548→   548→        if shake > 0.0:
+   549→   549→                shake = max(0.0, shake - delta * 30.0)
+   550→   550→                cam.offset = Vector2(randf_range(-shake, shake), randf_range(-shake, shake))
+   551→   551→        else:
+   552→   552→                cam.offset = Vector2.ZERO
+   553→   553→
+   554→   554→func _spawn(x: float) -> void:
+   555→   555→        var rel := x - world_x
+   556→   556→        var coin_rate := float(lv["coin_rate"])
+   557→   557→        var obst_rate := float(lv["obstacle_rate"])
+   558→   558→        if lv["type"] == "collect":
+   559→   559→                obst_rate *= 0.5
+   560→   560→                coin_rate = min(1.0, coin_rate + 0.2)
+   561→   561→        # scheduled passengers for taxi
+   562→   562→        if next_passenger_idx < passenger_spots.size() and x >= passenger_spots[next_passenger_idx]:
+   563→   563→                next_passenger_idx += 1
+   564→   564→                _make_obj("passenger", rel)
+   565→   565→                return
+   566→   566→        var r := randf()
+   567→   567→        if r < obst_rate:
+   568→   568→                _make_obj("cone", rel)
+   569→   569→        elif r < obst_rate + coin_rate:
+   570→   570→                _make_coin_arc(rel)
+   571→   571→        elif r < obst_rate + coin_rate + float(lv["ramp_rate"]):
+   572→   572→                _make_obj("ramp", rel)
+   573→   573→
+   574→   574→func _make_obj(kind: String, rel_x: float) -> Area2D:
+   575→   575→        var a := Area2D.new()
+   576→   576→        a.position = Vector2(VIEW_W + rel_x, GROUND_Y)
+   577→   577→        a.set_meta("kind", kind)
+   578→   578→        a.monitorable = true
+   579→   579→        var cs := CollisionShape2D.new()
+   580→   580→        var sh := RectangleShape2D.new()
+   581→   581→        var spr := Sprite2D.new()
+   582→   582→        match kind:
+   583→   583→                "cone":
+   584→   584→                        sh.size = Vector2(70, 90)
+   585→   585→                        cs.position = Vector2(0, -45)
+   586→   586→                        spr.texture = load("res://assets/sprites/cone.png")
+   587→   587→                        spr.scale = Vector2(0.55, 0.55)
+   588→   588→                        spr.position = Vector2(0, -48)
+   589→   589→                "passenger":
+   590→   590→                        sh.size = Vector2(90, 140)
+   591→   591→                        cs.position = Vector2(0, -70)
+   592→   592→                        spr.texture = load("res://assets/sprites/passenger.png")
+   593→   593→                        spr.scale = Vector2(0.5, 0.5)
+   594→   594→                        spr.position = Vector2(0, -85)
+   595→   595→                "ramp":
+   596→   596→                        sh.size = Vector2(220, 90)
+   597→   597→                        cs.position = Vector2(0, -45)
+   598→   598→                        spr.texture = load("res://assets/sprites/ramp.png")
+   599→   599→                        spr.scale = Vector2(0.75, 0.75)
+   600→   600→                        spr.position = Vector2(0, -50)
+   601→   601→        a.add_child(cs)
+   602→   602→        a.add_child(spr)
+   603→   603→        world.add_child(a)
+   604→   604→        return a
+   605→   605→
+   606→   606→func _make_coin_arc(rel_x: float) -> void:
+   607→   607→        var n := randi_range(4, 6)
+   608→   608→        for i in n:
+   609→   609→                var a := Area2D.new()
+   610→   610→                a.position = Vector2(VIEW_W + rel_x + i * 70.0, GROUND_Y - 70 - sin(float(i) / (n - 1) * PI) * 150.0)
+   611→   611→                a.set_meta("kind", "coin")
+   612→   612→                a.monitorable = true
+   613→   613→                var cs := CollisionShape2D.new()
+   614→   614→                var sh := RectangleShape2D.new()
+   615→   615→                sh.size = Vector2(80, 80)
+   616→   616→                cs.shape = sh
+   617→   617→                a.add_child(cs)
+   618→   618→                var spr := Sprite2D.new()
+   619→   619→                spr.texture = load("res://assets/sprites/coin.png")
+   620→   620→                spr.scale = Vector2(0.55, 0.55)
+   621→   621→                a.add_child(spr)
+   622→   622→                world.add_child(a)
+   623→   623→
+   624→   624→func _on_hit(a: Area2D) -> void:
+   625→   625→        if ended:
+   626→   626→                return
+   627→   627→        var kind := str(a.get_meta("kind", ""))
+   628→   628→        match kind:
+   629→   629→                "coin":
+   630→   630→                        coins_got += 1
+   631→   631→                        AudioMgr.play_sfx("coin")
+   632→   632→                        a.queue_free()
+   633→   633→                "passenger":
+   634→   634→                        passengers += 1
+   635→   635→                        AudioMgr.play_sfx("horn")
+   636→   636→                        a.queue_free()
+   637→   637→                "ramp":
+   638→   638→                        if on_ground:
+   639→   639→                                vy = -1150.0 * float(Globals.car_stats()["jump"])
+   640→   640→                                on_ground = false
+   641→   641→                                AudioMgr.play_sfx("jump")
+   642→   642→                "cone":
+   643→   643→                        if elapsed < invuln_until:
+   644→   644→                                return
+   645→   645→                        invuln_until = elapsed + 1.2
+   646→   646→                        slow_until = elapsed + 1.1
+   647→   647→                        shake = 9.0
+   648→   648→                        AudioMgr.play_sfx("crash")
+   649→   649→                        if brain != null and elapsed > _hit_chat_until:
+   650→   650→                                _hit_chat_until = elapsed + 5.0
+   651→   651→                                brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "hit")
+   652→   652→
+   653→   653→func _finish(win: bool) -> void:
+   654→   654→        if ended:
+   655→   655→                return
+   656→   656→        ended = true
+   657→   657→        AudioMgr.set_engine(false)
+   658→   658→        var stars := 0
+   659→   659→        var reward := 0
+   660→   660→        if win:
+   661→   661→                var tf := time_left / float(lv["time"])
+   662→   662→                stars = 3 if tf >= 0.25 else (2 if tf >= 0.08 else 1)
+   663→   663→                reward = int(lv["reward"]) + stars * 30
+   664→   664→                Globals.add_coins(reward)
+   665→   665→                Globals.set_stars(int(lv["id"]), stars)
+   666→   666→                AudioMgr.play_sfx("win")
+   667→   667→        else:
+   668→   668→                AudioMgr.play_sfx("fail")
+   669→   669→        # جشن بعد خط پایان: ماشین زنده می‌شود، می‌رقصد، رقیب‌ها رد می‌شوند و کری می‌خوانند
+   670→   670→        _celebrate(win)
+   671→   671→        var stars_c := stars
+   672→   672→        var reward_c := reward
+   673→   673→        get_tree().create_timer(3.4 if win else 1.4).timeout.connect(func():
+   674→   674→                _show_end(win, stars_c, reward_c))
+   675→   675→
+   676→   676→## جشنِ خط پایان — نسخه چشم‌دار زنده می‌شود + کانفتی + رقیب‌ها تیکه می‌اندازند
+   677→   677→func _celebrate(win: bool) -> void:
+   678→   678→        if car_sprite == null:
+   679→   679→                return
+   680→   680→        # ۱) تعویض به چهره زنده (چشم + لبخند) — روحِ ماشین برمی‌گردد
+   681→   681→        var cute_path: String = str(Globals.CARS[Globals.selected_car]["tex"])
+   682→   682→        if ResourceLoader.exists(cute_path):
+   683→   683→                car_sprite.texture = load(cute_path)
+   684→   684→                var th := car_sprite.texture.get_height() * car_sprite.scale.y
+   685→   685→                car_sprite.position.y = 12.0 - th * 0.5
+   686→   686→        # ۲) جست‌وخیز — فنری و خوشحال
+   687→   687→        var base_y := car_sprite.position.y
+   688→   688→        var tw := create_tween().set_loops(6)
+   689→   689→        tw.tween_property(car_sprite, "position:y", base_y - 26.0, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+   690→   690→        tw.parallel().tween_property(car_sprite, "scale", car_sprite.scale * Vector2(0.92, 1.12), 0.16)
+   691→   691→        tw.tween_property(car_sprite, "position:y", base_y, 0.2).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+   692→   692→        tw.parallel().tween_property(car_sprite, "scale", car_sprite.scale, 0.2)
+   693→   693→        # ۳) کانفتی — باران شادی روی جاده
+   694→   694→        for i in 3:
+   695→   695→                var c := CPUParticles2D.new()
+   696→   696→                c.position = Vector2(240 + i * 300.0, 60.0)
+   697→   697→                c.emitting = false
+   698→   698→                c.amount = 42
+   699→   699→                c.lifetime = 3.2
+   700→   700→                c.direction = Vector2(0, 1)
+   701→   701→                c.spread = 45.0
+   702→   702→                c.gravity = Vector2(0, 240)
+   703→   703→                c.initial_velocity_min = 60.0
+   704→   704→                c.initial_velocity_max = 160.0
+   705→   705→                c.scale_amount_min = 5.0
+   706→   706→                c.scale_amount_max = 9.0
+   707→   707→                var g := Gradient.new()
+   708→   708→                g.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+   709→   709→                var cols: Array = [Color(1.0, 0.42, 0.16), Color(1.0, 0.85, 0.2), Color(0.25, 0.75, 0.95)]
+   710→   710→                g.colors = PackedColorArray([cols[i], cols[(i + 1) % 3], cols[(i + 2) % 3]])
+   711→   711→                c.color_ramp = g
+   712→   712→                c.z_index = 8
+   713→   713→                add_child(c)
+   714→   714→                c.emitting = win
+   715→   715→        # ۴) حباب‌ها و کری‌خوانی
+   716→   716→        var my_id := str(Globals.CARS[Globals.selected_car]["id"])
+   717→   717→        if brain != null and car_anchor != null:
+   718→   718→                brain.say(car_anchor, my_id, "win" if win else "lose")
+   719→   719→        if win:
+   720→   720→                _rival_parade(my_id)
+   721→   721→
+   722→   722→## رقیب‌ها از جاده رد می‌شوند و کری می‌خوانند — «کری‌خوانیِ محله»
+   723→   723→func _rival_parade(my_id: String) -> void:
+   724→   724→        var ids: Array = []
+   725→   725→        for c in Globals.CARS:
+   726→   726→                if str(c["id"]) != my_id:
+   727→   727→                        ids.append(str(c["id"]))
+   728→   728→        if ids.is_empty():
+   729→   729→                return
+   730→   730→        for i in 2:
+   731→   731→                var rid: String = ids[randi_range(0, ids.size() - 1)]
+   732→   732→                var tex_path: String = "res://assets/sprites/" + rid + "_side.png"
+   733→   733→                if not ResourceLoader.exists(tex_path):
+   734→   734→                        continue
+   735→   735→                var rv := Sprite2D.new()
+   736→   736→                rv.texture = load(tex_path)
+   737→   737→                var sc := 214.0 / float(rv.texture.get_height())
+   738→   738→                rv.scale = Vector2(sc, sc)
+   739→   739→                rv.position = Vector2(1580.0, GROUND_Y - rv.texture.get_height() * sc * 0.5 + 12.0)
+   740→   740→                rv.z_index = 3
+   741→   741→                add_child(rv)
+   742→   742→                var stop_x := 720.0 + i * 240.0
+   743→   743→                var tw2 := create_tween()
+   744→   744→                tw2.tween_property(rv, "position:x", stop_x, 0.7).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+   745→   745→                tw2.tween_callback(func():
+   746→   746→                        if brain == null or not is_instance_valid(rv):
+   747→   747→                                return
+   748→   748→                        var anchor := Control.new()
+   749→   749→                        anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   750→   750→                        anchor.size = Vector2(160, 60)
+   751→   751→                        var sp: Vector2 = rv.get_global_transform_with_canvas().origin
+   752→   752→                        anchor.position = sp + Vector2(-40.0, -150.0)
+   753→   753→                        hud.add_child(anchor)
+   754→   754→                        brain.say(anchor, rid, "taunt")
+   755→   755→                        var tw3 := create_tween()
+   756→   756→                        tw3.tween_property(rv, "position:x", -300.0, 1.6).set_delay(1.9).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+   757→   757→                        tw3.tween_callback(rv.queue_free))
+   758→   758→
+   759→   759→func _show_end(win: bool, stars: int, reward: int) -> void:
+   760→   760→        end_panel = PanelContainer.new()
+   761→   761→        end_panel.add_theme_stylebox_override("panel", _sb(Color(0.99, 0.965, 0.9), Color(0.29, 0.216, 0.157), 24, 5))
+   762→   762→        var vb := VBoxContainer.new()
+   763→   763→        vb.add_theme_constant_override("separation", 12)
+   764→   764→        end_panel.add_child(vb)
+   765→   765→        end_title = Label.new()
+   766→   766→        end_title.text = Globals.L("win") if win else Globals.L("lose")
+   767→   767→        end_title.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+   768→   768→        end_title.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
+   769→   769→        end_title.add_theme_font_size_override("font_size", 40)
+   770→   770→        end_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   771→   771→        vb.add_child(end_title)
+   772→   772→        end_stars = Label.new()
+   773→   773→        end_stars.text = "٭٭٭".substr(0, stars) + "···".substr(0, 3 - stars) if stars > 0 else "---"
+   774→   774→        end_stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   775→   775→        end_stars.add_theme_font_size_override("font_size", 44)
+   776→   776→        end_stars.add_theme_color_override("font_color", Color(0.72, 0.52, 0.1))
+   777→   777→        vb.add_child(end_stars)
+   778→   778→        end_reward = Label.new()
+   779→   779→        end_reward.text = Globals.L("reward") + ": " + str(reward) + " سکه"
+   780→   780→        end_reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   781→   781→        end_reward.add_theme_font_size_override("font_size", 28)
+   782→   782→        end_reward.add_theme_color_override("font_color", Color(0.29, 0.216, 0.157))
+   783→   783→        vb.add_child(end_reward)
+   784→   784→        var hb := HBoxContainer.new()
+   785→   785→        hb.alignment = BoxContainer.ALIGNMENT_CENTER
+   786→   786→        hb.add_theme_constant_override("separation", 14)
+   787→   787→        end_retry_btn = Button.new()
+   788→   788→        end_retry_btn.text = Globals.L("retry")
+   789→   789→        end_retry_btn.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+   790→   790→        end_retry_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/game.tscn"))
+   791→   791→        _style_btn(end_retry_btn, true)
+   792→   792→        hb.add_child(end_retry_btn)
+   793→   793→        if win and int(lv["id"]) < 50:
+   794→   794→                var b_next := Button.new()
+   795→   795→                b_next.text = Globals.L("next")
+   796→   796→                b_next.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+   797→   797→                b_next.pressed.connect(func():
+   798→   798→                        Globals.set_meta("start_level", int(lv["id"]) + 1)
+   799→   799→                        get_tree().change_scene_to_file("res://scenes/game.tscn"))
+   800→   800→                _style_btn(b_next, true)
+   801→   801→                hb.add_child(b_next)
+   802→   802→        var b_menu := Button.new()
+   803→   803→        b_menu.text = Globals.L("menu")
+   804→   804→        b_menu.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+   805→   805→        b_menu.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/menu.tscn"))
+   806→   806→        _style_btn(b_menu, false)
+   807→   807→        hb.add_child(b_menu)
+   808→   808→        end_menu_btn = b_menu
+   809→   809→        vb.add_child(hb)
+   810→   810→        hud.add_child(end_panel)
+   811→   811→        # وسط‌چین لنگری — روی هر عرضی مرکز صفحه
+   812→   812→        _place(end_panel, 0.5, 0.5, 0.5, 0.5, -260, -170, 260, 130)
+   813→   813→        end_panel.custom_minimum_size = Vector2(520, 300)
+   814→   814→        end_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+   815→   815→        end_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+   816→   816→
+   817→   817→func _exit_tree() -> void:
+   818→   818→        AudioMgr.set_engine(false)
+   819→   819→
+   820→   820→
+   821→   821→## تست خودکار چرخه کامل: توقف → ادامه → برد سریع → پنل پایان → دوباره → منو
+   822→   822→func _autotest_full() -> void:
+   823→   823→        await get_tree().create_timer(1.0).timeout
+   824→   824→        _tap(pause_btn)
+   825→   825→        await get_tree().create_timer(0.3).timeout
+   826→   826→        var p1: bool = get_tree().paused
+   827→   827→        _tap(pause_btn)
+   828→   828→        await get_tree().create_timer(0.3).timeout
+   829→   829→        var p2: bool = get_tree().paused
+   830→   830→        print("[boghi][autotest] TAP-PAUSE ", "OK" if (p1 and not p2) else "FAIL")
+   831→   831→        if not (p1 and not p2):
+   832→   832→                get_tree().quit(1)
+   833→   833→                return
+   834→   834→        finish_px = world_x + 160.0 # برد سریع (~۱ ثانیه)
+   835→   835→        await get_tree().create_timer(5.2).timeout # برد + جشن + پنل پایان
+   836→   836→        if end_panel == null or end_retry_btn == null or end_menu_btn == null:
+   837→   837→                print("[boghi][autotest] END-PANEL FAIL")
+   838→   838→                get_tree().quit(1)
+   839→   839→                return
+   840→   840→        print("[boghi][autotest] END-PANEL OK")
+   841→   841→        var img := get_viewport().get_texture().get_image()
+   842→   842→        if img != null:
+   843→   843→                img.save_png("/home/z/my-project/scripts/shot_end_panel.png")
+   844→   844→        if not Globals.has_meta("at_retry"):
+   845→   845→                Globals.set_meta("at_retry", 1)
+   846→   846→                _tap(end_retry_btn)
+   847→   847→                return # صحنه دوباره لود می‌شود؛ نسخه جدید ادامه می‌دهد
+   848→   848→        Globals.set_meta("at_menu_return", true)
+   849→   849→        _tap(end_menu_btn)
+   850→   850→        await get_tree().create_timer(3.0).timeout
+   851→   851→        print("[boghi][autotest] TAP-ENDMENU FAIL (منو لود نشد)")
+   852→   852→        get_tree().quit(1)
+   853→   853→
+   854→   854→func _tap(btn: Button) -> void:
+   855→   855→        var pos: Vector2 = btn.get_global_rect().get_center()
+   856→   856→        for pressed in [true, false]:
+   857→   857→                var ev := InputEventMouseButton.new()
+   858→   858→                ev.button_index = MOUSE_BUTTON_LEFT
+   859→   859→                ev.pressed = pressed
+   860→   860→                if pressed:
+   861→   861→                        ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+   862→   862→                ev.position = pos
+   863→   863→                ev.global_position = pos
+   864→   864→                Input.parse_input_event(ev)
+   865→   865→
+   866→   866→
+   867→   867→func _make_shadow_tex() -> ImageTexture:
+   868→   868→    var sz := Vector2i(180, 56)
+   869→   869→    var img := Image.create(sz.x, sz.y, false, Image.FORMAT_RGBA8)
+   870→   870→    var cx := sz.x / 2.0
+   871→   871→    var cy := sz.y / 2.0
+   872→   872→    for y in sz.y:
+   873→   873→        for x in sz.x:
+   874→   874→            var d := Vector2((x - cx) / (cx - 6.0), (y - cy) / (cy - 4.0)).length()
+   875→   875→            var a: float = clamp(1.0 - d, 0.0, 1.0)
+   876→   876→            img.set_pixel(x, y, Color(0.03, 0.02, 0.05, a * a * 0.9))
+   877→   877→    return ImageTexture.create_from_image(img)
+   878→   878→
+   879→   879→
+   880→   880→## خطوط سرعتِ هنگام نیترو — رسم سبک هر فریم
+   881→   881→class SpeedLines extends Control:
+   882→   882→    var t := 0.0
+   883→   883→
+   884→   884→    func _process(delta: float) -> void:
+   885→   885→        t += delta
+   886→   886→        if visible:
+   887→   887→            queue_redraw()
+   888→   888→
+   889→   889→    func _draw() -> void:
+   890→   890→        var rng := RandomNumberGenerator.new()
+   891→   891→        rng.seed = int(t * 24.0)
+   892→   892→        for i in 20:
+   893→   893→            var y := rng.randf_range(70.0, 640.0)
+   894→   894→            var x := rng.randf_range(-60.0, 1020.0)
+   895→   895→            var ln := rng.randf_range(120.0, 320.0)
+   896→   896→            draw_line(Vector2(x, y), Vector2(x + ln, y), Color(1.0, 0.95, 0.8, 0.12), 3.0)
+   897→   897→

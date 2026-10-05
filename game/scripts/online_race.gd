@@ -112,8 +112,8 @@ func _ready() -> void:
         cancel.text = "بی‌خیال"
         if f_b != null:
                 cancel.add_theme_font_override("font", f_b)
-        cancel.add_theme_font_size_override("font_size", 18)
-        cancel.custom_minimum_size = Vector2(180, 48)
+        cancel.add_theme_font_size_override("font_size", 22)
+        cancel.custom_minimum_size = Vector2(220, 72)
         cancel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
         var csb := StyleBoxFlat.new()
         csb.bg_color = Color(0.20, 0.22, 0.25)

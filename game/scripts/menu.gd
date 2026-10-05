@@ -420,10 +420,11 @@ func _build_title() -> void:
 func _build_home_panel() -> void:
         panel_home = PanelContainer.new()
         panel_home.add_theme_stylebox_override("panel", _sb(COL_GLASS, Color(0.85, 0.68, 0.28, 0.45), 22, 2))
-        # اندازه ثابت + وسط‌چین مطلق — ضدآینه و ضدعرض‌های مختلف
-        panel_home.custom_minimum_size = Vector2(360, 512)
+        # اندازه بزرگ — دکمه‌ها باید حداقل ارتفاعِ لمس اندروید (~۸۸px کانواس) را داشته باشند
+        # چیدمان دوستونه تا هم دکمه بلند باشد هم زیر تیتر (تا y=۱۶۰) جا شود
+        panel_home.custom_minimum_size = Vector2(560, 488)
         panel_home.set_anchors_preset(Control.PRESET_CENTER)
-        panel_home.offset_top = 40.0 # پایین‌تر از تیتر (تیتر تا y=160)
+        panel_home.offset_top = 130.0 # کاملاً زیر زیرنویس (زیرنویس تا y≈۱۱۴) — تداخل ممنوع
         panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
         panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
         add_child(panel_home)
@@ -465,7 +466,7 @@ func _build_home_panel() -> void:
 
         # پلاک نئونی اسم — نوجوان‌پسند (بدون عکس بچه!)
         var plate_box := Control.new()
-        plate_box.custom_minimum_size = Vector2(324, 122)
+        plate_box.custom_minimum_size = Vector2(324, 100)
         var board_tex := _safe_load("res://assets/sprites/plate_empty.png")
         if board_tex != null:
                 var board := TextureRect.new()
@@ -496,28 +497,32 @@ func _build_home_panel() -> void:
         plate_box.add_child(plate_edit)
         hb.add_child(plate_box)
 
-        # سه‌بخشی: مسابقه (قرمز اصلی) / مأموریت‌ها / زندگی محله
-        var b_race := _mk_button("مسابقه", 30, "red", 64)
+        # سه‌بخشی: مسابقه (قرمز اصلی) + دو ردیف دوستونه — همگی بالای حداقل لمس
+        var b_race := _mk_button("مسابقه", 36, "red", 96)
         b_race.pressed.connect(_start_quick_race)
         hb.add_child(b_race)
 
-        var b_play := _mk_button(Globals.L("levels"), 24, "dark", 54)
+        var row1 := HBoxContainer.new()
+        row1.add_theme_constant_override("separation", 10)
+        var b_play := _mk_button(Globals.L("levels"), 26, "dark", 88)
         b_play.pressed.connect(func(): _show(panel_levels))
         play_btn = b_play
-        hb.add_child(b_play)
-
-        var b_life := _mk_button("زندگی محله", 24, "dark", 54)
+        row1.add_child(b_play)
+        var b_life := _mk_button("زندگی محله", 26, "dark", 88)
         b_life.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/story.tscn"))
-        hb.add_child(b_life)
+        row1.add_child(b_life)
+        hb.add_child(row1)
 
-        var b_garage := _mk_button(Globals.L("workshop"), 22, "dark", 48)
+        var row2 := HBoxContainer.new()
+        row2.add_theme_constant_override("separation", 10)
+        var b_garage := _mk_button("کارگاه", 24, "dark", 80)
         b_garage.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/garage.tscn"))
-        hb.add_child(b_garage)
-
+        row2.add_child(b_garage)
         # چند نفره آنلاین — جست‌وجوی حریف؛ پیدا نشد → اکبر AI پشت فرمون
-        var b_online := _mk_button("آنلاین چند نفره", 20, "dark", 46)
+        var b_online := _mk_button("آنلاین", 24, "dark", 80)
         b_online.pressed.connect(_open_online)
-        hb.add_child(b_online)
+        row2.add_child(b_online)
+        hb.add_child(row2)
 
 func _start_quick_race() -> void:
         # مسابقه سریع با حریف AI (قاب: حلقه‌ی مسابقه‌ی محله)
@@ -547,8 +552,13 @@ func _open_online() -> void:
 
 func _build_levels_panel() -> void:
         panel_levels = PanelContainer.new()
-        panel_levels.add_theme_stylebox_override("panel", _sb(Color(0.115, 0.125, 0.145, 0.97), Color(0.85, 0.68, 0.28, 0.55), 24, 3))
-        panel_levels.custom_minimum_size = Vector2(1040, 560)
+        var lv_sb := _sb(Color(0.115, 0.125, 0.145, 0.97), Color(0.85, 0.68, 0.28, 0.55), 24, 3)
+        lv_sb.content_margin_left = 18.0 # متن فارسی نباید به لبه‌ی پنل بچسبد
+        lv_sb.content_margin_right = 18.0
+        lv_sb.content_margin_top = 12.0
+        lv_sb.content_margin_bottom = 12.0
+        panel_levels.add_theme_stylebox_override("panel", lv_sb)
+        panel_levels.custom_minimum_size = Vector2(1240, 600)
         panel_levels.set_anchors_preset(Control.PRESET_CENTER)
         panel_levels.offset_top = 10.0
         panel_levels.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -569,28 +579,36 @@ func _build_levels_panel() -> void:
                 hdr.add_child(akbar_rect)
         var ak := VBoxContainer.new()
         ak.add_theme_constant_override("separation", 2)
+        # خودِ ستون هم باید کل عرض هدر را بگیرد — وگرنه لیبل‌ها در جعبه‌ی تنگ گیر می‌کنند
+        ak.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         var ak_name := _mk_label("اکبر سیبیلو — رئیس مأموریت‌ها", 26, false, true, COL_GOLD)
-        ak_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+        # ⛔ درس اسکرین‌شات: لیبل RTL با LEFT در صحنه‌ی LTR-قفل حروف را له می‌کند —
+        # RIGHT‌ نقطه‌ی شروع طبیعی فارسی است + EXPAND_FILL تا عرض هرگز کم نیاید
+        ak_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+        ak_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         ak.add_child(ak_name)
         akbar_line_label = _mk_label("", 20, true, false, COL_CREAM)
-        akbar_line_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+        akbar_line_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+        akbar_line_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         akbar_line_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
         akbar_line_label.add_theme_constant_override("outline_size", 5)
         ak.add_child(akbar_line_label)
         hdr.add_child(ak)
         lv.add_child(hdr)
         var scroll := ScrollContainer.new()
-        scroll.custom_minimum_size = Vector2(996, 300)
+        scroll.custom_minimum_size = Vector2(1196, 300)
         scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
         var grid := GridContainer.new()
-        grid.columns = 8
-        grid.add_theme_constant_override("h_separation", 10)
-        grid.add_theme_constant_override("v_separation", 10)
+        # ⛔ درس اسکرین‌شات گوشی: ۸ ستونِ ۱۱۲px «دکمه‌های ریز» می‌سازد —
+        # ۴ ستون کاشی درشت (۲۸۰×۱۰۴) با فونت درشت = هدف لمسی واقعی
+        grid.columns = 4
+        grid.add_theme_constant_override("h_separation", 12)
+        grid.add_theme_constant_override("v_separation", 12)
         for id in range(1, 51):
                 var st: int = Globals.level_stars.get(id, 0)
                 var unlocked: bool = Globals.level_unlocked(id)
                 var b := Button.new()
-                b.custom_minimum_size = Vector2(112, 64)
+                b.custom_minimum_size = Vector2(280, 104)
                 _style_btn(b, "tile")
                 b.disabled = not unlocked
                 # دو خط: عدد (لاله‌زار درشت) + ردیف ستاره (وازیرمتن — گلیف تضمینی)
@@ -603,7 +621,7 @@ func _build_levels_panel() -> void:
                 num.text = str(id)
                 if font_display != null:
                         num.add_theme_font_override("font", font_display)
-                num.add_theme_font_size_override("font_size", 30)
+                num.add_theme_font_size_override("font_size", 46)
                 num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 num.add_theme_color_override("font_color", COL_CREAM if unlocked else Color(0.55, 0.53, 0.50))
                 num.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -615,7 +633,7 @@ func _build_levels_panel() -> void:
                 stars.text = st_txt
                 if font_bold != null:
                         stars.add_theme_font_override("font", font_bold)
-                stars.add_theme_font_size_override("font_size", 14)
+                stars.add_theme_font_size_override("font_size", 20)
                 stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
                 stars.add_theme_color_override("font_color", COL_GOLD if st > 0 else Color(0.42, 0.44, 0.47))
                 stars.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -627,7 +645,7 @@ func _build_levels_panel() -> void:
                         first_tile = b
         scroll.add_child(grid)
         lv.add_child(scroll)
-        var b_back1 := _mk_button(Globals.L("back"), 24, "dark", 52)
+        var b_back1 := _mk_button(Globals.L("back"), 28, "dark", 68)
         b_back1.pressed.connect(func(): _show(panel_home))
         back_btn = b_back1
         lv.add_child(b_back1)
@@ -650,8 +668,8 @@ func _deco_brain() -> void:
                         func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
 
 func _deco_version() -> void:
-        # یک برچسب واحد وسط پایین — چیزی که آینه شود جابه‌جا نمی‌شود
-        var l := _mk_label("بوقی v0.11 (build 12)  •  از استودیو ایماروید", 14, true, false, Color(1, 1, 1, 0.42))
+        # برچسب نسخه از Globals — دیگر هرگز دستی نیست (باگ «v0.9 هاردکد»)
+        var l := _mk_label("بوقی v%s (build %d)  •  از استودیو ایماروید" % [Globals.VERSION, Globals.BUILD], 16, true, false, Color(1, 1, 1, 0.58))
         l.anchor_left = 0.0
         l.anchor_right = 1.0
         l.anchor_top = 1.0
