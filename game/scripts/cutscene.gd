@@ -26,7 +26,7 @@ func setup(ep: Dictionary) -> void:
         episode = ep
 
 func _ready() -> void:
-        set_anchors_preset(Control.PRESET_FULL_RECT)
+        set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT) # فیکس: درختی=حفظ مستطیل ۰×۰؛ باید آفست‌ها هم ست شوند
         layout_direction = Control.LAYOUT_DIRECTION_LTR
         _build_street()
         dialogue = DIALOGUE_SCRIPT.new()

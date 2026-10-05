@@ -33,7 +33,7 @@ var _done := false
 
 func _ready() -> void:
         layout_direction = Control.LAYOUT_DIRECTION_LTR
-        set_anchors_preset(Control.PRESET_FULL_RECT)
+        set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT) # فیکس: درختی=حفظ مستطیل ۰×۰؛ باید آفست‌ها هم ست شوند
         var veil := ColorRect.new()
         veil.color = Color(0, 0, 0, 0.72)
         veil.set_anchors_preset(Control.PRESET_FULL_RECT)

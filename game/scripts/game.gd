@@ -63,9 +63,17 @@ var end_panel: PanelContainer
 var end_title: Label
 var end_stars: Label
 var end_reward: Label
+var end_retry_btn: Button
+var end_menu_btn: Button
+var pause_btn: Button
+var pause_overlay: Control
+var autotest_full := false
 
 func _ready() -> void:
         autotest = OS.get_cmdline_user_args().has("--autotest")
+        autotest_full = OS.get_cmdline_user_args().has("--autotest-full")
+        if autotest_full and Globals.has_meta("at_retry"):
+                print("[boghi][autotest] TAP-RETRY OK — بازی دوباره لود شد")
         var lid: int = Globals.get_meta("start_level", 1)
         # مرحله‌ی سفارشی داستان (مثلاً «سیب‌زمینی و سنگک») اولویت دارد
         if Globals.has_meta("custom_level"):
@@ -103,9 +111,11 @@ func _ready() -> void:
                 if brain != null and not ended and car_anchor != null:
                         brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "go"))
         mission_label.text = Globals.L("mission") + " " + str(int(lv["id"])) + ": " + str(lv["name"]) + " — " + Globals.L("type_" + str(lv["type"]))
-        if autotest:
+        if autotest or autotest_full:
                 time_left = 999
                 _auto_timer = 0.0
+        if autotest_full:
+                _autotest_full()
 
 func _build_world() -> void:
         var backdrop := ColorRect.new()
@@ -268,11 +278,37 @@ func _build_hud() -> void:
         hud.add_child(progress)
         _place(progress, 0.5, 0.0, 0.5, 0.0, -250, 100, 250, 122)
 
-        var pause_btn := Button.new()
+        pause_btn = Button.new()
         pause_btn.text = "II"
         _style_btn(pause_btn, false)
         hud.add_child(pause_btn)
         _place(pause_btn, 1.0, 0.0, 1.0, 0.0, -64, 46, -12, 98)
+        pause_btn.pressed.connect(_toggle_pause)
+
+        # پرده توقف — صفحه نیمه‌تیره + برچسب فارسی (فونت‌امن، بدون ایموجی)
+        pause_overlay = Control.new()
+        pause_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+        pause_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        pause_overlay.visible = false
+        var pv := ColorRect.new()
+        pv.color = Color(0, 0, 0, 0.55)
+        pv.set_anchors_preset(Control.PRESET_FULL_RECT)
+        pv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        pause_overlay.add_child(pv)
+        var pl := Label.new()
+        pl.text = Globals.L("paused")
+        pl.add_theme_font_override("font", font)
+        pl.add_theme_font_size_override("font_size", 44)
+        pl.add_theme_color_override("font_color", Color(0.98, 0.93, 0.8))
+        pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        pl.set_anchors_preset(Control.PRESET_CENTER)
+        pl.anchor_left = 0.0
+        pl.anchor_right = 1.0
+        pl.offset_top = -60
+        pl.offset_bottom = 60
+        pl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        pause_overlay.add_child(pl)
+        hud.add_child(pause_overlay)
 
         var jump_btn := Button.new()
         jump_btn.text = Globals.L("jump")
@@ -370,7 +406,7 @@ func _unhandled_input(e: InputEvent) -> void:
                         _on_boost()
 
 func do_jump() -> void:
-        if ended:
+        if ended or get_tree().paused:
                 return
         if on_ground:
                 vy = -980.0 * float(Globals.car_stats()["jump"])
@@ -378,7 +414,7 @@ func do_jump() -> void:
                 AudioMgr.play_sfx("jump")
 
 func _on_boost() -> void:
-        if ended or turbo_meter < 0.99:
+        if ended or get_tree().paused or turbo_meter < 0.99:
                 return
         turbo_left = float(Globals.car_stats()["turbo"])
         turbo_meter = 0.0
@@ -387,10 +423,14 @@ func _on_boost() -> void:
                 brain.say(car_anchor, str(Globals.CARS[Globals.selected_car]["id"]), "nitro")
 
 func _toggle_pause() -> void:
+        if ended:
+                return
         var t := get_tree()
         t.paused = not t.paused
-        if end_panel == null:
-                pass
+        if pause_overlay != null:
+                pause_overlay.visible = t.paused
+        if pause_btn != null:
+                pause_btn.text = "II" if not t.paused else "I>"
 
 func _process(delta: float) -> void:
         if ended or get_tree().paused:
@@ -744,12 +784,12 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         var hb := HBoxContainer.new()
         hb.alignment = BoxContainer.ALIGNMENT_CENTER
         hb.add_theme_constant_override("separation", 14)
-        var b_retry := Button.new()
-        b_retry.text = Globals.L("retry")
-        b_retry.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
-        b_retry.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/game.tscn"))
-        _style_btn(b_retry, true)
-        hb.add_child(b_retry)
+        end_retry_btn = Button.new()
+        end_retry_btn.text = Globals.L("retry")
+        end_retry_btn.add_theme_font_override("font", load("res://assets/fonts/Vazirmatn-Bold.ttf"))
+        end_retry_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/game.tscn"))
+        _style_btn(end_retry_btn, true)
+        hb.add_child(end_retry_btn)
         if win and int(lv["id"]) < 50:
                 var b_next := Button.new()
                 b_next.text = Globals.L("next")
@@ -765,6 +805,7 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
         b_menu.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/menu.tscn"))
         _style_btn(b_menu, false)
         hb.add_child(b_menu)
+        end_menu_btn = b_menu
         vb.add_child(hb)
         hud.add_child(end_panel)
         # وسط‌چین لنگری — روی هر عرضی مرکز صفحه
@@ -775,6 +816,52 @@ func _show_end(win: bool, stars: int, reward: int) -> void:
 
 func _exit_tree() -> void:
         AudioMgr.set_engine(false)
+
+
+## تست خودکار چرخه کامل: توقف → ادامه → برد سریع → پنل پایان → دوباره → منو
+func _autotest_full() -> void:
+        await get_tree().create_timer(1.0).timeout
+        _tap(pause_btn)
+        await get_tree().create_timer(0.3).timeout
+        var p1: bool = get_tree().paused
+        _tap(pause_btn)
+        await get_tree().create_timer(0.3).timeout
+        var p2: bool = get_tree().paused
+        print("[boghi][autotest] TAP-PAUSE ", "OK" if (p1 and not p2) else "FAIL")
+        if not (p1 and not p2):
+                get_tree().quit(1)
+                return
+        finish_px = world_x + 160.0 # برد سریع (~۱ ثانیه)
+        await get_tree().create_timer(5.2).timeout # برد + جشن + پنل پایان
+        if end_panel == null or end_retry_btn == null or end_menu_btn == null:
+                print("[boghi][autotest] END-PANEL FAIL")
+                get_tree().quit(1)
+                return
+        print("[boghi][autotest] END-PANEL OK")
+        var img := get_viewport().get_texture().get_image()
+        if img != null:
+                img.save_png("/home/z/my-project/scripts/shot_end_panel.png")
+        if not Globals.has_meta("at_retry"):
+                Globals.set_meta("at_retry", 1)
+                _tap(end_retry_btn)
+                return # صحنه دوباره لود می‌شود؛ نسخه جدید ادامه می‌دهد
+        Globals.set_meta("at_menu_return", true)
+        _tap(end_menu_btn)
+        await get_tree().create_timer(3.0).timeout
+        print("[boghi][autotest] TAP-ENDMENU FAIL (منو لود نشد)")
+        get_tree().quit(1)
+
+func _tap(btn: Button) -> void:
+        var pos: Vector2 = btn.get_global_rect().get_center()
+        for pressed in [true, false]:
+                var ev := InputEventMouseButton.new()
+                ev.button_index = MOUSE_BUTTON_LEFT
+                ev.pressed = pressed
+                if pressed:
+                        ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+                ev.position = pos
+                ev.global_position = pos
+                Input.parse_input_event(ev)
 
 
 func _make_shadow_tex() -> ImageTexture:

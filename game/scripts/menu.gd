@@ -20,6 +20,8 @@ var coin_label: Label
 var plate_edit: LineEdit
 var brain = null
 var deco_cars: Array = []
+var online_ov: Control = null
+var _expect_online := false
 var back_btn: Button
 var first_tile: Button
 var akbar_rect: TextureRect
@@ -70,10 +72,21 @@ func _ready() -> void:
         call_deferred("_deco_brain")
         call_deferred("_deco_version")
         var uargs := OS.get_cmdline_user_args()
-        if uargs.has("--garage"):
-                get_tree().change_scene_to_file("res://scenes/garage.tscn")
+        # چرخه کامل تست: برگشت از پنل پایان مسابقه به منو — پایان موفق چرخه
+        if uargs.has("--autotest-full"):
+                if Globals.get_meta("at_menu_return", false):
+                        Globals.remove_meta("at_menu_return")
+                        print("[boghi][autotest] TAP-ENDMENU OK — چرخه کامل بازی→پایان→منو سالم")
+                        _shot("/home/z/my-project/scripts/shot_menu_return.png")
+                        get_tree().quit(0)
+                        return
+                Globals.set_meta("start_level", 1)
+                get_tree().change_scene_to_file("res://scenes/game.tscn")
+                return
         if uargs.has("--levels"):
                 _show(panel_levels)
+        if uargs.has("--onlinetest"):
+                _onlinetest()
         if uargs.has("--autotest"):
                 _autotest()
 
@@ -116,6 +129,24 @@ func _autotest() -> void:
 func _exit_tree() -> void:
         if _expect_scene_change:
                 print("[boghi][autotest] TAP-LEVEL OK — scene changed to ", "(Game)")
+        if _expect_online:
+                print("[boghi][onlinetest] ONLINE-TAKEOVER OK — اکبر آمد و مسابقه لود شد")
+
+## تست آنلاین: پنل جست‌وجو باید واقعاً دیده شود (باگ ۰×۰) و AI جانشین شود
+func _onlinetest() -> void:
+        await get_tree().create_timer(0.5).timeout
+        _open_online()
+        await get_tree().create_timer(0.6).timeout
+        var ok := online_ov != null and is_instance_valid(online_ov) and online_ov.visible and online_ov.size.x > 1000.0
+        print("[boghi][onlinetest] OVERLAY ", "OK" if ok else "FAIL", " size=", online_ov.size if online_ov != null else "none")
+        _shot("/home/z/my-project/scripts/shot_online.png")
+        if not ok:
+                get_tree().quit(1)
+                return
+        _expect_online = true
+        await get_tree().create_timer(24.0).timeout
+        print("[boghi][onlinetest] FAIL — تعویض صحنه انجام نشد")
+        get_tree().quit(1)
 
 func _shot(path: String) -> void:
         var img := get_viewport().get_texture().get_image()
@@ -501,7 +532,10 @@ func _start_quick_race() -> void:
 func _open_online() -> void:
         # جست‌وجوی حریف آنلاین؛ اگر تا پایان صبر پیدا نشد → اکبر AI
         var ov: Control = ONLINE_SCRIPT.new()
+        online_ov = ov
         add_child(ov)
+        if ov.has_method("start"):
+                ov.start(Globals.online_wait)
         ov.ai_takeover.connect(func():
                 Globals.set_meta("custom_level", {
                         "id": 902, "type": "race", "name": "آنلاین — حریف: اکبر (AI)", "district": "محله",
@@ -617,7 +651,7 @@ func _deco_brain() -> void:
 
 func _deco_version() -> void:
         # یک برچسب واحد وسط پایین — چیزی که آینه شود جابه‌جا نمی‌شود
-        var l := _mk_label("بوقی v1.0 (build 11)  •  از استودیو ایماروید", 14, true, false, Color(1, 1, 1, 0.42))
+        var l := _mk_label("بوقی v0.11 (build 12)  •  از استودیو ایماروید", 14, true, false, Color(1, 1, 1, 0.42))
         l.anchor_left = 0.0
         l.anchor_right = 1.0
         l.anchor_top = 1.0

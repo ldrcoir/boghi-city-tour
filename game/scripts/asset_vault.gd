@@ -42,7 +42,10 @@ static func _le32(b: PackedByteArray, off: int) -> int:
         return (b[off] | (b[off + 1] << 8) | (b[off + 2] << 16) | (b[off + 3] << 24)) & 0xFFFFFFFF
 
 static func _rotl(v: int, c: int) -> int:
-        return ((v << c) | (v >> (32 - c))) & 0xFFFFFFFF
+        # ⛔ فیکس باگ BVAULT: PackedInt32Array مقادیر بالای bit31 را منفی ذخیره می‌کند
+        # و شیفت راستِ GDScript روی منفی «حسابی» است — بدون ماسک، بیت‌های علامت
+        # به نتیجه می‌ریزند و کلید-استریم خراب می‌شود (سناریو روی گوشی باز نمی‌شد)
+        return ((v << c) & 0xFFFFFFFF) | ((v & 0xFFFFFFFF) >> (32 - c))
 
 static func _qr(s: PackedInt32Array, a: int, b: int, c: int, d: int) -> void:
         s[a] = (s[a] + s[b]) & 0xFFFFFFFF; s[d] = _rotl(s[d] ^ s[a], 16)
@@ -92,21 +95,41 @@ static func open_bvault(path: String) -> PackedByteArray:
 static func load_json(path: String) -> Dictionary:
         var base := path.get_basename()
         var data := open_bvault(base + ".bvault")
-        if data.is_empty():
-                if OS.is_debug_build():
-                        var jp := base + ".json"
-                        if FileAccess.file_exists(jp):
-                                var f := FileAccess.open(jp, FileAccess.READ)
-                                if f != null:
-                                        var parsed = JSON.parse_string(f.get_as_text())
-                                        if parsed is Dictionary:
-                                                return parsed
-                return {}
-        var parsed2 = JSON.parse_string(data.get_string_from_utf8())
-        return parsed2 if parsed2 is Dictionary else {}
+        var parsed = null
+        if not data.is_empty():
+                parsed = JSON.parse_string(data.get_string_from_utf8())
+                if parsed is Dictionary:
+                        return parsed
+                push_warning("BVAULT parse failed: " + base + ".bvault")
+        if OS.is_debug_build():
+                # fallback توسعه: خزانه نبود یا خراب بود → پلین JSON کنارش
+                var jp := base + ".json"
+                if FileAccess.file_exists(jp):
+                        var f := FileAccess.open(jp, FileAccess.READ)
+                        if f != null:
+                                var p2 = JSON.parse_string(f.get_as_text())
+                                if p2 is Dictionary:
+                                        return p2
+        return {}
 
 ## تست سلامت: خودِ لودر باید بتواند یک فایل تست رمزشده را بخواند
 static func self_test() -> bool:
+        # ۱) بردار استاندارد RFC 8439 §2.4.2 — جواب درست از بیرون آمده،
+        # پس اگر پیاده‌سازی خراب شود (مثل باگ rotl منفی) این تست می‌گیردش؛
+        # راند‌تریپ متقارنِ ساده این باگ را پنهان می‌کرد!
+        var rfc_key := PackedByteArray()
+        for i in 32:
+                rfc_key.append(i)
+        var rfc_nonce := PackedByteArray()
+        for b in PackedByteArray([0, 0, 0, 0, 0, 0, 0, 0x4a, 0, 0, 0, 0]):
+                rfc_nonce.append(b)
+        var rfc_pt := "Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.".to_utf8_buffer()
+        var want_hex := "6e2e359a2568f98041ba0728dd0d6981e97e7aec1d4360c20a27afccfd9fae0bf91b65c5524733ab8f593dabcd62b3571639d624e65152ab8f530c359f0861d807ca0dbf500d6a6156a38e088a22b65e52bc514d16ccf806818ce91ab77937365af90bbf74a35be6b40b8eedf2785e42874d"
+        var got := _chacha20_xor(rfc_key, rfc_nonce, rfc_pt, 1)
+        if got.hex_encode() != want_hex:
+                push_error("BVAULT self_test: RFC 8439 vector FAILED")
+                return false
+        # ۲) راند‌تریپ UTF-8
         var txt := "سلام از ناخدای vault — بوقی!"
         var msg := txt.to_utf8_buffer()
         var nonce := PackedByteArray()

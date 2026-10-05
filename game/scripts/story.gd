@@ -190,7 +190,9 @@ func _open(idx: int, cards: Array) -> void:
         stage.finished.connect(_on_episode_finished.bind(ep))
         add_child(stage)
 
-func _on_episode_finished(ep: Dictionary) -> void:
+func _on_episode_finished(_episode_id: String, ep: Dictionary) -> void:
+        # ⛔ فیکس: سیگنال finished خودش episode_id می‌فرستد + bind(ep) → دو آرگومان؛
+        # امضای قبلی تک‌آرگومان بود و کل پایان اپیزود بی‌صدا شکست می‌خورد
         if stage != null and is_instance_valid(stage):
                 stage.queue_free()
                 stage = null
@@ -235,6 +237,11 @@ func _run_storytest() -> void:
         var guard := 0
         while stage != null and is_instance_valid(stage) and guard < 400:
                 guard += 1
+                if guard % 20 == 0:
+                        print("[boghi][storytest] tap#", guard, " stage_alive=", is_instance_valid(stage),
+                                " size=", stage.size, " gpos=", stage.global_position,
+                                " vis=", stage.visible, " ar=", stage.anchor_right, " ab=", stage.anchor_bottom, " parent=", stage.get_parent().name, " psize=", stage.get_parent().size,
+                                " dialog_active=", stage.dialogue.is_active() if stage.dialogue != null else "?")
                 stage._on_tap()
                 await get_tree().create_timer(0.22).timeout
         await get_tree().create_timer(0.6).timeout

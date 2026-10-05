@@ -44,9 +44,9 @@ func _ready() -> void:
         var model := OS.get_model_name()
         var ver := Engine.get_version_info()
         var ver_str := "%d.%d.%d" % [ver["major"], ver["minor"], ver["patch"]]
-        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر بالای صفحه «v1.0» طلایی نمی‌بینی، یعنی فایل قدیمی نصب شده"
+        detail_label.text = "Loading menu… / در حال باز کردن منو\n" + model + " — Godot " + ver_str + "\nاگر بالای صفحه «v0.11» طلایی نمی‌بینی، یعنی فایل قدیمی نصب شده"
         # پلاک نسخه — بزرگ و طلایی، بالای صفحه؛ انگشت‌نگاری بیلد v0.7
-        var ver_label := _mk_label("بوقی v1.0 — بیلد ۱۱", 34)
+        var ver_label := _mk_label("بوقی v0.11 — بیلد ۱۲", 34)
         ver_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
         ver_label.anchor_top = 0.02
         ver_label.anchor_bottom = 0.11
@@ -71,10 +71,15 @@ func _go_menu() -> void:
         await get_tree().process_frame
         await get_tree().process_frame
         # مسیر مستقیم برای تست/دمو: --story یا --storytest → هاب زندگی محله
+        # --autotest-full → مستقیم مسابقه (چرخه کامل: بازی→پایان→دوباره→منو)
         var uargs := OS.get_cmdline_user_args()
         var scene_path := "res://scenes/menu.tscn"
         if uargs.has("--story") or uargs.has("--storytest"):
                 scene_path = "res://scenes/story.tscn"
+        elif uargs.has("--autotest-full"):
+                scene_path = "res://scenes/game.tscn"
+        elif uargs.has("--garage"):
+                scene_path = "res://scenes/garage.tscn"
         var packed: PackedScene = load(scene_path)
         if packed == null:
                 _fail("صحنه پیدا نشد: " + scene_path)
@@ -97,11 +102,20 @@ func _go_menu() -> void:
         # رسمیِ درخت معرفی کنیم؛ وگرنه current_scene نال می‌ماند و همه‌ی
         # change_scene_to_fileهای بعدی (ماموریت/کارگاه/برگشت) بی‌صدا شکست می‌خورند
         get_tree().current_scene = inst
-        print("[boghi][boot] current_scene -> menu OK")
+        print("[boghi][boot] current_scene -> ", scene_path.get_file(), " OK")
+        # تست سلامت خزانه BVAULT — اگر روزی key-استریم خراب شود همین‌جا در لاگ دیده می‌شود
+        var VA = load("res://scripts/asset_vault.gd")
+        if VA != null and not VA.self_test():
+                print("[boghi][boot] BVAULT SELF-TEST FAILED — محتوای رمزی سالم باز نمی‌شود!")
         detail_label.text = "منو آماده شد — نسخه درست نصب شده"
         var tw := create_tween()
         tw.tween_property(self, "modulate:a", 0.0, 0.35)
         tw.tween_callback(queue_free)
+        # اهرم ایمنی ضدقفل: بوت باید همیشه خودش را ببندد — حتی اگر توئین شکست بخورد؛
+        # وگرنه ColorRect تمام‌صفحه‌ی بوت با mouse_filter=STOP همه‌ی لمس‌ها را می‌بلعد
+        get_tree().create_timer(3.0).timeout.connect(func():
+                if is_instance_valid(self) and is_inside_tree():
+                        queue_free())
 
 func _fail(msg: String) -> void:
         status_label.text = "خطای راه‌اندازی"

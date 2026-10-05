@@ -21,7 +21,7 @@ var _chars_per_sec := 34.0
 var _active := false
 
 func _ready() -> void:
-        set_anchors_preset(Control.PRESET_FULL_RECT)
+        set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT) # فیکس: درختی=حفظ مستطیل ۰×۰؛ باید آفست‌ها هم ست شوند
         mouse_filter = Control.MOUSE_FILTER_IGNORE
         font_body = _font("res://assets/fonts/Vazirmatn-Regular.ttf")
         font_name = _font("res://assets/fonts/Lalezar-Regular.ttf")
@@ -98,7 +98,14 @@ func hide_line() -> void:
         _active = false
 
 func is_typing() -> bool:
-        return _active and _body_label.visible_characters < _full_text.length()
+        # ⛔ فیکس باگ «قفل روی اولین جمله»: visible_characters=-1 یعنی «کامل نشان بده»
+        # ولی مقایسه‌ی ساده -1 < length همیشه true می‌ماند و next هرگز نمی‌آمد!
+        if not _active:
+                return false
+        var vc := _body_label.visible_characters
+        if vc < 0:
+                return false
+        return vc < _full_text.length()
 
 func is_active() -> bool:
         return _active
