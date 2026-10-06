@@ -4,8 +4,8 @@ extends Node
 const SAVE_PATH := "user://boghi_save.json"
 
 # نسخه بازی — تنها منبع حقیقت؛ منو/لاگ از همین می‌خوانند (دست‌نویس ممنوع)
-const VERSION := "0.12"
-const BUILD := 14
+const VERSION := "0.13"
+const BUILD := 15
 
 var coins: int = 0
 var plate_name: String = "بوقی"
@@ -24,7 +24,7 @@ var online_wait: float = 15.0
 const CARS := [
         {
                 "id": "boghi", "name": "بوقی", "en": "Boghi",
-                "desc": "پراید قرمز معروف محله — چشم‌های آبی، لبخند همیشگی!",
+                "desc": "پراید قرمز محله — سبک و چابک، همیشه گرسنه‌ی سبقت!",
                 "tex": "res://assets/sprites/boghi_side.png",
                 "jump": 1.0, "accel": 1.0, "tough": 1.0, "price": 0
         },
@@ -36,7 +36,7 @@ const CARS := [
         },
         {
                 "id": "tiba", "name": "تیبا", "en": "Tiba",
-                "desc": "آبی و چابک — سبک برای پرش‌های دقیق",
+                "desc": "آبی و چابک — فرمان‌های تیز تو پیچ‌های تنگ",
                 "tex": "res://assets/sprites/tiba_side.png",
                 "jump": 1.12, "accel": 0.95, "tough": 0.8, "price": 600
         },
@@ -84,7 +84,7 @@ const CARS := [
         },
         {
                 "id": "quick", "name": "کوییک", "en": "Quick",
-                "desc": "نارنجی جیغ جوان — پرش‌های بلند هوایی",
+                "desc": "نارنجی جیغ جوان — عاشق دریفت‌های طولانی!",
                 "tex": "res://assets/sprites/quick_side.png",
                 "jump": 1.25, "accel": 1.05, "tough": 0.75, "price": 3400
         },
@@ -145,9 +145,9 @@ const CARS := [
 ]
 
 const UPGRADES := [
-        {"id": "engine", "name": "موتور", "desc": "سرعت بیشتر", "costs": [120, 260, 520]},
-        {"id": "tire", "name": "لاستیک", "desc": "پرش بلندتر", "costs": [100, 220, 450]},
-        {"id": "nitro", "name": "نیترو", "desc": "شتاب آتشین طولانی‌تر", "costs": [140, 300, 600]},
+        {"id": "engine", "name": "موتور", "desc": "شتاب و سرعت بیشتر", "costs": [120, 260, 520]},
+        {"id": "tire", "name": "لاستیک", "desc": "چسبندگی بیشتر در پیچ و دریفت", "costs": [100, 220, 450]},
+        {"id": "nitro", "name": "نیترو", "desc": "نیتروی قوی‌تر و طولانی‌تر", "costs": [140, 300, 600]},
 ]
 
 const I18N := {
@@ -274,6 +274,7 @@ func load_save() -> void:
 func car_stats() -> Dictionary:
         var c = CARS[selected_car]
         return {
+                # در مسابقه‌ی واقعی: jump = چسبندگی لاستیک (گریپ)، turbo = دوام نیترو
                 "jump": float(c["jump"]) * (1.0 + 0.10 * upgrades["tire"]),
                 "accel": float(c["accel"]) * (1.0 + 0.08 * upgrades["engine"]),
                 "tough": float(c["tough"]),

@@ -4,9 +4,10 @@ extends Node
 var sfx := {}
 var music_player: AudioStreamPlayer
 var engine_player: AudioStreamPlayer
+var skid_player: AudioStreamPlayer
 
 func _ready() -> void:
-        for n in ["horn", "coin", "jump", "boost", "crash", "win", "fail", "clank"]:
+        for n in ["horn", "coin", "jump", "boost", "crash", "win", "fail", "clank", "nitro", "lap", "beep"]:
                 var path := "res://assets/audio/%s.wav" % n
                 if ResourceLoader.exists(path):
                         sfx[n] = load(path)
@@ -37,6 +38,22 @@ func _ready() -> void:
         engine_player.volume_db = -60.0
         engine_player.finished.connect(func(): if engine_player.volume_db > -50.0: engine_player.play())
         add_child(engine_player)
+        # لوپ جیغ لاستیک — دریفت واقعی صدای لاستیک می‌خواهد
+        skid_player = AudioStreamPlayer.new()
+        var spath := "res://assets/audio/skid.wav"
+        if ResourceLoader.exists(spath):
+                skid_player.stream = load(spath)
+                var ss := skid_player.stream as AudioStreamWAV
+                if ss != null:
+                        ss.loop_mode = AudioStreamWAV.LOOP_FORWARD
+                        ss.loop_begin = 0
+                        var sbpf := 2
+                        if ss.stereo:
+                                sbpf = 4
+                        ss.loop_end = ss.data.size() / sbpf
+                skid_player.volume_db = -60.0
+                skid_player.finished.connect(func(): if skid_player.volume_db > -50.0: skid_player.play())
+                add_child(skid_player)
 
 func play_music() -> void:
         if not music_player.playing:
@@ -62,3 +79,14 @@ func set_engine(active: bool, intensity: float = 0.5) -> void:
                 engine_player.pitch_scale = 0.85 + 0.55 * clamp(intensity, 0.0, 1.0)
         else:
                 engine_player.stop()
+
+func set_skid(active: bool, intensity: float = 0.6) -> void:
+        if skid_player == null or skid_player.stream == null:
+                return
+        if active:
+                if not skid_player.playing:
+                        skid_player.play()
+                skid_player.volume_db = lerp(-24.0, -6.0, clamp(intensity, 0.0, 1.0))
+                skid_player.pitch_scale = 0.92 + 0.16 * clamp(intensity, 0.0, 1.0)
+        else:
+                skid_player.stop()
