@@ -17,7 +17,8 @@ echo "editor ok"
 
 echo "== 2/6 Export templates =="
 if [ ! -f "$TP/4.7.2.stable/linux_release.x86_64" ]; then
-  curl -sL -o /tmp/tpz https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
+  # درس: دانلود ۱.۲GB نیمه‌تمام با curl -C - قابل ادامه است — از صفر شروع نکن
+  curl -sL -C - -o /tmp/tpz https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz
   rm -rf /tmp/tpl && mkdir -p /tmp/tpl
   unzip -oq /tmp/tpz -d /tmp/tpl
   rm -rf "$TP/4.7.2.stable" && mv /tmp/tpl/templates "$TP/4.7.2.stable"
