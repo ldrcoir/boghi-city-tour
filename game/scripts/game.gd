@@ -16,25 +16,13 @@ const GRIP := 9.0
 const DRIFT_GRIP := 2.25
 const NITRO_MULT := 1.40
 
-# پیست — حلقه‌ی شهری با گوشه‌های پخ (بسته)
-const WPS := [
-        Vector2(1215, 1215), Vector2(4320, 1215), Vector2(5130, 2025), Vector2(5130, 3645),
-        Vector2(4320, 4455), Vector2(2025, 4455), Vector2(1215, 3645), Vector2(1215, 2025),
-]
-const WORLD_MIN := Vector2(360, 360)
-const WORLD_MAX := Vector2(5980, 5300)
+# پیست — از city_layout.json (بیک gen15_map.py) بارگذاری می‌شود
+const LAYOUT_PATH := "res://data/city_layout.json"
+var WORLD_MIN := Vector2(360, 360)
+var WORLD_MAX := Vector2(5980, 5300)
 
 const FA_D := "۰۱۲۳۴۵۶۷۸۹"
 const RIVAL_POOL := ["pride_blue", "pejo_green", "shahin", "shahin_white", "samand", "dena", "dena_race", "quick", "tiba", "formula_blue", "formula_red", "formula_black"]
-const ROOF_COLS := [
-        Color(0.085, 0.085, 0.125), Color(0.105, 0.095, 0.135), Color(0.075, 0.095, 0.115),
-        Color(0.115, 0.09, 0.095), Color(0.09, 0.10, 0.105),
-]
-const PARK_COLS := [Color(0.16, 0.17, 0.21), Color(0.20, 0.16, 0.15), Color(0.14, 0.18, 0.19), Color(0.19, 0.19, 0.16)]
-const NEON_COLS := [
-        Color(0.25, 0.85, 1.0), Color(1.0, 0.55, 0.25), Color(1.0, 0.35, 0.55),
-        Color(0.55, 1.0, 0.55), Color(1.0, 0.85, 0.3), Color(0.7, 0.5, 1.0),
-]
 
 var lv: Dictionary
 var elapsed := 0.0
@@ -50,15 +38,10 @@ var seg_d: Array = []      # جهت هر سگمنت
 var seg_len: Array = []
 var cum: Array = []        # طول تجمعی
 var track_len := 0.0
-var buildings: Array = []  # {pos, rot, size, neon, wins, kind, roof, acs, neon2}
-var lamps: Array = []      # {pos}
-var trees: Array = []      # {pos, r}
-var crosswalks: Array = [] # s روی مسیر
-var manholes: Array = []   # {pos}
-var patches: Array = []    # {pos, ang, w, h, lite}
-var parked: Array = []     # {pos, rot, col}
-var rumbles: Array = []    # {p0, p1} — لبه‌ی پیچ‌ها
-var solids: Array = []     # {pos, r} — مانع استاتیک (درخت/تیر/پارک‌شده)
+var buildings: Array = []  # {pos, rot, size} — از JSON
+var solids: Array = []     # {pos, r} — درخت/تیر/پارک‌شده از JSON
+var minimap: Control = null
+var map_rect := Rect2(240, 240, 5920, 4920)
 
 # بازیکن
 var car_pos := Vector2.ZERO
@@ -97,8 +80,6 @@ var finish_rank := 1
 
 # نودها
 var world: Node2D
-var track_node: Node2D
-var neon_node: Node2D
 var marks: Node2D
 var car: Node2D
 var car_sprite: Sprite2D
@@ -183,16 +164,33 @@ func _ready() -> void:
                 _autotest_full()
         if shots:
                 _run_shots()
+        if OS.get_cmdline_user_args().has("--playtest"):
+                time_left = 9999.0
+                _run_playtest()
 
 # ─────────────────────────── ریاضی مسیر ───────────────────────────
 func _build_track() -> void:
-        var n := WPS.size()
+        var txt := FileAccess.get_file_as_string(LAYOUT_PATH)
+        var j: Dictionary = JSON.parse_string(txt) if txt != "" else {}
+        if j.is_empty() or j.get("centerline", []).size() < 8:
+                push_error("city_layout.json missing!")
+                get_tree().quit(1)
+                return
+        var meta: Dictionary = j["meta"]
+        var r: Array = meta["rect"]
+        map_rect = Rect2(r[0], r[1], r[2] - r[0], r[3] - r[1])
+        var wm: Array = meta.get("world_min", [360, 360])
+        var wx: Array = meta.get("world_max", [5980, 5300])
+        WORLD_MIN = Vector2(wm[0], wm[1])
+        WORLD_MAX = Vector2(wx[0], wx[1])
+        var pts: Array = j["centerline"]
+        var n := pts.size()
         cum = [0.0]
         for i in n:
-                var a: Vector2 = WPS[i]
-                var b: Vector2 = WPS[(i + 1) % n]
+                var a: Vector2 = Vector2(pts[i][0], pts[i][1])
+                var b: Vector2 = Vector2(pts[(i + 1) % n][0], pts[(i + 1) % n][1])
                 var d := (b - a)
-                var l := d.length()
+                var l := maxf(d.length(), 0.001)
                 seg_a.append(a)
                 seg_d.append(d / l)
                 seg_len.append(l)
@@ -232,330 +230,27 @@ func _build_world() -> void:
         world = Node2D.new()
         add_child(world)
         var cm := CanvasModulate.new()
-        cm.color = Color(0.82, 0.84, 1.0)
+        cm.color = Color(0.93, 0.95, 1.0)
         world.add_child(cm)
-        track_node = TrackNode.new()
-        track_node.game = self
-        world.add_child(track_node)
-        neon_node = NeonNode.new()
-        neon_node.game = self
-        neon_node.z_index = 1
-        world.add_child(neon_node)
+        # زیرلایه‌ی تاریک کل دنیا — بیرونِ نقشه هم شب است، نه خاکستری
+        var under := ColorRect.new()
+        under.color = Color(0.027, 0.031, 0.055)
+        under.position = map_rect.position - Vector2(4000, 4000)
+        under.size = map_rect.size + Vector2(8000, 8000)
+        world.add_child(under)
+        # نقشه‌ی شهر — ۴ تایل بیک‌شده (gen15_map) — کیفیت ۱:۱
+        var tw := map_rect.size.x * 0.5
+        var th := map_rect.size.y * 0.5
+        for i in 4:
+                var spr := Sprite2D.new()
+                spr.texture = load("res://assets/sprites/map_%d.png" % i)
+                spr.centered = false
+                spr.position = map_rect.position + Vector2(float(i % 2) * tw, float(i / 2) * th)
+                world.add_child(spr)
         marks = SkidMarks.new()
         marks.z_index = 2
         world.add_child(marks)
-        _gen_city()
-        track_node.queue_redraw()
-        neon_node.queue_redraw()
-
-func _gen_city() -> void:
-        var rng := RandomNumberGenerator.new()
-        rng.seed = 20261013
-        var step := 330.0
-        for i in seg_a.size():
-                var d: Vector2 = seg_d[i]
-                var nrm := Vector2(-d.y, d.x)
-                var s := 240.0
-                var side := 1.0 if i % 2 == 0 else -1.0
-                while s < seg_len[i] - 200.0:
-                        var s_abs: float = cum[i] + s
-                        if s_abs > 500.0 and s_abs < track_len - 500.0:
-                                # ساختمان هم‌راستای شبکه‌ی شهر (کجی ناچیز) + فاصله‌ی تضمینی از جاده
-                                var sz := Vector2(190.0 + rng.randf() * 160.0, 150.0 + rng.randf() * 140.0)
-                                var hd := sz.length() * 0.5 + 18.0
-                                var off: float = float(ROAD_W) * 0.5 + 40.0 + hd + rng.randf() * 120.0
-                                var pos: Vector2 = seg_a[i] + d * s + nrm * off * side
-                                var rot: float = rng.randf_range(-0.03, 0.03)
-                                var neon: Color = NEON_COLS[rng.randi_range(0, NEON_COLS.size() - 1)]
-                                # پنجره‌های ریز کم‌نور — پشت‌بام واقعی، نه بیلبورد
-                                var wins: Array = []
-                                var wcols := int(sz.x / 34.0)
-                                var wrows := int(sz.y / 32.0)
-                                for wy in wrows:
-                                        for wx in wcols:
-                                                if rng.randf() < 0.40:
-                                                        var lp := Vector2(-sz.x * 0.5 + 18.0 + wx * 34.0, -sz.y * 0.5 + 16.0 + wy * 32.0)
-                                                        wins.append(lp)
-                                # جزئیات پشت‌بام — کولر و آب‌ریز
-                                var acs: Array = []
-                                for k in rng.randi_range(1, 3):
-                                        acs.append(Vector2(rng.randf_range(-sz.x * 0.3, sz.x * 0.3), rng.randf_range(-sz.y * 0.3, sz.y * 0.3)))
-                                buildings.append({
-                                        "pos": pos, "rot": rot, "size": sz, "neon": neon, "wins": wins,
-                                        "kind": rng.randi_range(0, 2),
-                                        "roof": ROOF_COLS[rng.randi_range(0, ROOF_COLS.size() - 1)],
-                                        "acs": acs, "neon2": NEON_COLS[rng.randi_range(0, NEON_COLS.size() - 1)],
-                                })
-                        s += step
-                        side *= -1.0 if rng.randf() < 0.25 else 1.0
-        # لبه‌های پیچ — آجر قرمز/سفید رالی
-        for i in seg_a.size():
-                var d1: Vector2 = seg_d[i]
-                var d2: Vector2 = seg_d[(i + 1) % seg_a.size()]
-                if absf(d1.angle_to(d2)) > 0.45:
-                        for sg in [i, (i + 1) % seg_a.size()]:
-                                var dd: Vector2 = seg_d[sg]
-                                var nn := Vector2(-dd.y, dd.x)
-                                var outer := 1.0 if nn.dot(-d1) < 0.0 else -1.0
-                                # گوشه‌ی اتصال دو سگمنت: انتهای سگمنت قبلی + ابتدای بعدی
-                                if sg == i:
-                                        var p_end: Vector2 = seg_a[i] + seg_d[i] * seg_len[i]
-                                        rumbles.append({"p0": p_end - seg_d[i] * 200.0 + nn * (ROAD_W * 0.5 + 6.0) * outer, "p1": p_end + nn * (ROAD_W * 0.5 + 6.0) * outer})
-                                else:
-                                        var p_st: Vector2 = seg_a[sg]
-                                        rumbles.append({"p0": p_st + nn * (ROAD_W * 0.5 + 6.0) * outer, "p1": p_st + seg_d[sg] * 200.0 + nn * (ROAD_W * 0.5 + 6.0) * outer})
-        # تیر چراغ خیابان — لبه‌ی آسفالت
-        var ls := 0.0
-        while ls < track_len:
-                var dd: Vector2 = _path_dir(ls)
-                var nn := Vector2(-dd.y, dd.x)
-                var sgn := 1.0 if int(ls / 640.0) % 2 == 0 else -1.0
-                lamps.append({"pos": _path_pos(ls) + nn * (ROAD_W * 0.5 + 12.0) * sgn})
-                ls += 640.0
-        # درخت‌ها — روی لبه‌ی بیرونی پیاده‌رو
-        ls = 260.0
-        var tside := 1.0
-        while ls < track_len - 300.0:
-                var dd: Vector2 = _path_dir(ls)
-                var nn := Vector2(-dd.y, dd.x)
-                trees.append({"pos": _path_pos(ls) + nn * (ROAD_W * 0.5 + 52.0) * tside, "r": 24.0 + rng.randf() * 12.0})
-                tside *= -1.0
-                ls += 470.0
-        # گذرگاه عابر — هر ۱۵۰۰ متر یک‌بار
-        ls = 900.0
-        while ls < track_len - 700.0:
-                crosswalks.append(ls)
-                ls += 1500.0
-        # منهول و وصله‌ی آسفالت — بافت خیابان واقعی
-        ls = 430.0
-        while ls < track_len - 400.0:
-                var dd: Vector2 = _path_dir(ls)
-                var nn := Vector2(-dd.y, dd.x)
-                manholes.append({"pos": _path_pos(ls) + nn * rng.randf_range(-80.0, 80.0)})
-                ls += 760.0
-        ls = 280.0
-        while ls < track_len - 300.0:
-                var dd: Vector2 = _path_dir(ls)
-                var nn := Vector2(-dd.y, dd.x)
-                patches.append({
-                        "pos": _path_pos(ls) + nn * rng.randf_range(-85.0, 85.0),
-                        "ang": dd.angle() + rng.randf_range(-0.5, 0.5),
-                        "w": 100.0 + rng.randf() * 100.0, "h": 42.0 + rng.randf() * 44.0,
-                        "lite": rng.randf() < 0.4,
-                })
-                ls += 430.0
-        # ماشین‌های پارک‌شده روی لبه‌ی پیاده‌رو (دور از گذرگاه و شروع)
-        ls = 760.0
-        var pside := 1.0
-        while ls < track_len - 900.0:
-                var ok := true
-                for cw in crosswalks:
-                        if absf(ls - float(cw)) < 260.0:
-                                ok = false
-                                break
-                if ok:
-                        var dd: Vector2 = _path_dir(ls)
-                        var nn := Vector2(-dd.y, dd.x)
-                        parked.append({
-                                "pos": _path_pos(ls + 120.0) + nn * (ROAD_W * 0.5 + 26.0) * pside,
-                                "rot": dd.angle(), "col": PARK_COLS[rng.randi_range(0, PARK_COLS.size() - 1)],
-                        })
-                pside *= -1.0
-                ls += 1130.0
-        # ⛔ فیکس «ماشین وسط جاده گیر می‌کند»: در گوشه‌ها، آفست عمودِ یک بازو
-        # می‌افتد روی بازوی دیگر مسیر — مانع نزدیک به هر بازوی جاده حذف می‌شود
-        # (فیلتر قبل از ساخت solids — وگرنه موانع قدیمی می‌مانند!)
-        lamps = lamps.filter(func(L): return float(_nearest(L["pos"])["dist"]) > ROAD_W * 0.5 + 20.0)
-        trees = trees.filter(func(T): return float(_nearest(T["pos"])["dist"]) > 66.0)
-        parked = parked.filter(func(pk): return float(_nearest(pk["pos"])["dist"]) > 128.0)
-        var keep: Array = []
-        for b in buildings:
-                var hd2: float = Vector2(b["size"]).length() * 0.5
-                if float(_nearest(b["pos"])["dist"]) > hd2 + float(ROAD_W) * 0.5 + 26.0:
-                        keep.append(b)
-        buildings = keep
-        # موانع استاتیک — درخت، تیر چراغ، ماشین پارک‌شده (برخورد واقعی)
-        for T in trees:
-                solids.append({"pos": T["pos"], "r": 20.0})
-        for L in lamps:
-                solids.append({"pos": L["pos"], "r": 8.0})
-        for pk in parked:
-                solids.append({"pos": pk["pos"], "r": 52.0})
-
-## نود رسم پیست و شهر — استاتیک، یک‌بار رسم
-class TrackNode extends Node2D:
-        var game: Node2D
-
-        func _draw() -> void:
-                var g := game
-                # ۱) زمین شب + بلوک‌های شهری (بافت پشت ساختمان‌ها)
-                draw_rect(Rect2(Vector2(120, 120), Vector2(6400, 5700)), Color(0.040, 0.045, 0.075))
-                var blk := RandomNumberGenerator.new()
-                blk.seed = 777
-                var bx := 160.0
-                while bx < 6300.0:
-                        var by := 160.0
-                        while by < 5600.0:
-                                draw_rect(Rect2(Vector2(bx, by), Vector2(300, 258)), Color(0.060, 0.064, 0.100))
-                                by += 292.0
-                        bx += 336.0
-                # ۲) پیاده‌رو — باند یکپارچه‌ی صاف دور جاده (نه دایره‌های دندانه‌دار)
-                for i in g.seg_a.size():
-                        draw_line(g.seg_a[i], g.seg_a[i] + g.seg_d[i] * g.seg_len[i], Color(0.215, 0.225, 0.275), g.ROAD_W + 132.0, true)
-                # ۳) آسفالت — هر سگمنت یک خط ضخیم (سرهای گرد گوشه‌ها را می‌بندد)
-                for i in g.seg_a.size():
-                        draw_line(g.seg_a[i], g.seg_a[i] + g.seg_d[i] * g.seg_len[i], Color(0.145, 0.145, 0.175), g.ROAD_W, true)
-                # سایش لاستیک — دو نوار تیره‌ی لاین
-                for i in g.seg_a.size():
-                        var d: Vector2 = g.seg_d[i]
-                        var nn := Vector2(-d.y, d.x) * 62.0
-                        draw_line(g.seg_a[i] + nn, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] + nn, Color(0.0, 0.0, 0.0, 0.10), 36.0, true)
-                        draw_line(g.seg_a[i] - nn, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] - nn, Color(0.0, 0.0, 0.0, 0.10), 36.0, true)
-                # ۴) وصله‌ی آسفالت + منهول — روح خیابون
-                for pa in g.patches:
-                        draw_set_transform_matrix(Transform2D(pa["ang"], pa["pos"]))
-                        var c := Color(0.175, 0.175, 0.205, 0.85) if bool(pa["lite"]) else Color(0.105, 0.105, 0.13, 0.85)
-                        draw_rect(Rect2(-pa["w"] * 0.5, -pa["h"] * 0.5, pa["w"], pa["h"]), c)
-                        draw_set_transform_matrix(Transform2D())
-                for mh in g.manholes:
-                        draw_circle(mh["pos"], 12.0, Color(0.095, 0.095, 0.115))
-                        draw_arc(mh["pos"], 12.0, 0, TAU, 16, Color(0.16, 0.16, 0.19), 2.5, true)
-                # ۵) خطوط جاده
-                for i in g.seg_a.size():
-                        var d: Vector2 = g.seg_d[i]
-                        var nn := Vector2(-d.y, d.x)
-                        # لبه‌های سفید
-                        var eo := nn * (float(g.ROAD_W) * 0.5 - 14.0)
-                        draw_line(g.seg_a[i] + eo, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] + eo, Color(0.88, 0.89, 0.94, 0.50), 5.0, true)
-                        draw_line(g.seg_a[i] - eo, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] - eo, Color(0.88, 0.89, 0.94, 0.50), 5.0, true)
-                        # دوخط زرد وسط (خیابان دوطرفه)
-                        var co := nn * 5.0
-                        draw_line(g.seg_a[i] + co, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] + co, Color(0.95, 0.78, 0.25, 0.55), 4.0, true)
-                        draw_line(g.seg_a[i] - co, g.seg_a[i] + g.seg_d[i] * g.seg_len[i] - co, Color(0.95, 0.78, 0.25, 0.55), 4.0, true)
-                # خط‌چین لاین‌های داخلی
-                var ss := 0.0
-                while ss < g.track_len:
-                        var a: Vector2 = g._path_pos(ss)
-                        var dd: Vector2 = g._path_dir(ss)
-                        var nn := Vector2(-dd.y, dd.x)
-                        draw_line(a + nn * 62.0, a + nn * 62.0 + dd * 56.0, Color(0.92, 0.92, 0.95, 0.28), 4.0, true)
-                        draw_line(a - nn * 62.0, a - nn * 62.0 + dd * 56.0, Color(0.92, 0.92, 0.95, 0.28), 4.0, true)
-                        ss += 128.0
-                # ۶) گذرگاه عابر
-                for cw in g.crosswalks:
-                        var base: Vector2 = g._path_pos(float(cw))
-                        var dd: Vector2 = g._path_dir(float(cw))
-                        var nn := Vector2(-dd.y, dd.x)
-                        var off := -float(g.ROAD_W) * 0.5 + 26.0
-                        while off < float(g.ROAD_W) * 0.5 - 26.0:
-                                draw_line(base + nn * off, base + dd * 30.0 + nn * off, Color(0.92, 0.93, 0.96, 0.30), 17.0, true)
-                                off += 44.0
-                # ۷) آجر قرمز/سفید لبه‌ی پیچ‌ها
-                for rb in g.rumbles:
-                        var p0: Vector2 = rb["p0"]
-                        var p1: Vector2 = rb["p1"]
-                        var ln := p0.distance_to(p1)
-                        var dir := (p1 - p0) / maxf(ln, 1.0)
-                        var t := 0.0
-                        var k := 0
-                        while t < ln:
-                                var seg := minf(30.0, ln - t)
-                                draw_line(p0 + dir * t, p0 + dir * (t + seg), Color(0.85, 0.22, 0.16, 0.9) if k % 2 == 0 else Color(0.92, 0.92, 0.94, 0.9), 9.0, true)
-                                t += seg
-                                k += 1
-                # ۸) خط شروع/پایان — شطرنجی + گرید
-                var st: Vector2 = g._path_pos(0.0)
-                var sd: Vector2 = g._path_dir(0.0)
-                var sn := Vector2(-sd.y, sd.x)
-                for row in 2:
-                        for c in 8:
-                                var cell := 30.0
-                                var p: Vector2 = st + sn * (-float(g.ROAD_W) * 0.5 + c * 32.5 + 4.0) + sd * (row * cell)
-                                var col := Color(0.92, 0.92, 0.92, 0.85) if (row + c) % 2 == 0 else Color(0.08, 0.08, 0.1, 0.85)
-                                var poly := PackedVector2Array([
-                                        p, p + sn * 30.0, p + sn * 30.0 + sd * cell, p + sd * cell,
-                                ])
-                                draw_colored_polygon(poly, col)
-                for gi in 2:
-                        var goff: Vector2 = sn * (-70.0 if gi == 0 else 70.0)
-                        var gp0: Vector2 = st + goff - sd * 130.0
-                        var gpts := PackedVector2Array([gp0, gp0 + sd * 110.0, gp0 + sd * 110.0 + sn * 52.0, gp0 + sn * 52.0, gp0])
-                        draw_polyline(gpts, Color(0.92, 0.92, 0.95, 0.30), 3.0, true)
-                # ۹) درخت‌ها
-                for T in g.trees:
-                        var r: float = T["r"]
-                        draw_circle(T["pos"], r, Color(0.075, 0.135, 0.085))
-                        draw_circle(T["pos"] + Vector2(-r * 0.22, -r * 0.24), r * 0.62, Color(0.105, 0.185, 0.115))
-                        draw_circle(T["pos"] + Vector2(r * 0.18, r * 0.2), r * 0.30, Color(0.06, 0.105, 0.07))
-                # ۱۰) ماشین‌های پارک‌شده
-                for pk in g.parked:
-                        draw_set_transform_matrix(Transform2D(pk["rot"], pk["pos"]))
-                        draw_rect(Rect2(-44, -20, 88, 40), pk["col"])
-                        draw_rect(Rect2(-14, -16, 40, 32), Color(0.10, 0.115, 0.15))
-                        draw_rect(Rect2(-44, -20, 88, 40), Color(0.0, 0.0, 0.0, 0.45), false, 2.0)
-                        draw_set_transform_matrix(Transform2D())
-                # ۱۱) ساختمان‌های شبانه — پشت‌بام، کولر، پنجره‌ی دوتایی
-                for b in g.buildings:
-                        var sz: Vector2 = b["size"]
-                        draw_set_transform_matrix(Transform2D(b["rot"], b["pos"]))
-                        draw_rect(Rect2(-sz * 0.5 - Vector2(7, 7), sz + Vector2(14, 14)), Color(0.015, 0.015, 0.04, 0.6))
-                        draw_rect(Rect2(-sz * 0.5, sz), b["roof"])
-                        draw_rect(Rect2(-sz * 0.5, sz), Color(0.30, 0.33, 0.44, 0.32), false, 2.0)
-                        for ap in b["acs"]:
-                                draw_rect(Rect2(ap - Vector2(13, 11), Vector2(26, 22)), Color(0.06, 0.062, 0.09))
-                                draw_arc(ap, 7.0, 0, TAU, 10, Color(0.13, 0.135, 0.17), 2.0, true)
-                        var nc: Color = b["neon"]
-                        var nc2: Color = b["neon2"]
-                        for wi in b["wins"].size():
-                                var lp: Vector2 = b["wins"][wi]
-                                var wc: Color = Color(1.0, 0.90, 0.68) if wi % 4 != 0 else (nc if wi % 8 == 0 else nc2)
-                                wc.a = 0.24
-                                draw_rect(Rect2(lp - Vector2(6, 4.5), Vector2(12, 9)), wc)
-                        # تابلوی نئون پشت‌بام برای برخی
-                        if int(b["kind"]) == 1:
-                                draw_rect(Rect2(-sz.x * 0.5 + 12, -sz.y * 0.5 + 10, minf(88.0, sz.x - 24.0), 13), Color(nc.r, nc.g, nc.b, 0.75))
-                        draw_set_transform_matrix(Transform2D())
-
-## هاله‌های نئون — همه‌چیز درخشان در یک نود ADD
-class NeonNode extends Node2D:
-        var game: Node2D
-
-        func _draw() -> void:
-                var g := game
-                # استخر نور چراغ‌های خیابان روی آسفالت
-                for L in g.lamps:
-                        var lp: Vector2 = L["pos"]
-                        draw_circle(lp, 95.0, Color(1.0, 0.80, 0.45, 0.045))
-                        draw_circle(lp, 50.0, Color(1.0, 0.85, 0.55, 0.075))
-                        draw_circle(lp, 5.0, Color(1.0, 0.93, 0.7, 0.85))
-                # هاله‌ی پنجره‌ها + نئون پشت‌بام + تابلو
-                for b in g.buildings:
-                        var sz: Vector2 = b["size"]
-                        draw_set_transform_matrix(Transform2D(b["rot"], b["pos"]))
-                        var nc: Color = b["neon"]
-                        for wi in b["wins"].size():
-                                var lp: Vector2 = b["wins"][wi]
-                                var wc: Color = Color(1.0, 0.90, 0.68) if wi % 4 != 0 else (nc if wi % 8 == 0 else b["neon2"])
-                                wc.a = 0.035
-                                draw_rect(Rect2(lp - Vector2(11, 8), Vector2(22, 16)), wc)
-                        if int(b["kind"]) == 0:
-                                # نوار نئون باریک دور پشت‌بام
-                                var r := Rect2(-sz * 0.5 + Vector2(4, 4), sz - Vector2(8, 8))
-                                var c := Rect2(r.position, Vector2(r.size.x, 2.0))
-                                var c2 := Rect2(Vector2(r.position.x, r.end.y - 2.0), Vector2(r.size.x, 2.0))
-                                var c3 := Rect2(r.position, Vector2(2.0, r.size.y))
-                                var c4 := Rect2(Vector2(r.end.x - 2.0, r.position.y), Vector2(2.0, r.size.y))
-                                for rc in [c, c2, c3, c4]:
-                                        draw_rect(rc, Color(nc.r, nc.g, nc.b, 0.34))
-                        if int(b["kind"]) == 1:
-                                var bw := minf(88.0, sz.x - 24.0)
-                                draw_rect(Rect2(-sz.x * 0.5 + 6, -sz.y * 0.5 + 4, bw + 12, 25), Color(nc.r, nc.g, nc.b, 0.20))
-                        draw_set_transform_matrix(Transform2D())
-                # مهتابی خط شروع
-                var st: Vector2 = g._path_pos(0.0)
-                var sd: Vector2 = g._path_dir(0.0)
-                var sn := Vector2(-sd.y, sd.x)
-                draw_line(st + sn * (float(g.ROAD_W) * 0.5 + 20.0), st - sn * (float(g.ROAD_W) * 0.5 + 20.0), Color(0.55, 0.85, 1.0, 0.10), 70.0, true)
+        _load_city()
 
 ## رد لاستیک — دریفت واقعی روی آسفالت می‌ماند
 class SkidMarks extends Node2D:
@@ -574,6 +269,18 @@ class SkidMarks extends Node2D:
                         draw_rect(Rect2(-11, -3, 22, 6), Color(0.03, 0.03, 0.05, 0.5))
                 draw_set_transform_matrix(Transform2D())
 
+func _load_city() -> void:
+        var txt := FileAccess.get_file_as_string(LAYOUT_PATH)
+        var j: Dictionary = JSON.parse_string(txt) if txt != "" else {}
+        for b in j.get("buildings", []):
+                buildings.append({
+                        "pos": Vector2(b[0], b[1]),
+                        "rot": deg_to_rad(float(b[2])),
+                        "size": Vector2(b[3], b[4]),
+                })
+        for s in j.get("solids", []):
+                solids.append({"pos": Vector2(s[0], s[1]), "r": float(s[2])})
+
 # ─────────────────────────── ساخت ماشین ───────────────────────────
 func _car_tex_path(id: String) -> String:
         var top := "res://assets/sprites/" + id + "_top.png"
@@ -584,34 +291,27 @@ func _car_tex_path(id: String) -> String:
 
 func _make_car_node(id: String, with_fx: bool, light_alpha: float) -> Dictionary:
         var n := Node2D.new()
-        var light := Polygon2D.new()
-        light.polygon = PackedVector2Array([
-                Vector2(30, -19), Vector2(30, 19), Vector2(400, 86), Vector2(400, -86),
-        ])
-        light.color = Color(1.0, 0.90, 0.60, light_alpha)
         var lmat := CanvasItemMaterial.new()
         lmat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-        light.material = lmat
-        light.z_index = -1
-        n.add_child(light)
-        # هسته‌ی روشن نزدیک ماشین — حس نور واقعی نه مه
-        var light2 := Polygon2D.new()
-        light2.polygon = PackedVector2Array([
-                Vector2(30, -13), Vector2(30, 13), Vector2(170, 34), Vector2(170, -34),
-        ])
-        light2.color = Color(1.0, 0.93, 0.68, light_alpha * 2.2)
-        light2.material = lmat
-        light2.z_index = -1
-        n.add_child(light2)
+        # مخروط نور جلو — بافت نرم (نه ذوزنقه‌ی تخت)
+        var cone := Sprite2D.new()
+        cone.texture = load("res://assets/sprites/headlight_cone.png")
+        cone.centered = false
+        cone.position = Vector2(52, -192)
+        cone.scale = Vector2(1.15, 1.15)
+        cone.material = lmat
+        cone.modulate = Color(1.0, 0.96, 0.85, clampf(light_alpha * 6.5, 0.0, 0.85))
+        cone.z_index = -1
+        n.add_child(cone)
         var sh := Sprite2D.new()
         sh.texture = _make_shadow_tex()
-        sh.scale = Vector2(1.45, 0.85)
+        sh.scale = Vector2(1.22, 1.0)
         sh.modulate = Color(1, 1, 1, 0.55)
         sh.z_index = -1
         n.add_child(sh)
         var spr := Sprite2D.new()
         spr.texture = load(_car_tex_path(id))
-        spr.scale = Vector2(1.5, 0.85) # نسبت واقعی خودرو — نه مربع اسباب‌بازی
+        spr.scale = Vector2.ONE # اسپرایت نو نسبت ۲٫۳:۱ دارد
         n.add_child(spr)
         # آندرگلوی نئون — امضای شبانه‌ی NFS زیر هر ماشین
         var ug := Polygon2D.new()
@@ -639,10 +339,13 @@ func _make_car_node(id: String, with_fx: bool, light_alpha: float) -> Dictionary
                 fl.initial_velocity_max = 420.0
                 fl.scale_amount_min = 3.0
                 fl.scale_amount_max = 6.5
+                fl.texture = load("res://assets/sprites/flame.png")
                 var fg := Gradient.new()
-                fg.offsets = PackedFloat32Array([0.0, 0.35, 1.0])
-                fg.colors = PackedColorArray([Color(1.0, 0.95, 0.55), Color(1.0, 0.45, 0.1), Color(0.6, 0.1, 0.05, 0.0)])
+                fg.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
+                fg.colors = PackedColorArray([Color(1, 1, 1, 1), Color(0.75, 0.85, 1.0, 0.8), Color(0.4, 0.5, 1.0, 0.0)])
                 fl.color_ramp = fg
+                fl.scale_amount_min = 0.55
+                fl.scale_amount_max = 0.95
                 n.add_child(fl)
                 var sm2 := CPUParticles2D.new()
                 sm2.position = Vector2(-84, 24)
@@ -655,10 +358,13 @@ func _make_car_node(id: String, with_fx: bool, light_alpha: float) -> Dictionary
                 sm2.initial_velocity_max = 90.0
                 sm2.scale_amount_min = 4.0
                 sm2.scale_amount_max = 9.0
+                sm2.texture = load("res://assets/sprites/smoke.png")
                 var sg := Gradient.new()
                 sg.offsets = PackedFloat32Array([0.0, 1.0])
-                sg.colors = PackedColorArray([Color(0.75, 0.75, 0.78, 0.5), Color(0.6, 0.6, 0.65, 0.0)])
+                sg.colors = PackedColorArray([Color(1, 1, 1, 0.55), Color(0.85, 0.85, 0.9, 0.0)])
                 sm2.color_ramp = sg
+                sm2.scale_amount_min = 0.6
+                sm2.scale_amount_max = 1.15
                 sm = sm2
                 n.add_child(sm2)
         return {"node": n, "spr": spr, "flame": fl, "smoke": sm}
@@ -693,7 +399,7 @@ func _spawn_rivals() -> void:
                 var fx := _make_car_node(id, false, 0.055)
                 world.add_child(fx["node"])
                 fx["node"].z_index = 4
-                fx["spr"].scale = Vector2(1.41, 0.80)
+                fx["spr"].scale = Vector2.ONE
                 rivals.append({
                         "node": fx["node"], "spr": fx["spr"],
                         "s": float(starts[i]), "spd": 0.0,
@@ -705,10 +411,10 @@ func _spawn_rivals() -> void:
 func _spawn_traffic(s_abs: float) -> void:
         var ids := ["traf_white", "traf_gray", "traf_taxi", "traf_van"]
         var id: String = ids[randi_range(0, ids.size() - 1)]
-        var fx := _make_car_node(id, false, 0.0)
+        var fx := _make_car_node(id, false, 0.035)
         world.add_child(fx["node"])
         fx["node"].z_index = 3
-        fx["spr"].scale = Vector2(1.36, 0.78)
+        fx["spr"].scale = Vector2.ONE
         var dir := 1.0
         if randf() < 0.22:
                 dir = -1.0
@@ -729,7 +435,7 @@ func _spawn_coins(s_abs: float) -> void:
                 n.z_index = 2
                 var spr := Sprite2D.new()
                 spr.texture = tex
-                spr.scale = Vector2(0.42, 0.42)
+                spr.scale = Vector2(0.55, 0.55)
                 n.add_child(spr)
                 var pos: Vector2 = _path_pos(s_abs + i * 115.0) + nn * lane
                 n.position = pos
@@ -817,17 +523,24 @@ func _build_hud() -> void:
         _place(pause_btn, 0.0, 0.0, 0.0, 0.0, 24, 46, 116, 122)
         pause_btn.pressed.connect(_toggle_pause)
 
+        # مینی‌مپ — گوشه‌ی پایین-راست (سبک NFS)
+        minimap = MiniMap.new()
+        minimap.game = self
+        minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        _place(minimap, 1.0, 0.0, 1.0, 0.0, -252, 158, -28, 350)
+        hud.add_child(minimap)
+
         # نیترو — دکمه بزرگ آبی، بالا-وسطِ زون راست (انگشت راست راحت می‌رسد)
         var btn_nitro := Button.new()
         btn_nitro.text = Globals.L("nitro")
         btn_nitro.add_theme_font_override("font", font)
         btn_nitro.add_theme_font_size_override("font_size", 44)
-        var nfs := _sb(Color(0.13, 0.35, 0.75), Color(0.35, 0.6, 1.0), 18, 3)
+        var nfs := _sb(Color(0.09, 0.20, 0.38, 0.78), Color(0.45, 0.72, 1.0, 0.75), 22, 2)
         btn_nitro.add_theme_stylebox_override("normal", nfs)
-        btn_nitro.add_theme_stylebox_override("hover", _sb(Color(0.18, 0.42, 0.85), Color(0.45, 0.7, 1.0), 18, 3))
-        btn_nitro.add_theme_stylebox_override("pressed", _sb(Color(0.1, 0.25, 0.55), Color(0.35, 0.6, 1.0), 18, 3))
+        btn_nitro.add_theme_stylebox_override("hover", _sb(Color(0.13, 0.27, 0.48, 0.85), Color(0.6, 0.82, 1.0, 0.9), 22, 2))
+        btn_nitro.add_theme_stylebox_override("pressed", _sb(Color(0.06, 0.14, 0.28, 0.9), Color(0.45, 0.72, 1.0, 0.9), 22, 2))
         btn_nitro.add_theme_stylebox_override("disabled", nfs)
-        btn_nitro.add_theme_color_override("font_color", Color(0.85, 0.93, 1.0))
+        btn_nitro.add_theme_color_override("font_color", Color(0.88, 0.95, 1.0))
         btn_nitro.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
         btn_nitro.button_down.connect(func(): nitro_held = true)
         btn_nitro.button_up.connect(func(): nitro_held = false)
@@ -839,11 +552,11 @@ func _build_hud() -> void:
         btn_brake.text = "ترمز"
         btn_brake.add_theme_font_override("font", font)
         btn_brake.add_theme_font_size_override("font_size", 38)
-        btn_brake.add_theme_stylebox_override("normal", _sb(Color(0.45, 0.13, 0.13), Color(0.75, 0.3, 0.25), 18, 3))
-        btn_brake.add_theme_stylebox_override("hover", _sb(Color(0.55, 0.18, 0.16), Color(0.8, 0.35, 0.3), 18, 3))
-        btn_brake.add_theme_stylebox_override("pressed", _sb(Color(0.32, 0.08, 0.08), Color(0.75, 0.3, 0.25), 18, 3))
-        btn_brake.add_theme_stylebox_override("disabled", _sb(Color(0.45, 0.13, 0.13), Color(0.75, 0.3, 0.25), 18, 3))
-        btn_brake.add_theme_color_override("font_color", Color(1.0, 0.9, 0.85))
+        btn_brake.add_theme_stylebox_override("normal", _sb(Color(0.34, 0.10, 0.10, 0.78), Color(0.9, 0.42, 0.35, 0.65), 22, 2))
+        btn_brake.add_theme_stylebox_override("hover", _sb(Color(0.42, 0.14, 0.13, 0.85), Color(1.0, 0.5, 0.42, 0.8), 22, 2))
+        btn_brake.add_theme_stylebox_override("pressed", _sb(Color(0.24, 0.07, 0.07, 0.9), Color(0.9, 0.42, 0.35, 0.9), 22, 2))
+        btn_brake.add_theme_stylebox_override("disabled", _sb(Color(0.34, 0.10, 0.10, 0.78), Color(0.9, 0.42, 0.35, 0.65), 22, 2))
+        btn_brake.add_theme_color_override("font_color", Color(1.0, 0.92, 0.88))
         btn_brake.button_down.connect(func(): brake_held = true)
         btn_brake.button_up.connect(func(): brake_held = false)
         hud.add_child(btn_brake)
@@ -889,8 +602,8 @@ func _build_hud() -> void:
         intro_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         intro_label.anchor_left = 0.0
         intro_label.anchor_right = 1.0
-        intro_label.anchor_top = 0.26
-        intro_label.anchor_bottom = 0.26
+        intro_label.anchor_top = 0.335
+        intro_label.anchor_bottom = 0.335
         intro_label.offset_top = -90.0
         intro_label.offset_bottom = 100.0
         intro_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -988,14 +701,22 @@ class SpeedGauge extends Control:
                 var r := minf(size.x * 0.46, size.y * 0.8)
                 var a0 := PI * 0.78
                 var a1 := PI * 2.22
-                draw_arc(c, r, a0, a1, 40, Color(0.1, 0.1, 0.16, 0.75), 10.0, true)
-                var ac := Color(0.25, 0.75, 1.0).lerp(Color(1.0, 0.35, 0.15), frac)
+                # ناحیه‌ی سرخ سرعت
+                draw_arc(c, r, a0 + (a1 - a0) * 0.78, a1, 40, Color(0.75, 0.16, 0.12, 0.55), 11.0, true)
+                draw_arc(c, r, a0, a1, 40, Color(0.08, 0.09, 0.14, 0.8), 11.0, true)
+                # تیک‌ها
+                for k in 11:
+                        var ta := a0 + (a1 - a0) * k / 10.0
+                        var p1 := c + Vector2(cos(ta), sin(ta)) * (r - 12.0)
+                        var p2 := c + Vector2(cos(ta), sin(ta)) * (r - 22.0)
+                        draw_line(p1, p2, Color(0.75, 0.78, 0.86, 0.5), 2.0, true)
+                var ac := Color(0.55, 0.85, 1.0).lerp(Color(1.0, 0.32, 0.12), frac)
                 if frac > 0.02:
-                        draw_arc(c, r, a0, a0 + (a1 - a0) * frac, 40, ac, 10.0, true)
+                        draw_arc(c, r, a0, a0 + (a1 - a0) * frac, 40, ac, 7.0, true)
                 var na := a0 + (a1 - a0) * frac
-                var tip := c + Vector2(cos(na), sin(na)) * (r - 18.0)
-                draw_line(c, tip, Color(0.95, 0.95, 1.0, 0.9), 4.0, true)
-                draw_circle(c, 8.0, Color(0.85, 0.85, 0.95, 0.95))
+                var tip := c + Vector2(cos(na), sin(na)) * (r - 20.0)
+                draw_line(c, tip, Color(0.97, 0.97, 1.0, 0.95), 4.0, true)
+                draw_circle(c, 7.0, Color(0.88, 0.88, 0.96, 0.95))
 
 ## خطوط سرعت نیترو
 class SpeedLines extends Control:
@@ -1008,14 +729,16 @@ class SpeedLines extends Control:
 
         func _draw() -> void:
                 var rng := RandomNumberGenerator.new()
-                rng.seed = int(t * 24.0)
-                for i in 12:
-                        var y := rng.randf_range(60.0, 660.0)
-                        var edge := rng.randf() < 0.5
-                        var x := rng.randf_range(-40.0, 240.0) if edge else rng.randf_range(1040.0, 1320.0)
-                        var ln := rng.randf_range(60.0, 170.0)
-                        var hdir := 1.0 if x < 500.0 else -1.0
-                        draw_line(Vector2(x, y), Vector2(x + ln * hdir, y), Color(0.75, 0.88, 1.0, 0.09), 2.0)
+                rng.seed = int(t * 30.0)
+                var c := size * 0.5
+                for i in 22:
+                        var ang := rng.randf_range(0.0, TAU)
+                        var r0 := rng.randf_range(430.0, 760.0)
+                        var ln := rng.randf_range(90.0, 260.0)
+                        var dirv := Vector2(cos(ang), sin(ang))
+                        var p0 := c + dirv * r0
+                        var p1 := c + dirv * (r0 + ln)
+                        draw_line(p0, p1, Color(0.8, 0.9, 1.0, rng.randf_range(0.05, 0.14)), 2.5)
 
 # ─────────────────────────── ورودی ───────────────────────────
 ## فرمان لمسی ضدباگ: هر انگشت با شناسه‌اش ثبت می‌شود؛ رهاکردن در هر نقطه‌ای
@@ -1074,6 +797,45 @@ func _derive_steer() -> void:
         if hint_r != null:
                 hint_r.amt = lerpf(float(hint_r.amt), 1.0 if steer_right else 0.0, 0.25)
                 hint_r.queue_redraw()
+
+## مینی‌مپ — مسیر + جای ماشین‌ها (سبک NFS)
+class MiniMap extends Control:
+        var game: Node2D
+        var acc := 0.0
+
+        func _process(delta: float) -> void:
+                acc += delta
+                if acc > 0.08:
+                        acc = 0.0
+                        queue_redraw()
+
+        func _draw() -> void:
+                if game == null or game.seg_a.is_empty():
+                        return
+                var g := game
+                var pad := 10.0
+                var sw := size.x - pad * 2.0
+                var sh := size.y - pad * 2.0
+                var sc: float = minf(sw / g.map_rect.size.x, sh / g.map_rect.size.y)
+                var off: Vector2 = (size - Vector2(g.map_rect.size.x, g.map_rect.size.y) * sc) * 0.5
+                draw_rect(Rect2(Vector2.ZERO, size), Color(0.05, 0.06, 0.10, 0.72))
+                draw_rect(Rect2(Vector2(2, 2), size - Vector2(4, 4)), Color(0.85, 0.68, 0.28, 0.35), false, 1.5)
+                var pts := PackedVector2Array()
+                for i in range(0, g.seg_a.size(), 4):
+                        pts.append(g.seg_a[i] * sc + off)
+                if pts.size() > 2:
+                        pts.append(pts[0])
+                        draw_polyline(pts, Color(0.55, 0.60, 0.72, 0.9), 3.0, true)
+                # خط پایان
+                var st: Vector2 = g.seg_a[0] * sc + off
+                draw_circle(st, 3.5, Color(0.95, 0.95, 1.0, 0.9))
+                for R in g.rivals:
+                        var rp: Vector2 = R["node"].position * sc + off
+                        draw_circle(rp, 4.0, Color(0.95, 0.35, 0.30, 0.95))
+                if g.car != null:
+                        var pp: Vector2 = g.car.position * sc + off
+                        draw_circle(pp, 5.0, Color(1.0, 0.82, 0.2, 1.0))
+                        draw_circle(pp, 7.5, Color(1.0, 0.82, 0.2, 0.35))
 
 ## فلش‌های گوشه — جای متن «چپ/راست»، بدون یک کلمه
 class SteerHint extends Control:
@@ -1446,7 +1208,7 @@ func _update_coins(delta: float) -> void:
                 var C = coins_on_road[i]
                 C["t"] = float(C["t"]) + delta * 5.0
                 var spr: Sprite2D = C["node"].get_child(0)
-                spr.scale = Vector2(0.42, 0.42) * (1.0 + 0.1 * sin(float(C["t"])))
+                spr.scale = Vector2(0.55, 0.55) * (1.0 + 0.1 * sin(float(C["t"])))
                 var my_prog2 := float(lap) * track_len + path_s
                 if absf(fposmod(float(C["s"]), track_len) - fposmod(my_prog2, track_len)) > 2400.0:
                         C["node"].queue_free()
@@ -1495,6 +1257,11 @@ func _update_camera(delta: float) -> void:
         if nitro_on:
                 zt -= 0.05
         cam.zoom = cam.zoom.lerp(Vector2(zt, zt), delta * 2.5)
+        # دوربین هرگز از لبه‌ی نقشه بیرون نمی‌رود
+        var half := Vector2(VIEW_W, VIEW_H) * 0.5 / cam.zoom
+        var lo := map_rect.position + half * 0.55
+        var hi := map_rect.end - half * 0.55
+        cam.position = Vector2(clampf(cam.position.x, lo.x, hi.x), clampf(cam.position.y, lo.y, hi.y))
 
 func _update_brain_anchor() -> void:
         if car_anchor != null:
@@ -1641,7 +1408,7 @@ func _run_autotest(delta: float) -> void:
                                 var img := get_viewport().get_texture().get_image()
                                 if img != null:
                                         img.save_png("/home/z/my-project/scripts/shot_game.png")
-                                print("AUTOTEST OK lap=", lap, " pos=", car_pos.round(), " spd=", int(vel.length()), " off=", nr["dist"] < ROAD_W * 0.5, " rank=", _calc_rank(), " rivals=", rivals.size(), " traf=", traffic.size(), " bld=", buildings.size(), " lamps=", lamps.size(), " nearest=", int(nr["dist"]))
+                                print("AUTOTEST OK lap=", lap, " pos=", car_pos.round(), " spd=", int(vel.length()), " off=", nr["dist"] < ROAD_W * 0.5, " rank=", _calc_rank(), " rivals=", rivals.size(), " traf=", traffic.size(), " bld=", buildings.size(), " lamps=", 0, " nearest=", int(nr["dist"]))
                                 get_tree().quit()
 
 func _press_at(pos: Vector2) -> void:
@@ -1720,6 +1487,50 @@ func _autotest_full() -> void:
         await get_tree().create_timer(3.0).timeout
         print("[boghi][autotest] TAP-ENDMENU FAIL (منو لود نشد)")
         get_tree().quit(1)
+
+## پلی‌تست کامل — اتوپایلوت مسیر را دور می‌زند؛ شات در همه‌ی مراحل
+func _run_playtest() -> void:
+        var dir_exec := get_viewport()
+        await get_tree().create_timer(0.4).timeout
+        _save_shot("pt_1_countdown.png")
+        await get_tree().create_timer(2.7).timeout
+        print("[playtest] GO — رانندگی شروع")
+        var t0 := Time.get_ticks_msec()
+        var top_spd := 0.0
+        var shots_done := {}
+        var plan := {6.0: "pt_2_start.png", 14.0: "pt_3_straight.png", 22.0: "pt_4_corner.png",
+                34.0: "pt_5_midrace.png", 46.0: "pt_6_traffic.png", 58.0: "pt_7_final.png"}
+        while not racing_over and ended == false:
+                await get_tree().process_frame
+                var el := (Time.get_ticks_msec() - t0) / 1000.0
+                # — راننده: نگاه به نقطه‌ی پیش‌رو
+                var ahead := 300.0 + vel.length() * 0.45
+                var tgt := _path_pos(path_s + ahead)
+                var d := _path_dir(path_s + ahead)
+                var nn := Vector2(-d.y, d.x)
+                tgt += nn * 30.0
+                var want := (tgt - car_pos).angle()
+                var diff := angle_difference(heading, want)
+                kb_left = diff < -0.03
+                kb_right = diff > 0.03
+                var d2 := _path_dir(path_s + 700.0)
+                var curve := absf(d.angle_to(d2))
+                nitro_held = curve < 0.06 and nitro_meter > 0.5
+                brake_held = curve > 0.5 and vel.length() > max_s * 0.75
+                top_spd = maxf(top_spd, vel.length())
+                for k in plan:
+                        if el > float(k) and not shots_done.has(k):
+                                shots_done[k] = true
+                                _save_shot(plan[k])
+                                print("[playtest] shot ", plan[k], " t=", int(el), " spd=", int(vel.length()), " lap=", lap + 1, " rank=", _calc_rank())
+                if el > 220.0:
+                        break
+        var total := (Time.get_ticks_msec() - t0) / 1000.0
+        print("[playtest] FINISH rank=", finish_rank, " time=", int(total), "s top=", int(top_spd * 0.21), "kmh coins=", coins_got)
+        await get_tree().create_timer(2.9).timeout
+        _save_shot("pt_8_result.png")
+        print("[playtest] DONE")
+        get_tree().quit()
 
 # ─────────────────────────── شات‌های بصری (--shots) ───────────────────────────
 func _save_shot(fname: String) -> void:

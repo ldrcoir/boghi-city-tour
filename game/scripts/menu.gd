@@ -37,7 +37,7 @@ const COL_GOLD := Color(0.96, 0.76, 0.25)
 const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
 const COL_RED := Color(0.78, 0.15, 0.12)
 const COL_RED_DARK := Color(0.45, 0.08, 0.06)
-const COL_GLASS := Color(0.10, 0.11, 0.13, 0.90)
+const COL_GLASS := Color(0.055, 0.065, 0.10, 0.93)
 const COL_CREAM := Color(0.95, 0.93, 0.88)
 # ناحیه امن بالا (استاتوس‌بار گوشی) — هیچ UI مهمی بالای این خط
 const SAFE_TOP := 46.0
@@ -166,7 +166,9 @@ func _tap(btn: Button) -> void:
                 Input.parse_input_event(ev)
 
 func _build_background() -> void:
-        var tex := _safe_load("res://assets/sprites/menu_bg.webp")
+        var tex := _safe_load("res://assets/sprites/menu_bg.png")
+        if tex == null:
+                tex = _safe_load("res://assets/sprites/menu_bg.webp")
         if tex != null:
                 var bg := TextureRect.new()
                 bg.texture = tex
@@ -307,112 +309,76 @@ func _add_gradient(top: bool) -> void:
                 tr.anchor_bottom = 1.0
         add_child(tr)
 
-## ماشین‌های قهرمان محله — پایین-چپ؛ پشت پنل‌ها (z کمتر) تا زیرشان نروند جلوی چشم
+## ماشین قهرمان — اسپرایت top-down هنر نو با آندرگلو بیک‌شده
 func _deco_cars() -> void:
-        var sh1 := TextureRect.new()
-        sh1.texture = _make_shadow_tex()
-        sh1.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        sh1.anchor_left = 0.014
-        sh1.anchor_right = 0.246
-        sh1.anchor_top = 0.928
-        sh1.anchor_bottom = 0.985
-        sh1.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        add_child(sh1)
-        deco_cars.append(sh1)
-        var c1 := TextureRect.new()
-        c1.texture = _safe_load("res://assets/sprites/boghi_side.png")
-        c1.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        c1.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        c1.anchor_left = 0.025
-        c1.anchor_right = 0.235
-        c1.anchor_top = 0.748
-        c1.anchor_bottom = 0.975
-        c1.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        add_child(c1)
-        deco_cars.append(c1)
-        var tap1 := Button.new()
-        tap1.flat = true
-        tap1.modulate.a = 0.0
-        tap1.anchor_left = 0.025
-        tap1.anchor_right = 0.235
-        tap1.anchor_top = 0.748
-        tap1.anchor_bottom = 0.975
-        tap1.pressed.connect(func():
-                if brain != null and is_instance_valid(c1):
-                        brain.say(c1, "boghi", "idle"))
-        add_child(tap1)
-        deco_cars.append(tap1)
-        if brain != null and is_instance_valid(c1):
-                BRAIN_SCRIPT.add_breathing(c1, 4.0, 1.25)
-        var sh2 := TextureRect.new()
-        sh2.texture = _make_shadow_tex()
-        sh2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        sh2.anchor_left = 0.252
-        sh2.anchor_right = 0.475
-        sh2.anchor_top = 0.935
-        sh2.anchor_bottom = 0.985
-        sh2.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        add_child(sh2)
-        deco_cars.append(sh2)
-        var c2 := TextureRect.new()
-        c2.texture = _safe_load("res://assets/sprites/pride_side.png")
-        c2.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        c2.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        c2.anchor_left = 0.258
-        c2.anchor_right = 0.458
-        c2.anchor_top = 0.772
-        c2.anchor_bottom = 0.972
-        c2.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        add_child(c2)
-        deco_cars.append(c2)
-        var tap2 := Button.new()
-        tap2.flat = true
-        tap2.modulate.a = 0.0
-        tap2.anchor_left = 0.258
-        tap2.anchor_right = 0.458
-        tap2.anchor_top = 0.772
-        tap2.anchor_bottom = 0.972
-        tap2.pressed.connect(func():
-                if brain != null and is_instance_valid(c2):
-                        brain.say(c2, "pride", "idle"))
-        add_child(tap2)
-        deco_cars.append(tap2)
-        if brain != null and is_instance_valid(c2):
-                BRAIN_SCRIPT.add_breathing(c2, 3.0, 1.5)
-        # ماشین‌ها باید پشت پنل‌ها باشند (بعد از پنل‌ها add می‌شوند — ببرش عقب)
-        for i in deco_cars.size():
-                if is_instance_valid(deco_cars[i]):
-                        move_child(deco_cars[i], 1)
+        var hero := TextureRect.new()
+        var htex := _safe_load("res://assets/sprites/menu_hero.png")
+        if htex == null:
+                return
+        hero.texture = htex
+        hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        hero.anchor_left = 0.02
+        hero.anchor_right = 0.02
+        hero.anchor_top = 1.0
+        hero.anchor_bottom = 1.0
+        hero.offset_left = -20.0
+        hero.offset_right = 250.0
+        hero.offset_top = -400.0
+        hero.offset_bottom = 30.0
+        hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        add_child(hero)
+        deco_cars.append(hero)
+        move_child(hero, 1)
+        if brain != null:
+                BRAIN_SCRIPT.add_breathing(hero, 4.0, 1.1)
 
 ## تیتر موتوری — همیشه رندر می‌شود؛ داخل ناحیه امن استاتوس‌بار
 func _build_title() -> void:
-        var title := _mk_label("بوقی: تور شهرها", 54, false, true, COL_GOLD)
-        title.add_theme_color_override("font_outline_color", Color(0.10, 0.06, 0.03))
-        title.add_theme_constant_override("outline_size", 14)
+        # هاله‌ی طلایی پشت تیتر
+        var glow := TextureRect.new()
+        glow.texture = _safe_load("res://assets/sprites/title_glow.png")
+        if glow.texture != null:
+                glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+                glow.stretch_mode = TextureRect.STRETCH_SCALE
+                glow.anchor_left = 0.5
+                glow.anchor_right = 0.5
+                glow.offset_left = -320.0
+                glow.offset_right = 320.0
+                glow.offset_top = SAFE_TOP - 46.0
+                glow.offset_bottom = SAFE_TOP + 118.0
+                glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+                glow.modulate = Color(1.0, 0.9, 0.6, 0.85)
+                add_child(glow)
+                title_nodes.append(glow)
+        var title := _mk_label("بوقی", 108, false, true, Color(1.0, 0.87, 0.42))
+        title.add_theme_color_override("font_outline_color", Color(0.14, 0.05, 0.02))
+        title.add_theme_constant_override("outline_size", 18)
         title.anchor_left = 0.0
         title.anchor_right = 1.0
-        title.offset_top = SAFE_TOP
-        title.offset_bottom = SAFE_TOP + 66
+        title.offset_top = SAFE_TOP - 8
+        title.offset_bottom = SAFE_TOP + 118
         title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(title)
         title_nodes.append(title)
+        # خط نئونی دوتایی زیر لوگو
         var bar := Panel.new()
-        bar.add_theme_stylebox_override("panel", _sb(COL_RED, Color(0, 0, 0, 0), 3))
+        bar.add_theme_stylebox_override("panel", _sb(Color(1.0, 0.62, 0.16, 0.95), Color(0, 0, 0, 0), 2))
         bar.anchor_left = 0.5
         bar.anchor_right = 0.5
-        bar.offset_left = -100.0
-        bar.offset_right = 100.0
-        bar.offset_top = SAFE_TOP + 72
-        bar.offset_bottom = SAFE_TOP + 79
+        bar.offset_left = -96.0
+        bar.offset_right = 96.0
+        bar.offset_top = SAFE_TOP + 122
+        bar.offset_bottom = SAFE_TOP + 127
         add_child(bar)
         title_nodes.append(bar)
-        var sub := _mk_label("فصل ۱ — تهران  •  ۵۰ مأموریت محله", 20, true, false, Color(1, 1, 1, 0.88))
-        sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
-        sub.add_theme_constant_override("outline_size", 6)
+        var sub := _mk_label("تور شهرها  •  فصل ۱: تهران", 26, true, false, Color(0.94, 0.92, 0.88, 0.95))
+        sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+        sub.add_theme_constant_override("outline_size", 7)
         sub.anchor_left = 0.0
         sub.anchor_right = 1.0
-        sub.offset_top = SAFE_TOP + 84
-        sub.offset_bottom = SAFE_TOP + 114
+        sub.offset_top = SAFE_TOP + 134
+        sub.offset_bottom = SAFE_TOP + 170
         sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
         add_child(sub)
         title_nodes.append(sub)
@@ -424,7 +390,7 @@ func _build_home_panel() -> void:
         # چیدمان دوستونه تا هم دکمه بلند باشد هم زیر تیتر (تا y=۱۶۰) جا شود
         panel_home.custom_minimum_size = Vector2(560, 488)
         panel_home.set_anchors_preset(Control.PRESET_CENTER)
-        panel_home.offset_top = 130.0 # کاملاً زیر زیرنویس (زیرنویس تا y≈۱۱۴) — تداخل ممنوع
+        panel_home.offset_top = 176.0 # کاملاً زیر زیرنویس نو (تا y≈۱۷۰) — تداخل ممنوع
         panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
         panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
         add_child(panel_home)
@@ -656,16 +622,7 @@ func _build_levels_panel() -> void:
 func _deco_brain() -> void:
         brain = BRAIN_SCRIPT.new()
         add_child(brain)
-        # گپ زدن خودکار ماشین‌ها — روح طنز منو (مثل v0.9)
-        if deco_cars.size() >= 5:
-                brain.start_idle_chatter(
-                        func(cid: String) -> Control:
-                                if cid == "boghi" and is_instance_valid(deco_cars[1]):
-                                        return deco_cars[1]
-                                if cid == "pride" and is_instance_valid(deco_cars[4]):
-                                        return deco_cars[4]
-                                return null,
-                        func() -> Array: return ["boghi", "pride"], 8.0, 15.0)
+        # حباب حرف در منو حذف شد — لحن جدی‌تر؛ مغز فقط نفس‌کشیدن را می‌دهد
 
 func _deco_version() -> void:
         # برچسب نسخه از Globals — دیگر هرگز دستی نیست (باگ «v0.9 هاردکد»)

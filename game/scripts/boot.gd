@@ -79,7 +79,7 @@ func _go_menu() -> void:
         var scene_path := "res://scenes/menu.tscn"
         if uargs.has("--story") or uargs.has("--storytest"):
                 scene_path = "res://scenes/story.tscn"
-        elif uargs.has("--autotest-full") or uargs.has("--shots"):
+        elif uargs.has("--autotest-full") or uargs.has("--shots") or uargs.has("--playtest"):
                 scene_path = "res://scenes/game.tscn"
         elif uargs.has("--garage"):
                 scene_path = "res://scenes/garage.tscn"

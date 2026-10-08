@@ -4,8 +4,8 @@ extends Node
 const SAVE_PATH := "user://boghi_save.json"
 
 # نسخه بازی — تنها منبع حقیقت؛ منو/لاگ از همین می‌خوانند (دست‌نویس ممنوع)
-const VERSION := "0.14"
-const BUILD := 16
+const VERSION := "0.15"
+const BUILD := 17
 
 var coins: int = 0
 var plate_name: String = "بوقی"
