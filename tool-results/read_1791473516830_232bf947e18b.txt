@@ -1,0 +1,685 @@
+     1→extends Control
+     2→## منوی اصلی v1.0 — بازطراحی نوجوان‌پسند
+     3→## درس‌های v0.9 که این نسل ساخته شد:
+     4→##  ۱) layout_direction باید صریحاً LTR باشد؛ 0 یعنی ارث‌بری و روی گوشی فارسی
+     5→##     همه‌چیز آینه می‌شد (پنل راست→چپ، برچسب‌ها جابه‌جا)
+     6→##  ۲) هر پنل اندازه‌ی ثابت و وسط‌چین است — آینه هم بشود همان وسط می‌ماند
+     7→##     و روی هر عرضی (1280 دسکتاپ تا 1600 گوشی) سالم است
+     8→##  ۳) تیتر داخل ناحیه‌ی امن است (زیر استاتوس‌بار بریده نمی‌شود)
+     9→##  ۴) بدون لوگوی تصویری — تیتر موتوری همیشه رندر می‌شود (ماشین روی برج ممنوع!)
+    10→##  ۵) پلاک بدون عکس بچه — نوجوان‌پسند
+    11→##  ۶) autotest واقعی: منو → ماموریت‌ها → مرحله ۱ → ورود به بازی
+    12→
+    13→var font: FontFile
+    14→var font_bold: FontFile
+    15→var font_display: FontFile
+    16→var panel_home: PanelContainer
+    17→var panel_levels: PanelContainer
+    18→var play_btn: Button
+    19→var coin_label: Label
+    20→var plate_edit: LineEdit
+    21→var brain = null
+    22→var deco_cars: Array = []
+    23→var online_ov: Control = null
+    24→var _expect_online := false
+    25→var back_btn: Button
+    26→var first_tile: Button
+    27→var akbar_rect: TextureRect
+    28→var akbar_line_label: Label
+    29→var title_nodes: Array = []
+    30→var _expect_scene_change := false
+    31→
+    32→# بارگذاری مستقیم مغز — بدون وابستگی به class cache
+    33→const BRAIN_SCRIPT := preload("res://scripts/car_brain.gd")
+    34→const ONLINE_SCRIPT := preload("res://scripts/online_race.gd")
+    35→
+    36→const COL_GOLD := Color(0.96, 0.76, 0.25)
+    37→const COL_GOLD_DIM := Color(0.72, 0.55, 0.2)
+    38→const COL_RED := Color(0.78, 0.15, 0.12)
+    39→const COL_RED_DARK := Color(0.45, 0.08, 0.06)
+    40→const COL_GLASS := Color(0.055, 0.065, 0.10, 0.93)
+    41→const COL_CREAM := Color(0.95, 0.93, 0.88)
+    42→# ناحیه امن بالا (استاتوس‌بار گوشی) — هیچ UI مهمی بالای این خط
+    43→const SAFE_TOP := 46.0
+    44→
+    45→func _safe_load(path: String) -> Resource:
+    46→        # بارگذاری امن: منبع نبودن یا خرابی هرگز منو را نمی‌شکند
+    47→        if path == null or not ResourceLoader.exists(path):
+    48→                return null
+    49→        return load(path)
+    50→
+    51→func _safe_font(path: String) -> FontFile:
+    52→        var r := _safe_load(path)
+    53→        if r is FontFile:
+    54→                return r
+    55→        return null
+    56→
+    57→func _ready() -> void:
+    58→        # ⛔ قفل صریح LTR — مقدار 0 (ارث‌بری) باگ v0.9 بود که روی گوشی فارسی
+    59→        # کل چیدمان را آینه می‌کرد
+    60→        layout_direction = Control.LAYOUT_DIRECTION_LTR
+    61→        font = _safe_font("res://assets/fonts/Vazirmatn-Regular.ttf")
+    62→        font_bold = _safe_font("res://assets/fonts/Vazirmatn-Bold.ttf")
+    63→        font_display = _safe_font("res://assets/fonts/Lalezar-Regular.ttf")
+    64→        _build_background()
+    65→        _build_ui()
+    66→        _refresh()
+    67→        if has_node("/root/AudioMgr"):
+    68→                get_node("/root/AudioMgr").play_music()
+    69→        # تزئینات زنده — هر کدام فراخوان جداگانه تا خرابیِ هر بخش فقط خودش را بیندازد
+    70→        call_deferred("_deco_gradients")
+    71→        call_deferred("_deco_cars")
+    72→        call_deferred("_deco_brain")
+    73→        call_deferred("_deco_version")
+    74→        var uargs := OS.get_cmdline_user_args()
+    75→        # چرخه کامل تست: برگشت از پنل پایان مسابقه به منو — پایان موفق چرخه
+    76→        if uargs.has("--autotest-full"):
+    77→                if Globals.get_meta("at_menu_return", false):
+    78→                        Globals.remove_meta("at_menu_return")
+    79→                        print("[boghi][autotest] TAP-ENDMENU OK — چرخه کامل بازی→پایان→منو سالم")
+    80→                        _shot("/home/z/my-project/scripts/shot_menu_return.png")
+    81→                        get_tree().quit(0)
+    82→                        return
+    83→                Globals.set_meta("start_level", 1)
+    84→                get_tree().change_scene_to_file("res://scenes/game.tscn")
+    85→                return
+    86→        if uargs.has("--levels"):
+    87→                _show(panel_levels)
+    88→        if uargs.has("--onlinetest"):
+    89→                _onlinetest()
+    90→        if uargs.has("--autotest"):
+    91→                _autotest()
+    92→
+    93→func _autotest() -> void:
+    94→        await get_tree().create_timer(1.2).timeout
+    95→        _shot("/home/z/my-project/scripts/shot_menu.png")
+    96→        if play_btn == null or not is_instance_valid(play_btn):
+    97→                print("[boghi][autotest] TAP-PLAY FAIL (no button)")
+    98→                get_tree().quit(1)
+    99→                return
+   100→        # ۱) تپ واقعی روی «ماموریت‌ها»
+   101→        _tap(play_btn)
+   102→        await get_tree().create_timer(0.7).timeout
+   103→        var ok := panel_levels != null and panel_levels.visible
+   104→        print("[boghi][autotest] TAP-PLAY ", "OK" if ok else "FAIL")
+   105→        _shot("/home/z/my-project/scripts/shot_levels.png")
+   106→        if not ok:
+   107→                get_tree().quit(1)
+   108→                return
+   109→        # ۲) برگشت به خانه
+   110→        if back_btn != null and is_instance_valid(back_btn):
+   111→                _tap(back_btn)
+   112→                await get_tree().create_timer(0.5).timeout
+   113→                print("[boghi][autotest] TAP-BACK ", "OK" if panel_home.visible else "FAIL")
+   114→        # ۳) ورود به مرحله ۱ — تپ روی کاشی اول؛ انتظار: تعویض صحنه به Game
+   115→        if first_tile == null or not is_instance_valid(first_tile):
+   116→                print("[boghi][autotest] TAP-LEVEL FAIL (no tile)")
+   117→                get_tree().quit(1)
+   118→                return
+   119→        _tap(play_btn) # برگرد به لیست
+   120→        await get_tree().create_timer(0.5).timeout
+   121→        _tap(first_tile)
+   122→        _expect_scene_change = true
+   123→        # اگر تا ۲ ثانیه دیگر صحنه عوض نشده باشد، منو هنوز زنده است = شکست
+   124→        await get_tree().create_timer(2.0).timeout
+   125→        print("[boghi][autotest] TAP-LEVEL FAIL (scene did not change — باگ ورود به بازی!)")
+   126→        get_tree().quit(1)
+   127→
+   128→## وقتی صحنه عوض می‌شود منو free می‌شود — همین‌جا موفقیت تپِ مرحله را اعلام می‌کنیم
+   129→func _exit_tree() -> void:
+   130→        if _expect_scene_change:
+   131→                print("[boghi][autotest] TAP-LEVEL OK — scene changed to ", "(Game)")
+   132→        if _expect_online:
+   133→                print("[boghi][onlinetest] ONLINE-TAKEOVER OK — اکبر آمد و مسابقه لود شد")
+   134→
+   135→## تست آنلاین: پنل جست‌وجو باید واقعاً دیده شود (باگ ۰×۰) و AI جانشین شود
+   136→func _onlinetest() -> void:
+   137→        await get_tree().create_timer(0.5).timeout
+   138→        _open_online()
+   139→        await get_tree().create_timer(0.6).timeout
+   140→        var ok := online_ov != null and is_instance_valid(online_ov) and online_ov.visible and online_ov.size.x > 1000.0
+   141→        print("[boghi][onlinetest] OVERLAY ", "OK" if ok else "FAIL", " size=", online_ov.size if online_ov != null else "none")
+   142→        _shot("/home/z/my-project/scripts/shot_online.png")
+   143→        if not ok:
+   144→                get_tree().quit(1)
+   145→                return
+   146→        _expect_online = true
+   147→        await get_tree().create_timer(24.0).timeout
+   148→        print("[boghi][onlinetest] FAIL — تعویض صحنه انجام نشد")
+   149→        get_tree().quit(1)
+   150→
+   151→func _shot(path: String) -> void:
+   152→        var img := get_viewport().get_texture().get_image()
+   153→        if img != null:
+   154→                img.save_png(path)
+   155→
+   156→func _tap(btn: Button) -> void:
+   157→        var pos: Vector2 = btn.get_global_rect().get_center()
+   158→        for pressed in [true, false]:
+   159→                var ev := InputEventMouseButton.new()
+   160→                ev.button_index = MOUSE_BUTTON_LEFT
+   161→                ev.pressed = pressed
+   162→                if pressed:
+   163→                        ev.button_mask = MOUSE_BUTTON_MASK_LEFT
+   164→                ev.position = pos
+   165→                ev.global_position = pos
+   166→                Input.parse_input_event(ev)
+   167→
+   168→func _build_background() -> void:
+   169→        var tex := _safe_load("res://assets/sprites/menu_bg.png")
+   170→        if tex == null:
+   171→                tex = _safe_load("res://assets/sprites/menu_bg.webp")
+   172→        if tex != null:
+   173→                var bg := TextureRect.new()
+   174→                bg.texture = tex
+   175→                bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   176→                bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+   177→                bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+   178→                bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   179→                add_child(bg)
+   180→        else:
+   181→                var gt := GradientTexture2D.new()
+   182→                var g := Gradient.new()
+   183→                g.offsets = PackedFloat32Array([0.0, 0.6, 1.0])
+   184→                g.colors = PackedColorArray([Color(0.30, 0.16, 0.10), Color(0.14, 0.09, 0.07), Color(0.06, 0.04, 0.04)])
+   185→                gt.gradient = g
+   186→                gt.fill_from = Vector2(0.3, 0.0)
+   187→                gt.fill_to = Vector2(0.7, 1.0)
+   188→                var bg := TextureRect.new()
+   189→                bg.texture = gt
+   190→                bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   191→                bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+   192→                bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   193→                add_child(bg)
+   194→
+   195→func _mk_label(txt: String, size: int, bold := false, display := false, col := COL_CREAM) -> Label:
+   196→        var l := Label.new()
+   197→        l.text = txt
+   198→        var f := font_display if display else (font_bold if bold else font)
+   199→        if f != null:
+   200→                l.add_theme_font_override("font", f)
+   201→        l.add_theme_font_size_override("font_size", size)
+   202→        l.add_theme_color_override("font_color", col)
+   203→        l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   204→        return l
+   205→
+   206→func _sb(bg: Color, border: Color, radius: int, bw: int = 0, shadow := true) -> StyleBoxFlat:
+   207→        var sb := StyleBoxFlat.new()
+   208→        sb.bg_color = bg
+   209→        sb.set_corner_radius_all(radius)
+   210→        sb.border_color = border
+   211→        sb.border_width_left = bw
+   212→        sb.border_width_right = bw
+   213→        sb.border_width_top = bw
+   214→        sb.border_width_bottom = bw + (4 if bw > 0 else 0)
+   215→        if shadow:
+   216→                sb.shadow_color = Color(0, 0, 0, 0.45)
+   217→                sb.shadow_size = 10
+   218→        return sb
+   219→
+   220→## سبک دکمه: «red» = اصلی آتشین، «dark» = فرعی شیشه‌ای، «tile» = کاشی ماموریت
+   221→func _style_btn(b: Button, kind := "red") -> void:
+   222→        var normal: StyleBoxFlat
+   223→        var hover: StyleBoxFlat
+   224→        var pressed: StyleBoxFlat
+   225→        var disabled: StyleBoxFlat
+   226→        var fg := COL_CREAM
+   227→        if kind == "red":
+   228→                normal = _sb(COL_RED, COL_RED_DARK, 16, 3)
+   229→                hover = _sb(COL_RED.lightened(0.10), COL_RED_DARK, 16, 3)
+   230→                pressed = _sb(COL_RED_DARK, COL_RED_DARK, 16, 3)
+   231→                disabled = _sb(Color(0.35, 0.2, 0.18), Color(0.3, 0.16, 0.14), 16, 3)
+   232→                fg = Color(1, 0.96, 0.9)
+   233→        elif kind == "dark":
+   234→                normal = _sb(Color(0.16, 0.175, 0.20, 0.97), COL_GOLD_DIM, 16, 2)
+   235→                hover = _sb(Color(0.22, 0.235, 0.26, 0.97), COL_GOLD, 16, 2)
+   236→                pressed = _sb(Color(0.10, 0.11, 0.13, 0.97), COL_GOLD_DIM, 16, 2)
+   237→                disabled = _sb(Color(0.14, 0.145, 0.16), Color(0.2, 0.2, 0.22), 16, 2)
+   238→                fg = Color(0.98, 0.92, 0.72)
+   239→        else:
+   240→                normal = _sb(Color(0.20, 0.22, 0.25, 0.97), Color(0.36, 0.39, 0.43), 12, 2, false)
+   241→                hover = _sb(Color(0.27, 0.30, 0.34, 0.97), COL_GOLD_DIM, 12, 2, false)
+   242→                pressed = _sb(Color(0.13, 0.14, 0.16, 0.97), Color(0.3, 0.32, 0.35), 12, 2, false)
+   243→                disabled = _sb(Color(0.145, 0.15, 0.16, 0.9), Color(0.21, 0.215, 0.22), 12, 2, false)
+   244→                fg = COL_CREAM
+   245→        b.add_theme_stylebox_override("normal", normal)
+   246→        b.add_theme_stylebox_override("hover", hover)
+   247→        b.add_theme_stylebox_override("pressed", pressed)
+   248→        b.add_theme_stylebox_override("disabled", disabled)
+   249→        b.add_theme_color_override("font_color", fg)
+   250→        b.add_theme_color_override("font_hover_color", fg)
+   251→        b.add_theme_color_override("font_focus_color", fg)
+   252→        b.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
+   253→        b.add_theme_color_override("font_disabled_color", Color(0.52, 0.5, 0.47))
+   254→
+   255→func _mk_button(txt: String, size := 26, kind := "red", h := 74) -> Button:
+   256→        var b := Button.new()
+   257→        b.text = txt
+   258→        if font_display != null:
+   259→                b.add_theme_font_override("font", font_display)
+   260→        b.add_theme_font_size_override("font_size", size)
+   261→        b.custom_minimum_size = Vector2(320, h)
+   262→        _style_btn(b, kind)
+   263→        return b
+   264→
+   265→## سایهٔ نرم زیر ماشین‌ها
+   266→func _make_shadow_tex() -> Texture2D:
+   267→        var gt := GradientTexture2D.new()
+   268→        gt.fill = GradientTexture2D.FILL_RADIAL
+   269→        gt.width = 240
+   270→        gt.height = 64
+   271→        gt.fill_from = Vector2(0.5, 0.5)
+   272→        gt.fill_to = Vector2(0.5, 0.0)
+   273→        var g := Gradient.new()
+   274→        g.offsets = PackedFloat32Array([0.0, 0.65, 1.0])
+   275→        g.colors = PackedColorArray([Color(0.02, 0.02, 0.03, 0.8), Color(0.02, 0.02, 0.03, 0.22), Color(0, 0, 0, 0)])
+   276→        gt.gradient = g
+   277→        return gt
+   278→
+   279→func _deco_gradients() -> void:
+   280→        _add_gradient(true)
+   281→        _add_gradient(false)
+   282→
+   283→func _add_gradient(top: bool) -> void:
+   284→        var gt := GradientTexture2D.new()
+   285→        var g := Gradient.new()
+   286→        if top:
+   287→                g.offsets = PackedFloat32Array([0.0, 1.0])
+   288→                g.colors = PackedColorArray([Color(0.05, 0.04, 0.06, 0.62), Color(0, 0, 0, 0.0)])
+   289→                gt.fill_from = Vector2(0, 0)
+   290→                gt.fill_to = Vector2(0, 1)
+   291→        else:
+   292→                g.offsets = PackedFloat32Array([0.0, 1.0])
+   293→                g.colors = PackedColorArray([Color(0, 0, 0, 0.0), Color(0.04, 0.03, 0.05, 0.72)])
+   294→                gt.fill_from = Vector2(0, 0)
+   295→                gt.fill_to = Vector2(0, 1)
+   296→        gt.gradient = g
+   297→        var tr := TextureRect.new()
+   298→        tr.texture = gt
+   299→        tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   300→        tr.stretch_mode = TextureRect.STRETCH_SCALE
+   301→        tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   302→        tr.anchor_left = 0.0
+   303→        tr.anchor_right = 1.0
+   304→        if top:
+   305→                tr.anchor_top = 0.0
+   306→                tr.anchor_bottom = 0.24
+   307→        else:
+   308→                tr.anchor_top = 0.70
+   309→                tr.anchor_bottom = 1.0
+   310→        add_child(tr)
+   311→
+   312→## ماشین قهرمان — اسپرایت top-down هنر نو با آندرگلو بیک‌شده
+   313→func _deco_cars() -> void:
+   314→        var hero := TextureRect.new()
+   315→        var htex := _safe_load("res://assets/sprites/menu_hero.png")
+   316→        if htex == null:
+   317→                return
+   318→        hero.texture = htex
+   319→        hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   320→        hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   321→        hero.anchor_left = 0.02
+   322→        hero.anchor_right = 0.02
+   323→        hero.anchor_top = 1.0
+   324→        hero.anchor_bottom = 1.0
+   325→        hero.offset_left = -20.0
+   326→        hero.offset_right = 250.0
+   327→        hero.offset_top = -400.0
+   328→        hero.offset_bottom = 30.0
+   329→        hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   330→        add_child(hero)
+   331→        deco_cars.append(hero)
+   332→        move_child(hero, 1)
+   333→        if brain != null:
+   334→                BRAIN_SCRIPT.add_breathing(hero, 4.0, 1.1)
+   335→
+   336→## تیتر موتوری — همیشه رندر می‌شود؛ داخل ناحیه امن استاتوس‌بار
+   337→func _build_title() -> void:
+   338→        # هاله‌ی طلایی پشت تیتر
+   339→        var glow := TextureRect.new()
+   340→        glow.texture = _safe_load("res://assets/sprites/title_glow.png")
+   341→        if glow.texture != null:
+   342→                glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   343→                glow.stretch_mode = TextureRect.STRETCH_SCALE
+   344→                glow.anchor_left = 0.5
+   345→                glow.anchor_right = 0.5
+   346→                glow.offset_left = -320.0
+   347→                glow.offset_right = 320.0
+   348→                glow.offset_top = SAFE_TOP - 46.0
+   349→                glow.offset_bottom = SAFE_TOP + 118.0
+   350→                glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   351→                glow.modulate = Color(1.0, 0.9, 0.6, 0.85)
+   352→                add_child(glow)
+   353→                title_nodes.append(glow)
+   354→        var title := _mk_label("بوقی", 108, false, true, Color(1.0, 0.87, 0.42))
+   355→        title.add_theme_color_override("font_outline_color", Color(0.14, 0.05, 0.02))
+   356→        title.add_theme_constant_override("outline_size", 18)
+   357→        title.anchor_left = 0.0
+   358→        title.anchor_right = 1.0
+   359→        title.offset_top = SAFE_TOP - 8
+   360→        title.offset_bottom = SAFE_TOP + 118
+   361→        title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   362→        add_child(title)
+   363→        title_nodes.append(title)
+   364→        # خط نئونی دوتایی زیر لوگو
+   365→        var bar := Panel.new()
+   366→        bar.add_theme_stylebox_override("panel", _sb(Color(1.0, 0.62, 0.16, 0.95), Color(0, 0, 0, 0), 2))
+   367→        bar.anchor_left = 0.5
+   368→        bar.anchor_right = 0.5
+   369→        bar.offset_left = -96.0
+   370→        bar.offset_right = 96.0
+   371→        bar.offset_top = SAFE_TOP + 122
+   372→        bar.offset_bottom = SAFE_TOP + 127
+   373→        add_child(bar)
+   374→        title_nodes.append(bar)
+   375→        var sub := _mk_label("تور شهرها  •  فصل ۱: تهران", 26, true, false, Color(0.94, 0.92, 0.88, 0.95))
+   376→        sub.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+   377→        sub.add_theme_constant_override("outline_size", 7)
+   378→        sub.anchor_left = 0.0
+   379→        sub.anchor_right = 1.0
+   380→        sub.offset_top = SAFE_TOP + 134
+   381→        sub.offset_bottom = SAFE_TOP + 170
+   382→        sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   383→        add_child(sub)
+   384→        title_nodes.append(sub)
+   385→
+   386→func _build_home_panel() -> void:
+   387→        panel_home = PanelContainer.new()
+   388→        panel_home.add_theme_stylebox_override("panel", _sb(COL_GLASS, Color(0.85, 0.68, 0.28, 0.45), 22, 2))
+   389→        # اندازه بزرگ — دکمه‌ها باید حداقل ارتفاعِ لمس اندروید (~۸۸px کانواس) را داشته باشند
+   390→        # چیدمان دوستونه تا هم دکمه بلند باشد هم زیر تیتر (تا y=۱۶۰) جا شود
+   391→        panel_home.custom_minimum_size = Vector2(560, 488)
+   392→        panel_home.set_anchors_preset(Control.PRESET_CENTER)
+   393→        panel_home.offset_top = 176.0 # کاملاً زیر زیرنویس نو (تا y≈۱۷۰) — تداخل ممنوع
+   394→        panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
+   395→        panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
+   396→        add_child(panel_home)
+   397→
+   398→        var mv := MarginContainer.new()
+   399→        mv.add_theme_constant_override("margin_left", 18)
+   400→        mv.add_theme_constant_override("margin_right", 18)
+   401→        mv.add_theme_constant_override("margin_top", 14)
+   402→        mv.add_theme_constant_override("margin_bottom", 14)
+   403→        panel_home.add_child(mv)
+   404→
+   405→        var hb := VBoxContainer.new()
+   406→        hb.add_theme_constant_override("separation", 10)
+   407→        hb.alignment = BoxContainer.ALIGNMENT_CENTER
+   408→        mv.add_child(hb)
+   409→
+   410→        # چیپ سکه — آیکون واقعی (ایموجی در فونت گوشی گلیف ندارد)
+   411→        var chip := PanelContainer.new()
+   412→        chip.add_theme_stylebox_override("panel", _sb(Color(0.16, 0.17, 0.20, 0.97), COL_GOLD_DIM, 22, 1, false))
+   413→        chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+   414→        var chip_hb := HBoxContainer.new()
+   415→        chip_hb.add_theme_constant_override("separation", 8)
+   416→        chip.add_child(chip_hb)
+   417→        var coin_tex := _safe_load("res://assets/sprites/coin.png")
+   418→        if coin_tex != null:
+   419→                var coin_icon := TextureRect.new()
+   420→                coin_icon.texture = coin_tex
+   421→                coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   422→                coin_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   423→                coin_icon.custom_minimum_size = Vector2(30, 30)
+   424→                coin_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+   425→                chip_hb.add_child(coin_icon)
+   426→        coin_label = _mk_label(str(Globals.coins), 24, true, false, COL_GOLD)
+   427→        coin_label.custom_minimum_size = Vector2(90, 42)
+   428→        coin_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+   429→        coin_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+   430→        chip_hb.add_child(coin_label)
+   431→        hb.add_child(chip)
+   432→
+   433→        # پلاک نئونی اسم — نوجوان‌پسند (بدون عکس بچه!)
+   434→        var plate_box := Control.new()
+   435→        plate_box.custom_minimum_size = Vector2(324, 100)
+   436→        var board_tex := _safe_load("res://assets/sprites/plate_empty.png")
+   437→        if board_tex != null:
+   438→                var board := TextureRect.new()
+   439→                board.texture = board_tex
+   440→                board.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   441→                board.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   442→                board.set_anchors_preset(Control.PRESET_FULL_RECT)
+   443→                board.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   444→                plate_box.add_child(board)
+   445→        plate_edit = LineEdit.new()
+   446→        plate_edit.text = Globals.plate_name
+   447→        plate_edit.max_length = 12
+   448→        if font_bold != null:
+   449→                plate_edit.add_theme_font_override("font", font_bold)
+   450→        plate_edit.add_theme_font_size_override("font_size", 32)
+   451→        plate_edit.alignment = HORIZONTAL_ALIGNMENT_CENTER
+   452→        plate_edit.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+   453→        plate_edit.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+   454→        plate_edit.add_theme_color_override("font_color", Color(0.99, 0.85, 0.30))
+   455→        plate_edit.add_theme_color_override("caret_color", Color(0.99, 0.85, 0.30))
+   456→        plate_edit.add_theme_color_override("font_placeholder_color", Color(0.6, 0.5, 0.25))
+   457→        plate_edit.placeholder_text = "اسم تو..."
+   458→        plate_edit.anchor_left = 0.12
+   459→        plate_edit.anchor_right = 0.88
+   460→        plate_edit.anchor_top = 0.34
+   461→        plate_edit.anchor_bottom = 0.72
+   462→        plate_edit.text_changed.connect(func(_t): _on_plate_changed())
+   463→        plate_box.add_child(plate_edit)
+   464→        hb.add_child(plate_box)
+   465→
+   466→        # سه‌بخشی: مسابقه (قرمز اصلی) + دو ردیف دوستونه — همگی بالای حداقل لمس
+   467→        var b_race := _mk_button("مسابقه", 36, "red", 96)
+   468→        b_race.pressed.connect(_start_quick_race)
+   469→        hb.add_child(b_race)
+   470→
+   471→        var row1 := HBoxContainer.new()
+   472→        row1.add_theme_constant_override("separation", 10)
+   473→        var b_play := _mk_button(Globals.L("levels"), 26, "dark", 88)
+   474→        b_play.pressed.connect(func(): _show(panel_levels))
+   475→        play_btn = b_play
+   476→        row1.add_child(b_play)
+   477→        var b_life := _mk_button("زندگی محله", 26, "dark", 88)
+   478→        b_life.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/story.tscn"))
+   479→        row1.add_child(b_life)
+   480→        hb.add_child(row1)
+   481→
+   482→        var row2 := HBoxContainer.new()
+   483→        row2.add_theme_constant_override("separation", 10)
+   484→        var b_garage := _mk_button("کارگاه", 24, "dark", 80)
+   485→        b_garage.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/garage.tscn"))
+   486→        row2.add_child(b_garage)
+   487→        # چند نفره آنلاین — جست‌وجوی حریف؛ پیدا نشد → اکبر AI پشت فرمون
+   488→        var b_online := _mk_button("آنلاین", 24, "dark", 80)
+   489→        b_online.pressed.connect(_open_online)
+   490→        row2.add_child(b_online)
+   491→        hb.add_child(row2)
+   492→
+   493→func _start_quick_race() -> void:
+   494→        # مسابقه سریع با حریف AI (قاب: حلقه‌ی مسابقه‌ی محله)
+   495→        Globals.set_meta("custom_level", {
+   496→                "id": 901, "type": "race", "name": "حلقه‌ی مسابقه‌ی محله", "district": "محله",
+   497→                "speed": 13.2, "distance": 460, "time": 70,
+   498→                "obstacle_rate": 0.5, "coin_rate": 0.85, "ramp_rate": 0.3, "reward": 70,
+   499→        })
+   500→        Globals.set_meta("start_level", 901)
+   501→        get_tree().change_scene_to_file("res://scenes/game.tscn")
+   502→
+   503→func _open_online() -> void:
+   504→        # جست‌وجوی حریف آنلاین؛ اگر تا پایان صبر پیدا نشد → اکبر AI
+   505→        var ov: Control = ONLINE_SCRIPT.new()
+   506→        online_ov = ov
+   507→        add_child(ov)
+   508→        if ov.has_method("start"):
+   509→                ov.start(Globals.online_wait)
+   510→        ov.ai_takeover.connect(func():
+   511→                Globals.set_meta("custom_level", {
+   512→                        "id": 902, "type": "race", "name": "آنلاین — حریف: اکبر (AI)", "district": "محله",
+   513→                        "speed": 13.6, "distance": 500, "time": 75,
+   514→                        "obstacle_rate": 0.5, "coin_rate": 0.85, "ramp_rate": 0.3, "reward": 90,
+   515→                })
+   516→                Globals.set_meta("start_level", 902)
+   517→                get_tree().change_scene_to_file("res://scenes/game.tscn"))
+   518→
+   519→func _build_levels_panel() -> void:
+   520→        panel_levels = PanelContainer.new()
+   521→        var lv_sb := _sb(Color(0.115, 0.125, 0.145, 0.97), Color(0.85, 0.68, 0.28, 0.55), 24, 3)
+   522→        lv_sb.content_margin_left = 18.0 # متن فارسی نباید به لبه‌ی پنل بچسبد
+   523→        lv_sb.content_margin_right = 18.0
+   524→        lv_sb.content_margin_top = 12.0
+   525→        lv_sb.content_margin_bottom = 12.0
+   526→        panel_levels.add_theme_stylebox_override("panel", lv_sb)
+   527→        panel_levels.custom_minimum_size = Vector2(1240, 600)
+   528→        panel_levels.set_anchors_preset(Control.PRESET_CENTER)
+   529→        panel_levels.offset_top = 10.0
+   530→        panel_levels.grow_horizontal = Control.GROW_DIRECTION_BOTH
+   531→        panel_levels.grow_vertical = Control.GROW_DIRECTION_BOTH
+   532→        panel_levels.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   533→        var lv := VBoxContainer.new()
+   534→        lv.add_theme_constant_override("separation", 8)
+   535→        panel_levels.add_child(lv)
+   536→        # هدر: اکبر سیبیلو (شخصیت طنز) + تیکه‌ی تصادفی
+   537→        var hdr := HBoxContainer.new()
+   538→        hdr.add_theme_constant_override("separation", 14)
+   539→        akbar_rect = TextureRect.new()
+   540→        akbar_rect.texture = _safe_load("res://assets/sprites/akbar.png")
+   541→        if akbar_rect.texture != null:
+   542→                akbar_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+   543→                akbar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+   544→                akbar_rect.custom_minimum_size = Vector2(92, 108)
+   545→                hdr.add_child(akbar_rect)
+   546→        var ak := VBoxContainer.new()
+   547→        ak.add_theme_constant_override("separation", 2)
+   548→        # خودِ ستون هم باید کل عرض هدر را بگیرد — وگرنه لیبل‌ها در جعبه‌ی تنگ گیر می‌کنند
+   549→        ak.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+   550→        var ak_name := _mk_label("اکبر سیبیلو — رئیس مأموریت‌ها", 26, false, true, COL_GOLD)
+   551→        # ⛔ درس اسکرین‌شات: لیبل RTL با LEFT در صحنه‌ی LTR-قفل حروف را له می‌کند —
+   552→        # RIGHT‌ نقطه‌ی شروع طبیعی فارسی است + EXPAND_FILL تا عرض هرگز کم نیاید
+   553→        ak_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+   554→        ak_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+   555→        ak.add_child(ak_name)
+   556→        akbar_line_label = _mk_label("", 20, true, false, COL_CREAM)
+   557→        akbar_line_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+   558→        akbar_line_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+   559→        akbar_line_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.7))
+   560→        akbar_line_label.add_theme_constant_override("outline_size", 5)
+   561→        ak.add_child(akbar_line_label)
+   562→        hdr.add_child(ak)
+   563→        lv.add_child(hdr)
+   564→        var scroll := ScrollContainer.new()
+   565→        scroll.custom_minimum_size = Vector2(1196, 300)
+   566→        scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+   567→        var grid := GridContainer.new()
+   568→        # ⛔ درس اسکرین‌شات گوشی: ۸ ستونِ ۱۱۲px «دکمه‌های ریز» می‌سازد —
+   569→        # ۴ ستون کاشی درشت (۲۸۰×۱۰۴) با فونت درشت = هدف لمسی واقعی
+   570→        grid.columns = 4
+   571→        grid.add_theme_constant_override("h_separation", 12)
+   572→        grid.add_theme_constant_override("v_separation", 12)
+   573→        for id in range(1, 51):
+   574→                var st: int = Globals.level_stars.get(id, 0)
+   575→                var unlocked: bool = Globals.level_unlocked(id)
+   576→                var b := Button.new()
+   577→                b.custom_minimum_size = Vector2(280, 104)
+   578→                _style_btn(b, "tile")
+   579→                b.disabled = not unlocked
+   580→                # دو خط: عدد (لاله‌زار درشت) + ردیف ستاره (وازیرمتن — گلیف تضمینی)
+   581→                var vb := VBoxContainer.new()
+   582→                vb.set_anchors_preset(Control.PRESET_FULL_RECT)
+   583→                vb.alignment = BoxContainer.ALIGNMENT_CENTER
+   584→                vb.add_theme_constant_override("separation", 0)
+   585→                vb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   586→                var num := Label.new()
+   587→                num.text = str(id)
+   588→                if font_display != null:
+   589→                        num.add_theme_font_override("font", font_display)
+   590→                num.add_theme_font_size_override("font_size", 46)
+   591→                num.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   592→                num.add_theme_color_override("font_color", COL_CREAM if unlocked else Color(0.55, 0.53, 0.50))
+   593→                num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   594→                vb.add_child(num)
+   595→                var stars := Label.new()
+   596→                var st_txt := ""
+   597→                for s in 3:
+   598→                        st_txt += "٭" if s < st else "·"
+   599→                stars.text = st_txt
+   600→                if font_bold != null:
+   601→                        stars.add_theme_font_override("font", font_bold)
+   602→                stars.add_theme_font_size_override("font_size", 20)
+   603→                stars.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   604→                stars.add_theme_color_override("font_color", COL_GOLD if st > 0 else Color(0.42, 0.44, 0.47))
+   605→                stars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   606→                vb.add_child(stars)
+   607→                b.add_child(vb)
+   608→                b.pressed.connect(_start_level.bind(id))
+   609→                grid.add_child(b)
+   610→                if id == 1:
+   611→                        first_tile = b
+   612→        scroll.add_child(grid)
+   613→        lv.add_child(scroll)
+   614→        var b_back1 := _mk_button(Globals.L("back"), 28, "dark", 68)
+   615→        b_back1.pressed.connect(func(): _show(panel_home))
+   616→        back_btn = b_back1
+   617→        lv.add_child(b_back1)
+   618→        # پنل مستقیم (بدون CenterContainer تمام‌صفحه — درس v0.8)
+   619→        add_child(panel_levels)
+   620→        panel_levels.visible = false
+   621→
+   622→func _deco_brain() -> void:
+   623→        brain = BRAIN_SCRIPT.new()
+   624→        add_child(brain)
+   625→        # حباب حرف در منو حذف شد — لحن جدی‌تر؛ مغز فقط نفس‌کشیدن را می‌دهد
+   626→
+   627→func _deco_version() -> void:
+   628→        # برچسب نسخه از Globals — دیگر هرگز دستی نیست (باگ «v0.9 هاردکد»)
+   629→        var l := _mk_label("بوقی v%s (build %d)  •  از استودیو ایماروید" % [Globals.VERSION, Globals.BUILD], 16, true, false, Color(1, 1, 1, 0.58))
+   630→        l.anchor_left = 0.0
+   631→        l.anchor_right = 1.0
+   632→        l.anchor_top = 1.0
+   633→        l.anchor_bottom = 1.0
+   634→        l.offset_left = 16.0
+   635→        l.offset_right = -16.0
+   636→        l.offset_top = -34.0
+   637→        l.offset_bottom = -8.0
+   638→        l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+   639→        l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+   640→        add_child(l)
+   641→
+   642→func _build_ui() -> void:
+   643→        _build_title()
+   644→        _build_home_panel()
+   645→        _build_levels_panel()
+   646→        _show(panel_home)
+   647→
+   648→func _show(p: PanelContainer) -> void:
+   649→        if panel_home == null or panel_levels == null:
+   650→                return
+   651→        panel_home.visible = p == panel_home
+   652→        panel_levels.visible = p == panel_levels
+   653→        # تیتر فقط مال صفحه‌ی خانه است (لیست ماموریت‌ها خودش هدر دارد)
+   654→        for n in title_nodes:
+   655→                if is_instance_valid(n):
+   656→                        n.visible = p == panel_home
+   657→        for n in deco_cars:
+   658→                if is_instance_valid(n):
+   659→                        n.visible = p == panel_home
+   660→        # هر باز شدن مأموریت‌ها: تیکه تازه‌ی اکبر
+   661→        if p == panel_levels and akbar_line_label != null:
+   662→                var line := CarBrain.pick_line("akbar", "idle")
+   663→                if line.is_empty():
+   664→                        line = "امروز جاده مال ماست!"
+   665→                akbar_line_label.text = line
+   666→                if brain != null and akbar_rect != null and is_instance_valid(akbar_rect) and akbar_rect.texture != null:
+   667→                        brain.say(akbar_rect, "akbar", "idle")
+   668→        _refresh()
+   669→
+   670→func _on_plate_changed() -> void:
+   671→        Globals.plate_name = plate_edit.text.strip_edges()
+   672→        if Globals.plate_name.is_empty():
+   673→                Globals.plate_name = "بوقی"
+   674→        Globals.save_game()
+   675→
+   676→func _refresh() -> void:
+   677→        if coin_label:
+   678→                coin_label.text = str(Globals.coins)
+   679→        if plate_edit:
+   680→                plate_edit.text = Globals.plate_name
+   681→
+   682→func _start_level(id: int) -> void:
+   683→        Globals.set_meta("start_level", id)
+   684→        get_tree().change_scene_to_file("res://scenes/game.tscn")
+   685→

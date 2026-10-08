@@ -20,6 +20,8 @@ var coin_label: Label
 var plate_edit: LineEdit
 var brain = null
 var deco_cars: Array = []
+var _drive_car: Node2D = null
+var _drive_spd := 220.0
 var online_ov: Control = null
 var _expect_online := false
 var back_btn: Button
@@ -89,6 +91,15 @@ func _ready() -> void:
                 _onlinetest()
         if uargs.has("--autotest"):
                 _autotest()
+        if uargs.has("--menushot"):
+                _menushot()
+
+## شات منو بعد از ورود ماشین درایو-بای — برای بازبینی خودم
+func _menushot() -> void:
+        await get_tree().create_timer(4.6).timeout
+        _shot("/home/z/my-project/scripts/shot_menu_live.png")
+        print("[boghi][menu] live shot saved")
+        get_tree().quit()
 
 func _autotest() -> void:
         await get_tree().create_timer(1.2).timeout
@@ -260,6 +271,12 @@ func _mk_button(txt: String, size := 26, kind := "red", h := 74) -> Button:
         b.add_theme_font_size_override("font_size", size)
         b.custom_minimum_size = Vector2(320, h)
         _style_btn(b, kind)
+        # فیدبک شنیداری/بصری — منوی زنده
+        b.pressed.connect(func():
+                if has_node("/root/AudioMgr"):
+                        get_node("/root/AudioMgr").ui_click())
+        b.mouse_entered.connect(func(): b.modulate = Color(1.12, 1.12, 1.1))
+        b.mouse_exited.connect(func(): b.modulate = Color.WHITE)
         return b
 
 ## سایهٔ نرم زیر ماشین‌ها
@@ -309,29 +326,71 @@ func _add_gradient(top: bool) -> void:
                 tr.anchor_bottom = 1.0
         add_child(tr)
 
-## ماشین قهرمان — اسپرایت top-down هنر نو با آندرگلو بیک‌شده
+## ماشین زنده‌ی منو — بوقی top-down با مخروط نور، در خیابان پایینِ نقاشی رد می‌شود
 func _deco_cars() -> void:
-        var hero := TextureRect.new()
-        var htex := _safe_load("res://assets/sprites/menu_hero.png")
-        if htex == null:
+        var tex := _safe_load("res://assets/sprites/boghi_top.png")
+        if tex == null:
                 return
-        hero.texture = htex
-        hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        hero.anchor_left = 0.02
-        hero.anchor_right = 0.02
-        hero.anchor_top = 1.0
-        hero.anchor_bottom = 1.0
-        hero.offset_left = -20.0
-        hero.offset_right = 250.0
-        hero.offset_top = -400.0
-        hero.offset_bottom = 30.0
-        hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        add_child(hero)
-        deco_cars.append(hero)
-        move_child(hero, 1)
-        if brain != null:
-                BRAIN_SCRIPT.add_breathing(hero, 4.0, 1.1)
+        _drive_car = Node2D.new()
+        var lmat := CanvasItemMaterial.new()
+        lmat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+        var sh := Sprite2D.new()
+        sh.texture = _safe_load("res://assets/sprites/light_soft.png")
+        sh.scale = Vector2(2.6, 1.2)
+        sh.modulate = Color(0, 0, 0.02, 0.5)
+        sh.position = Vector2(4, 14)
+        _drive_car.add_child(sh)
+        var ug := Sprite2D.new()
+        ug.texture = _safe_load("res://assets/sprites/light_soft.png")
+        ug.scale = Vector2(2.4, 0.95)
+        ug.modulate = Color(0.5, 0.9, 1.0, 0.32)
+        ug.material = lmat
+        ug.position = Vector2(0, 8)
+        _drive_car.add_child(ug)
+        var cone := Sprite2D.new()
+        cone.texture = _safe_load("res://assets/sprites/headlight_cone.png")
+        cone.centered = false
+        cone.position = Vector2(26, -104)
+        cone.scale = Vector2(0.8, 0.8)
+        cone.material = lmat
+        cone.modulate = Color(1.0, 0.95, 0.8, 0.42)
+        _drive_car.add_child(cone)
+        var spr := Sprite2D.new()
+        spr.texture = tex
+        spr.scale = Vector2(1.3, 1.3)
+        _drive_car.add_child(spr)
+        add_child(_drive_car)
+        move_child(_drive_car, 1)  # پشت پنل/تیتر — جلوی پس‌زمینه
+        _drive_reset(true)
+        set_process(true)
+
+var _drive_wait := 0.0
+
+func _drive_reset(first: bool) -> void:
+        var from_left := randf() < 0.5
+        _drive_car.position = Vector2(-280.0 if from_left else 1560.0, randf_range(648.0, 678.0))
+        _drive_spd = (1.0 if from_left else -1.0) * randf_range(190.0, 280.0)
+        _drive_car.scale = Vector2.ONE
+        _drive_car.skew = 0.0
+        if not from_left:
+                # رد شدن از راست به چپ — ماشین برعکس (rotation π) و کمی پایین‌تر
+                _drive_car.rotation = PI
+                _drive_car.position.y += 6.0
+        else:
+                _drive_car.rotation = 0.0
+        _drive_wait = randf_range(2.2, 5.0) if not first else 0.8
+
+func _process(delta: float) -> void:
+        if _drive_car == null:
+                return
+        if _drive_wait > 0.0:
+                _drive_wait -= delta
+                return
+        _drive_car.position.x += _drive_spd * delta
+        # لرزش خیلی ظریف جاده — حس موتور روشن
+        _drive_car.position.y += sin(Time.get_ticks_msec() * 0.02) * 0.06
+        if _drive_car.position.x < -340.0 or _drive_car.position.x > 1620.0:
+                _drive_reset(false)
 
 ## تیتر موتوری — همیشه رندر می‌شود؛ داخل ناحیه امن استاتوس‌بار
 func _build_title() -> void:
@@ -388,9 +447,9 @@ func _build_home_panel() -> void:
         panel_home.add_theme_stylebox_override("panel", _sb(COL_GLASS, Color(0.85, 0.68, 0.28, 0.45), 22, 2))
         # اندازه بزرگ — دکمه‌ها باید حداقل ارتفاعِ لمس اندروید (~۸۸px کانواس) را داشته باشند
         # چیدمان دوستونه تا هم دکمه بلند باشد هم زیر تیتر (تا y=۱۶۰) جا شود
-        panel_home.custom_minimum_size = Vector2(560, 488)
+        panel_home.custom_minimum_size = Vector2(560, 452)
         panel_home.set_anchors_preset(Control.PRESET_CENTER)
-        panel_home.offset_top = 176.0 # کاملاً زیر زیرنویس نو (تا y≈۱۷۰) — تداخل ممنوع
+        panel_home.offset_top = 228.0 # زیرنویس تا y=۲۱۶ — هشت پیکسل نفس
         panel_home.grow_horizontal = Control.GROW_DIRECTION_BOTH
         panel_home.grow_vertical = Control.GROW_DIRECTION_BOTH
         add_child(panel_home)

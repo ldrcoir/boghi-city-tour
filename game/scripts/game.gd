@@ -15,6 +15,8 @@ const TURN_RATE := 2.55
 const GRIP := 9.0
 const DRIFT_GRIP := 2.25
 const NITRO_MULT := 1.40
+# گیربکس مجازی — مرزهای دنده بر حسب کسر سرعت ماکزیمم (حس واقعی دور موتور)
+const GEARS := [0.0, 0.15, 0.31, 0.50, 0.72, 1.02]
 
 # پیست — از city_layout.json (بیک gen15_map.py) بارگذاری می‌شود
 const LAYOUT_PATH := "res://data/city_layout.json"
@@ -55,6 +57,12 @@ var drifting := false
 var nitro_on := false
 var nitro_meter := 1.0
 var nitro_drain := 0.30
+var _nitro_was := false
+var gear := 1
+var rpm_s := 0.16
+var _shift_cd := 0.0
+var brake_glow: Sprite2D = null
+var puff: CPUParticles2D = null
 var steer_left := false
 var steer_right := false
 var brake_held := false
@@ -154,7 +162,7 @@ func _ready() -> void:
         car_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
         car_anchor.size = Vector2.ZERO
         hud.add_child(car_anchor)
-        mission_label.text = Globals.L("mission") + " " + fa(int(lv["id"])) + ": " + str(lv["name"])
+        mission_label.text = Globals.L("mission") + " " + fa(int(lv["id"])) + " — " + str(lv["name"])
         var mtw := create_tween()
         mtw.tween_interval(5.0)
         mtw.tween_property(mission_label, "modulate:a", 0.0, 0.8)
@@ -237,6 +245,9 @@ func _build_world() -> void:
         under.color = Color(0.027, 0.031, 0.055)
         under.position = map_rect.position - Vector2(4000, 4000)
         under.size = map_rect.size + Vector2(8000, 8000)
+        # ⛔ فیکس باگ بزرگ: mouse_filter پیش‌فرض STOP است — این مستطیل تمام‌صفحه
+        # همه‌ی لمس‌ها را می‌بلعید و فرمان لمسی روی کل بازی مرده بود!
+        under.mouse_filter = Control.MOUSE_FILTER_IGNORE
         world.add_child(under)
         # نقشه‌ی شهر — ۴ تایل بیک‌شده (gen15_map) — کیفیت ۱:۱
         var tw := map_rect.size.x * 0.5
@@ -327,6 +338,17 @@ func _make_car_node(id: String, with_fx: bool, light_alpha: float) -> Dictionary
         n.add_child(ug)
         var fl: CPUParticles2D = null
         var sm: CPUParticles2D = null
+        var pf: CPUParticles2D = null
+        var brk := Sprite2D.new()
+        brk.texture = load("res://assets/sprites/light_soft.png")
+        brk.position = Vector2(-93, 0)
+        brk.scale = Vector2(0.55, 0.40)
+        brk.modulate = Color(1.0, 0.16, 0.10, 0.10)
+        var bmat := CanvasItemMaterial.new()
+        bmat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+        brk.material = bmat
+        brk.z_index = 1
+        n.add_child(brk)
         if with_fx:
                 fl = CPUParticles2D.new()
                 fl.position = Vector2(-95, 0)
@@ -367,7 +389,25 @@ func _make_car_node(id: String, with_fx: bool, light_alpha: float) -> Dictionary
                 sm2.scale_amount_max = 1.15
                 sm = sm2
                 n.add_child(sm2)
-        return {"node": n, "spr": spr, "flame": fl, "smoke": sm}
+                # دود آرام اگزوز درجا — نفس موتور خام
+                pf = CPUParticles2D.new()
+                pf.position = Vector2(-97, 8)
+                pf.emitting = false
+                pf.amount = 7
+                pf.lifetime = 1.15
+                pf.direction = Vector2(-1, 0)
+                pf.spread = 15.0
+                pf.initial_velocity_min = 24.0
+                pf.initial_velocity_max = 58.0
+                pf.scale_amount_min = 2.2
+                pf.scale_amount_max = 4.2
+                pf.texture = load("res://assets/sprites/smoke.png")
+                var pg := Gradient.new()
+                pg.offsets = PackedFloat32Array([0.0, 1.0])
+                pg.colors = PackedColorArray([Color(0.76, 0.76, 0.8, 0.3), Color(0.7, 0.7, 0.76, 0.0)])
+                pf.color_ramp = pg
+                n.add_child(pf)
+        return {"node": n, "spr": spr, "flame": fl, "smoke": sm, "puff": pf, "brake": brk}
 
 func _build_car(stats: Dictionary) -> void:
         car = Node2D.new()
@@ -378,6 +418,8 @@ func _build_car(stats: Dictionary) -> void:
         car_sprite = fx["spr"]
         flame = fx["flame"]
         smoke = fx["smoke"]
+        puff = fx["puff"]
+        brake_glow = fx["brake"]
         car_pos = _path_pos(0.0)
         heading = _path_dir(0.0).angle()
         car.position = car_pos
@@ -406,6 +448,7 @@ func _spawn_rivals() -> void:
                         "pace": randf_range(0.965, 1.045),
                         "lane": float(lanes[i]), "lane_cur": float(lanes[i]),
                         "ang": 0.0, "corner": false, "mt": 0.0,
+                        "brake": fx["brake"], "dec": false,
                 })
 
 func _spawn_traffic(s_abs: float) -> void:
@@ -435,7 +478,7 @@ func _spawn_coins(s_abs: float) -> void:
                 n.z_index = 2
                 var spr := Sprite2D.new()
                 spr.texture = tex
-                spr.scale = Vector2(0.55, 0.55)
+                spr.scale = Vector2(0.78, 0.78)
                 n.add_child(spr)
                 var pos: Vector2 = _path_pos(s_abs + i * 115.0) + nn * lane
                 n.position = pos
@@ -509,8 +552,8 @@ func _build_hud() -> void:
         _place(coin_label, 1.0, 0.0, 1.0, 0.0, -280, 46, -70, 96)
         time_label = _hud_label(font, 32, Vector2.ZERO, Color(0.95, 0.4, 0.3))
         _place(time_label, 1.0, 0.0, 1.0, 0.0, -280, 100, -70, 144)
-        mission_label = _hud_label(font, 26, Vector2.ZERO, Color(0.9, 0.9, 0.95, 0.85))
-        _place(mission_label, 0.0, 0.0, 1.0, 0.0, 130, 46, -20, 86)
+        mission_label = _hud_label(font, 24, Vector2.ZERO, Color(0.9, 0.9, 0.95, 0.85))
+        _place(mission_label, 0.0, 0.0, 1.0, 0.0, 240, 176, -240, 214)
         mission_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
         # دکمه توقف — بالا چپ
@@ -572,7 +615,7 @@ func _build_hud() -> void:
         nitro_bar.add_theme_stylebox_override("fill", _sb(Color(0.25, 0.65, 1.0), Color(0.15, 0.4, 0.9), 6, 0, false))
         nitro_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
         hud.add_child(nitro_bar)
-        _place(nitro_bar, 0.5, 1.0, 0.5, 1.0, -130, -252, 130, -228)
+        _place(nitro_bar, 0.5, 1.0, 0.5, 1.0, -110, -192, 110, -170)
 
         # گیج سرعت — سفارشی (قوس + عقربه) + عدد کیلومتر
         gauge = SpeedGauge.new()
@@ -583,7 +626,7 @@ func _build_hud() -> void:
         kmh_label = _hud_label(font, 56, Vector2.ZERO, Color(0.98, 0.98, 1.0))
         kmh_label.add_theme_constant_override("outline_size", 10)
         kmh_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        _place(kmh_label, 0.5, 1.0, 0.5, 1.0, -85, -150, 85, -85)
+        _place(kmh_label, 0.5, 1.0, 0.5, 1.0, -90, -134, 90, -74)
 
         # خطوط سرعت نیترو
         lines = SpeedLines.new()
@@ -864,7 +907,8 @@ func _toggle_pause() -> void:
         if pause_overlay != null:
                 pause_overlay.visible = t.paused
         AudioMgr.set_engine(not t.paused, 0.3)
-        AudioMgr.set_skid(false)
+        AudioMgr.set_skid(not t.paused, 0.0)
+        AudioMgr.set_wind(0.0 if t.paused else 0.2)
 
 # ─────────────────────────── حلقه اصلی ───────────────────────────
 func _process(delta: float) -> void:
@@ -894,7 +938,7 @@ func _process(delta: float) -> void:
                         itw.parallel().tween_property(intro_label, "modulate:a", 0.0, 0.4).set_delay(0.25)
                 if intro <= 0.0:
                         intro_label.visible = false
-                AudioMgr.set_engine(true, clampf(0.85 - intro * 0.3, 0.15, 0.85))
+                AudioMgr.set_engine_ex(true, clampf(0.85 - intro * 0.3, 0.15, 0.85), 0.55, false)
                 cam.zoom = cam.zoom.lerp(Vector2(1.05, 1.05), delta * 2.0)
                 _update_rivals(delta)
                 return
@@ -924,8 +968,7 @@ func _update_player(delta: float) -> void:
                 vel *= exp(-1.6 * delta)
                 car_pos += vel * delta
                 car.position = car_pos
-                AudioMgr.set_engine(false)
-                AudioMgr.set_skid(false)
+                AudioMgr.stop_driving_loops()
                 return
 
         var fwd := Vector2.RIGHT.rotated(heading)
@@ -948,8 +991,12 @@ func _update_player(delta: float) -> void:
                 if drifting:
                         AudioMgr.set_skid(true, 0.7)
 
-        # نیترو
+        # نیترو — با پانچ لحظه‌ای (حس تزریق)
         nitro_on = nitro_held and nitro_meter > 0.02 and not brake_held
+        if nitro_on and not _nitro_was:
+                vel += fwd * 135.0
+                shake = maxf(shake, 1.4)
+        _nitro_was = nitro_on
         if nitro_on:
                 nitro_meter = maxf(0.0, nitro_meter - nitro_drain * delta)
                 if not lines.visible:
@@ -1027,12 +1074,35 @@ func _update_player(delta: float) -> void:
         var skid_amt := clampf(1.0 - (grip / grip_norm) + (vl.length() / 240.0), 0.0, 1.0)
         AudioMgr.set_skid(drifting and absf(vf) > 100.0, skid_amt)
 
-        # صدا + افکت
-        AudioMgr.set_engine(true, clampf(absf(vf) / max_s, 0.12, 1.0) * (1.12 if nitro_on else 1.0))
+        # گیربکس مجازی — دور موتور اره‌ای: بالا می‌رود، دنده عوض می‌شود، می‌افتد
+        var sn2 := clampf(absf(vf) / max_s, 0.0, 1.04)
+        var g := 1
+        while g < GEARS.size() and sn2 > GEARS[g]:
+                g += 1
+        var lo := float(GEARS[g - 1])
+        var hi := float(GEARS[g])
+        var rt := clampf((sn2 - lo) / maxf(0.02, hi - lo), 0.0, 1.0)
+        rt = 0.16 + 0.84 * rt
+        if nitro_on:
+                rt = minf(1.0, rt + 0.12)
+        rpm_s = lerpf(rpm_s, rt, minf(1.0, delta * 11.0))
+        if g != gear:
+                if g > gear and sn2 > 0.06 and _shift_cd <= 0.0:
+                        AudioMgr.play_sfx("shift", -11.0)
+                        _shift_cd = 0.22
+                gear = g
+        _shift_cd = maxf(0.0, _shift_cd - delta)
+        AudioMgr.set_engine_ex(true, rpm_s, 0.25 if brake_held else 1.0, nitro_on)
+        AudioMgr.set_wind(clampf(sn2 * 1.08, 0.0, 1.0))
         if flame != null:
                 flame.emitting = nitro_on
         if lines != null:
                 lines.visible = nitro_on
+        if puff != null:
+                puff.emitting = absf(vf) < 95.0
+        if brake_glow != null:
+                var btgt := 0.85 if (brake_held or (drifting and absf(vf) > 190.0)) else 0.1
+                brake_glow.modulate.a = lerpf(brake_glow.modulate.a, btgt, minf(1.0, delta * 10.0))
 
         # اعمال به نود
         car.position = car_pos
@@ -1042,6 +1112,28 @@ func _update_player(delta: float) -> void:
                 car_sprite.modulate = Color(1.0, 0.6, 0.55, 0.9)
         else:
                 car_sprite.modulate = Color(1, 1, 1)
+
+func _spawn_sparks(p: Vector2, n: int = 15) -> void:
+        var sp := CPUParticles2D.new()
+        sp.position = p
+        sp.amount = n
+        sp.lifetime = 0.5
+        sp.one_shot = true
+        sp.explosiveness = 1.0
+        sp.direction = Vector2.UP
+        sp.spread = 180.0
+        sp.gravity = Vector2(0, 950)
+        sp.initial_velocity_min = 170.0
+        sp.initial_velocity_max = 430.0
+        sp.scale_amount_min = 1.6
+        sp.scale_amount_max = 3.4
+        var sg := Gradient.new()
+        sg.offsets = PackedFloat32Array([0.0, 0.7, 1.0])
+        sg.colors = PackedColorArray([Color(1.0, 0.92, 0.6), Color(1.0, 0.55, 0.2), Color(0.8, 0.2, 0.05, 0.0)])
+        sp.color_ramp = sg
+        world.add_child(sp)
+        sp.emitting = true
+        get_tree().create_timer(1.3).timeout.connect(sp.queue_free)
 
 func _resolve_buildings() -> void:
         for b in buildings:
@@ -1063,6 +1155,7 @@ func _resolve_buildings() -> void:
                                 vel *= 0.42
                                 shake = 7.0
                                 AudioMgr.play_sfx("crash")
+                                _spawn_sparks(car_pos - vel.normalized() * 34.0 if vel.length() > 20.0 else car_pos, 16)
         # موانع استاتیک — درخت/تیر چراغ/ماشین پارک‌شده (برخورد دایره‌ای نرم)
         for so in solids:
                 var dv: Vector2 = car_pos - so["pos"]
@@ -1075,6 +1168,7 @@ func _resolve_buildings() -> void:
                                 vel *= 0.55
                                 shake = maxf(shake, 4.0)
                                 AudioMgr.play_sfx("clank")
+                                _spawn_sparks(so["pos"] + dv.normalized() * float(so["r"]), 8)
 
 func _car_contacts(_delta: float) -> void:
         for R in rivals:
@@ -1092,6 +1186,7 @@ func _car_contacts(_delta: float) -> void:
                         vel *= 0.34
                         shake = 10.0
                         AudioMgr.play_sfx("crash")
+                        _spawn_sparks((car_pos + tp) * 0.5, 18)
                         T["spd"] *= 0.4
                         T["lane"] += (30.0 if T["lane"] > 0 else -30.0)
 
@@ -1147,6 +1242,7 @@ func _update_rivals(delta: float) -> void:
                         var ang := absf(d1.angle_to(d2))
                         var cs := 1.0 - clampf(ang * 0.62, 0.0, 0.44)
                         R["corner"] = ang > 0.3
+                        R["dec"] = cs < 0.82
                         R["spd"] = lerpf(float(R["spd"]), base * cs, delta * 2.0)
                         s += float(R["spd"]) * delta
                         R["s"] = s
@@ -1159,6 +1255,10 @@ func _update_rivals(delta: float) -> void:
                 var ta := dd.angle()
                 R["node"].rotation = lerp_angle(float(R["node"].rotation), ta, delta * 6.0)
                 R["ang"] = absf(dd.angle_to(Vector2.RIGHT.rotated(float(R["node"].rotation))))
+                # چراغ ترمز رقیب — موقع کند شدن در پیچ می‌سوزد
+                var brk: Sprite2D = R["brake"]
+                var btgt := 0.8 if (racing and bool(R["dec"])) else 0.08
+                brk.modulate.a = lerpf(brk.modulate.a, btgt, minf(1.0, delta * 9.0))
                 # رد لاستیک رقیب در پیچ تند — تایمر مستقل خودش (باگ اشتراک _mark_t)
                 if racing and bool(R["corner"]) and float(R["spd"]) > 300.0:
                         R["mt"] = float(R["mt"]) - delta * 0.5
@@ -1295,6 +1395,14 @@ func _celebrate(win: bool) -> void:
         if brain != null and car_anchor != null:
                 var my_id := str(Globals.CARS[Globals.selected_car]["id"])
                 brain.say(car_anchor, my_id, "win" if win else "lose")
+                # حباب شخصیت نباید روی پنل پایان بیفتد — بالا-وسط و عمر کوتاه
+                await get_tree().process_frame
+                if brain.bubble != null and is_instance_valid(brain.bubble):
+                        brain.bubble.position = Vector2((VIEW_W - brain.bubble.size.x) * 0.5, 92.0)
+                        get_tree().create_timer(2.1).timeout.connect(func():
+                                if brain.bubble != null and is_instance_valid(brain.bubble):
+                                        brain.bubble.queue_free()
+                                        brain.bubble = null)
 
 func _show_end(win: bool, stars: int, reward: int) -> void:
         end_panel = PanelContainer.new()
@@ -1373,6 +1481,13 @@ func _run_autotest(delta: float) -> void:
                                 _press_at(Vector2(VIEW_W * 0.15, VIEW_H * 0.72)) # خنثی‌سازی — برگرد مسیر
                                 var turned := absf(angle_difference(_at_heading0, heading))
                                 print("[boghi][autotest] STEER-RIGHT ", "OK" if turned > 0.08 else "FAIL turned=" + str(turned))
+                                # شهر جدید چگال است — بعد از تست فرمان، ماشین وسط مسیر قرار می‌گیرد
+                                # تا نیترو/دریفت واقعاً تست شوند، نه برخورد با ساختمان
+                                var rs := path_s + 60.0
+                                car_pos = _path_pos(rs)
+                                heading = _path_dir(rs).angle()
+                                vel = _path_dir(rs) * max_s * 0.85
+                                path_s = rs
                                 if turned <= 0.08:
                                         get_tree().quit(1)
                 2:
@@ -1391,6 +1506,12 @@ func _run_autotest(delta: float) -> void:
                         # تست دریفت: ترمز + فرمان راست در سرعت → لغزش + جیغ لاستیک
                         if _auto_timer > 2.4 and _at_stage == 4:
                                 _at_stage = 7
+                                # دنیا زنده است (ترافیک/پیچ) — ماشین دوباره تازه وسط مسیر سریع می‌شود
+                                var rs2 := path_s + 40.0
+                                car_pos = _path_pos(rs2)
+                                heading = _path_dir(rs2).angle()
+                                vel = _path_dir(rs2) * max_s * 0.95
+                                path_s = rs2
                                 _press_at(Vector2(380.0, VIEW_H - 120.0)) # ترمز
                                 _press_at(Vector2(VIEW_W * 0.85, VIEW_H * 0.72)) # فرمان راست
                                 _drift_seen = false
